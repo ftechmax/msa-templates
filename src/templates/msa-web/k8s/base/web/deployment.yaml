@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: applicationname-web
+  labels:
+    app: applicationname-web
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: applicationname-web
+  template:
+    metadata:
+      labels:
+        app: applicationname-web
+      annotations:
+        prometheus.io.scrape: 'true'
+        voortman.health: 'true'
+    spec:
+      containers:
+        - name: applicationname-web
+          image: applicationname-web
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APPLICATIONNAME_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: applicationname-web-config
+                  key: applicationname-url
+            - name: INTERNATIONALIZATION_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: applicationname-web-config
+                  key: internationalization-url
+          volumeMounts:
+            - mountPath: /var/cache/nginx/
+              name: cache
+            - mountPath: /var/log/nginx/
+              name: log
+            - mountPath: /etc/nginx/conf.d/
+              name: confd
+            - mountPath: /var/run/
+              name: run
+          resources:
+            limits:
+              memory: 25Mi
+              cpu: 500m
+            requests:
+              memory: 5Mi
+              cpu: 10m
+      volumes:
+        - emptyDir: {}
+          name: cache
+        - emptyDir: {}
+          name: log
+        - emptyDir: {}
+          name: confd
+        - emptyDir: {}
+          name: run

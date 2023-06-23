@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "ApplicationName.Worker": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE": "false"
+      },
+      "applicationUrl": "http://localhost:5001",
+      "dotnetRunMessages": true
+    },
+    "Bridge to Kubernetes": {
+      "commandName": "AzureDevSpacesLocal"
+    }
+  }
+}

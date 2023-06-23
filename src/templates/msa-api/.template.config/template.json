@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Voortman",
+  "classifications": ["Web", "WebAPI", "MSA"],
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "name": ".NET 6 API microservice",
+  "description": "A WebApi microservice solution",
+  "identity": "Voortman.Dotnet.MSA.API",
+  "shortName": "msa-api",
+  "defaultName": "Api1",
+  "sourceName": "ApplicationName",
+  "preferNameDirectory": true,
+  "primaryOutputs": [{ "path": "ApplicationName.sln" }],
+  "symbols": {
+    "RabbitMqSecret": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "rabbitmq-default-user",
+      "replaces": "{{RABBITMQ-SECRET-NAME}}",
+      "description": "The name of the RabbitMQ secret"
+    },
+    "MongoDbSecret": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "mongodb-user-password",
+      "replaces": "{{MONGODB-SECRET-NAME}}",
+      "description": "The name of the MongoDB secret"
+    }
+  }
+}
