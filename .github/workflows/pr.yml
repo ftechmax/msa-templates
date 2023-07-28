@@ -3,7 +3,7 @@ name: Pull request build
 on:
   merge_group:
   pull_request:
-     types: [opened, synchronize]
+    types: [opened, synchronize]
 
 jobs:
   build:
@@ -17,5 +17,4 @@ jobs:
           fetch-depth: 0
 
       - name: Build
-        run: dotnet build
-
+        run: dotnet build ./src/MSA.Templates.sln
