@@ -10,7 +10,7 @@ on:
 jobs:
   release:
     name: Release package
-    runs-on: [linux, ubuntu-latest]
+    runs-on: [ubuntu-latest]
     container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
     permissions:
       contents: write
