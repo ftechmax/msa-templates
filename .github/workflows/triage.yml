@@ -7,7 +7,7 @@ on:
 jobs:
   label:
     name: Label pull request
-    runs-on: [ubuntu-latest]
+    runs-on: [linux, ubuntu-latest]
     container: alpine
     permissions:
       contents: read
@@ -15,5 +15,5 @@ jobs:
     steps:
       - uses: actions/labeler@v4
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
           sync-labels: true

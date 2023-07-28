@@ -3,15 +3,18 @@ name: Release package
 on:
   push:
     branches:
-      - 'main'
+      - "main"
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
   release:
     name: Release package
-    runs-on: [ubuntu-latest]
+    runs-on: [linux, ubuntu-latest]
     container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
     permissions:
       contents: write
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -21,24 +24,26 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
         with:
-          versionSpec: '6.x'
+          versionSpec: "6.x"
           preferLatestVersion: true
 
       - name: Determine Version
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0
 
-      - name: Pack code to package
-        run: dotnet pack MSA.Templates.csproj -c Release --include-symbols
+      - name: Create package
+        run: dotnet pack MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
 
-      - name: Ship package
-        run: dotnet nuget push $GITHUB_WORKSPACE/**/*.symbols.nupkg -k ${{ secrets.CI_NUGET_TOKEN }} -s ${{ secrets.CI_NUGET_RELEASE_REPO }}
+      - name: Publish package
+        run: |-
+          dotnet nuget add source --username $GITHUB_REPOSITORY_OWNER --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json"
+          dotnet nuget push $GITHUB_WORKSPACE/**/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
 
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.gitversion.outputs.semVer }}
-          commit: 'main'
-          name: Release ${{ steps.gitversion.outputs.semVer }}
-          generateReleaseNotes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Create release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     tag: ${{ steps.gitversion.outputs.semVer }}
+      #     commit: "main"
+      #     name: Release ${{ steps.gitversion.outputs.semVer }}
+      #     generateReleaseNotes: true
+      #     token: ${{ secrets.GITHUB_TOKEN }}
