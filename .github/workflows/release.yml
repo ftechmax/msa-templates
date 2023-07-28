@@ -8,10 +8,10 @@ on:
 jobs:
   release:
     name: Release package
-    runs-on: [self-hosted, linux]
+    runs-on: [ubuntu-latest]
+    container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
     permissions:
       contents: write
-    container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Pack code to package
-        run: dotnet pack Voortman.Templates.csproj -c Release --include-symbols
+        run: dotnet pack MSA.Templates.csproj -c Release --include-symbols
 
       - name: Ship package
         run: dotnet nuget push $GITHUB_WORKSPACE/**/*.symbols.nupkg -k ${{ secrets.CI_NUGET_TOKEN }} -s ${{ secrets.CI_NUGET_RELEASE_REPO }}
