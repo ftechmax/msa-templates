@@ -1,0 +1,34 @@
+name: Release package
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  release:
+    name: Release package
+    runs-on: [self-hosted, linux]
+    permissions:
+      contents: write
+    container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Pack code to package
+        run: dotnet pack Voortman.Templates.csproj -c Release --include-symbols
+
+      - name: Ship package
+        run: dotnet nuget push $GITHUB_WORKSPACE/**/*.symbols.nupkg -k ${{ secrets.CI_NUGET_TOKEN }} -s ${{ secrets.CI_NUGET_RELEASE_REPO }}
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.GitVersion_SemVer }}
+          commit: 'main'
+          name: Release ${{ env.GitVersion_SemVer }}
+          generateReleaseNotes: true
+          token: ${{ secrets.GITHUB_TOKEN }}

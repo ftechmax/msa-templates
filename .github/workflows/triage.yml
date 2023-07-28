@@ -1,0 +1,18 @@
+#label selection can be found in ..\labeler.yml
+
+name: Labeler
+on: [pull_request]
+
+jobs:
+  label:
+    runs-on: [self-hosted, linux]
+    container: alpine
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/labeler@v4
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        sync-labels: true
