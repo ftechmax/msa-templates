@@ -6,5 +6,5 @@ resources:
   - ./../../base
 images:
   - name: applicationname-worker
-    newName: dockerregistry.voortman.net/applicationname-worker
+    newName: '{{DEV_REGISTRY}}/applicationname-worker'
     newTag: '{{IMAGE_TAG}}'

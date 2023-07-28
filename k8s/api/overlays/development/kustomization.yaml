@@ -8,24 +8,24 @@ patches:
   - patch: |-
       - op: replace
         path: '/spec/hostname'
-        value: 'applicationname.devkube.voortman.net'
+        value: 'applicationname.{{DEV_HOSTNAME}}'
       - op: add
         path: '/spec/cors/origins/-'
-        value: 'http://applicationname.devkube.voortman.net'
+        value: 'http://applicationname.{{DEV_HOSTNAME}}'
     target:
       kind: Mapping
       name: applicationname-api
   - patch: |-
       - op: replace
         path: '/spec/hostname'
-        value: 'applicationname.devkube.voortman.net'
+        value: 'applicationname.{{DEV_HOSTNAME}}'
       - op: add
         path: '/spec/cors/origins/-'
-        value: 'http://applicationname.devkube.voortman.net'
+        value: 'http://applicationname.{{DEV_HOSTNAME}}'
     target:
       kind: Mapping
       name: applicationname-api-hub
 images:
   - name: applicationname-api
-    newName: 'dockerregistry.voortman.net/applicationname-api'
+    newName: '{{DEV_REGISTRY}}/applicationname-api'
     newTag: '{{IMAGE_TAG}}'

@@ -17,7 +17,6 @@ spec:
         app: applicationname-worker
       annotations:
         prometheus.io.scrape: 'true'
-        voortman.health: 'true'
     spec:
       containers:
         - name: applicationname-worker
