@@ -7,7 +7,7 @@ on:
 jobs:
   label:
     name: Label pull request
-    runs-on: [linux, ubuntu-latest]
+    runs-on: [ubuntu-latest]
     container: alpine
     permissions:
       contents: read

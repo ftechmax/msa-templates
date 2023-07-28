@@ -1,15 +1,8 @@
-code:
-  - '**/*.cs'
-
-frontend:
-  - '**/*.ts'
-  - '**/*.scss'
-
 documentation:
-  - '**/*.MD'
-  - '**/*.md'
+  - "**/*.MD"
+  - "**/*.md"
 
 automation:
-  - '.github/**'
-  - '.git*'
-  - 'NuGet.config'
+  - ".github/**"
+  - ".git*"
+  - "NuGet.config"

@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build merge result
-    runs-on: [linux, ubuntu-latest]
+    runs-on: [ubuntu-latest]
     container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
     steps:
       - name: Checkout
