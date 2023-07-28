@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <PackageId>Voortman.Templates</PackageId>
-    <Title>Voortman Templates</Title>
-    <Description>Templates to use when creating an application for Voortman.</Description>
-    <PackageTags>dotnet-new;templates;voortman</PackageTags>
+    <PackageId>MSA.Templates</PackageId>
+    <Title>MSA Templates</Title>
+    <Description>Templates to use when creating an application for MSA.</Description>
+    <PackageTags>dotnet-new;templates</PackageTags>
     <TargetFramework>netstandard2.0</TargetFramework>
 
     <IncludeContentInPack>true</IncludeContentInPack>

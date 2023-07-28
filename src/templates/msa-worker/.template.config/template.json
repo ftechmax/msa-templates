@@ -1,6 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "Voortman",
+  "author": "ftechmax",
   "classifications": ["Common", "Worker", "MSA"],
   "tags": {
     "language": "C#",
@@ -8,7 +8,7 @@
   },
   "name": ".NET 6 worker microservice",
   "description": "A worker microservice solution",
-  "identity": "Voortman.Dotnet.MSA.Worker",
+  "identity": "Dotnet.MSA.Worker",
   "shortName": "msa-worker",
   "defaultName": "Worker1",
   "sourceName": "ApplicationName",
