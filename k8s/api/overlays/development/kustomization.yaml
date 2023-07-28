@@ -1,0 +1,31 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+resources:
+  - ./../../base
+patches:
+  - patch: |-
+      - op: replace
+        path: '/spec/hostname'
+        value: 'applicationname.{{DEV_HOSTNAME}}'
+      - op: add
+        path: '/spec/cors/origins/-'
+        value: 'http://applicationname.{{DEV_HOSTNAME}}'
+    target:
+      kind: Mapping
+      name: applicationname-api
+  - patch: |-
+      - op: replace
+        path: '/spec/hostname'
+        value: 'applicationname.{{DEV_HOSTNAME}}'
+      - op: add
+        path: '/spec/cors/origins/-'
+        value: 'http://applicationname.{{DEV_HOSTNAME}}'
+    target:
+      kind: Mapping
+      name: applicationname-api-hub
+images:
+  - name: applicationname-api
+    newName: '{{DEV_REGISTRY}}/applicationname-api'
+    newTag: '{{IMAGE_TAG}}'

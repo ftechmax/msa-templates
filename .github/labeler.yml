@@ -1,0 +1,8 @@
+documentation:
+  - "**/*.MD"
+  - "**/*.md"
+
+automation:
+  - ".github/**"
+  - ".git*"
+  - "NuGet.config"

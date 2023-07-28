@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json.schemastore.org/vs-2017.3.host",
+  "order": 0,
+  "icon": "pod-128.png",
+  "symbolInfo": [
+    {
+      "id": "SecureContainer",
+      "name": {
+        "text": "Enable baseline security"
+      },
+      "isVisible": true
+    },
+    {
+      "id": "RabbitMqSecret",
+      "name": {
+        "text": "The name of the RabbitMQ secret. Run `kubectl get secrets` on your cluster to find it"
+      },
+      "isVisible": true
+    },
+    {
+      "id": "MongoDbSecret",
+      "name": {
+        "text": "The name of the MongoDB secret. Run `kubectl get secrets` on your cluster to find it"
+      },
+      "isVisible": true
+    }
+  ]
+}

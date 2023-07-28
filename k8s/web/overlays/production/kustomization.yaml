@@ -1,0 +1,24 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+resources:
+  - ./../../base
+patches:
+  - patch: |-
+      - op: replace
+        path: '/spec/hostname'
+        value: 'applicationname.{{HOSTNAME}}'
+    target:
+      kind: Mapping
+      name: applicationname-web
+  - path: './patches/web/patch-security-context.yaml'
+configMapGenerator:
+  - name: applicationname-web-config
+    literals:
+      - 'applicationname-url=http://applicationname.{{HOSTNAME}}'
+      - 'internationalization-url=http://internationalization.{{HOSTNAME}}'
+images:
+  - name: applicationname-web
+    newName: '{{REGISTRY}}/applicationname-web'
+    newTag: '{{IMAGE_TAG}}'

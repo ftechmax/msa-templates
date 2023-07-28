@@ -1,0 +1,16 @@
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: applicationname-api
+spec:
+  prefix: /api/
+  rewrite: /
+  service: applicationname-api:80
+  hostname: HOSTNAME
+  cors:
+    origins:
+      - PROJECT_URL
+    methods:
+      - POST
+      - GET

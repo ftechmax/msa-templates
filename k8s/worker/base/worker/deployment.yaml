@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: applicationname-worker
+  labels:
+    app: applicationname-worker
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: applicationname-worker
+  template:
+    metadata:
+      labels:
+        app: applicationname-worker
+      annotations:
+        prometheus.io.scrape: 'true'
+    spec:
+      containers:
+        - name: applicationname-worker
+          image: applicationname-worker
+          ports:
+            - containerPort: 8080
+          env:
+            - name: rabbitmq__host
+              valueFrom:
+                secretKeyRef:
+                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  key: host
+            - name: rabbitmq__username
+              valueFrom:
+                secretKeyRef:
+                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  key: username
+            - name: rabbitmq__password
+              valueFrom:
+                secretKeyRef:
+                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  key: password
+            - name: mongodb__username
+              valueFrom:
+                secretKeyRef:
+                  name: '{{MONGODB-SECRET-NAME}}'
+                  key: username
+            - name: mongodb__password
+              valueFrom:
+                secretKeyRef:
+                  name: '{{MONGODB-SECRET-NAME}}'
+                  key: password

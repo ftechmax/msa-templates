@@ -1,0 +1,49 @@
+name: Release package
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  release:
+    name: Release package
+    runs-on: [ubuntu-latest]
+    container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with:
+          versionSpec: "5.x"
+          preferLatestVersion: true
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0
+        with:
+          useConfigFile: true
+      - name: Create package
+        run: dotnet pack ./src/MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
+
+      - name: Publish package
+        run: |-
+          dotnet nuget add source --username $GITHUB_REPOSITORY_OWNER --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/$GITHUB_REPOSITORY_OWNER/index.json"
+          dotnet nuget push $GITHUB_WORKSPACE/**/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.gitversion.outputs.semVer }}
+          commit: "main"
+          name: Release ${{ steps.gitversion.outputs.semVer }}
+          generateReleaseNotes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
