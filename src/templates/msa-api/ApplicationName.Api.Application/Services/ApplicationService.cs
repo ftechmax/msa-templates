@@ -1,15 +1,15 @@
-﻿using ApplicationName.Api.Application.Commands;
+﻿using System;
+using System.Threading.Tasks;
+using ApplicationName.Api.Application.Commands;
 using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Commands;
 using ApplicationName.Api.Contracts.Dtos;
 using AutoMapper;
-using Dawn;
+using CommunityToolkit.Diagnostics;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
-using System;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Api.Application.Services;
 
@@ -37,8 +37,8 @@ public sealed class ApplicationService : IApplicationService
 
     public async Task<ExampleResultDto> GetAsync(GetExampleDto dto)
     {
-        Guard.Argument(dto, nameof(dto)).NotNull();
-        Guard.Argument(dto.Id, nameof(dto.Id)).NotDefault();
+        Guard.IsNotNull(dto);
+        Guard.IsNotDefault(dto.Id);
 
         var key = GetKey(dto.Id);
         var result = await _protoCacheRepository.GetAsync<ExampleResultDto>(key);
