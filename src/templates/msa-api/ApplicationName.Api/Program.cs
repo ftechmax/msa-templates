@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
@@ -17,9 +20,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
 
 namespace ApplicationName.Api;
 
@@ -115,7 +115,7 @@ public static class Program
             {
                 options.RecordException = true;
             })
-            .AddMassTransitInstrumentation()
+            .AddSource("MassTransit")
             .AddMongoDBInstrumentation()
             .AddRedisInstrumentation()
             .AddOtlpExporter(configure =>
