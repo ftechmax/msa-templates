@@ -1,3 +1,7 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Threading.Tasks;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
@@ -13,10 +17,6 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Worker;
 
@@ -77,7 +77,7 @@ public static class Program
 
         services.AddOpenTelemetry().WithTracing(cfg => cfg
             .SetResourceBuilder(appResourceBuilder)
-            .AddMassTransitInstrumentation()
+            .AddSource("MassTransit")
             .AddMongoDBInstrumentation()
             .AddOtlpExporter(configure =>
             {
