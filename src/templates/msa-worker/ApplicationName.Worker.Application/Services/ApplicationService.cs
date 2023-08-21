@@ -1,7 +1,7 @@
-﻿using ApplicationName.Worker.Application.Documents;
+﻿using System.Threading.Tasks;
+using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts.Commands;
-using Dawn;
-using System.Threading.Tasks;
+using CommunityToolkit.Diagnostics;
 
 namespace ApplicationName.Worker.Application.Services;
 
@@ -16,7 +16,7 @@ public class ApplicationService : IApplicationService
 
     public async Task<ExampleDocument> HandleAsync(IExampleCommand command)
     {
-        Guard.Argument(command, nameof(command)).NotNull();
+        Guard.IsNotNull(command);
 
         var document = await _documentRepository.GetAsync<ExampleDocument>();
         if (document == default)

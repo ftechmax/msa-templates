@@ -1,10 +1,10 @@
-﻿using ApplicationName.Worker.Application;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts;
-using Dawn;
+using CommunityToolkit.Diagnostics;
 using MongoDB.Driver;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Worker.Infrastructure;
 
@@ -29,10 +29,10 @@ public class DocumentRepository : IDocumentRepository
 
     public Task UpsertAsync(ExampleDocument document)
     {
-        Guard.Argument(document, nameof(document)).NotNull();
-        Guard.Argument(document.Id, nameof(document.Id)).NotDefault();
-        Guard.Argument(document.Created, nameof(document.Created)).NotDefault();
-        Guard.Argument(document.Updated, nameof(document.Updated)).NotDefault();
+        Guard.IsNotNull(document);
+        Guard.IsNotDefault(document.Id);
+        Guard.IsNotDefault(document.Created);
+        Guard.IsNotDefault(document.Updated);
 
         var collection = GetCollection<ExampleDocument>();
         var updateDefinition = Builders<ExampleDocument>.Update

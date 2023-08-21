@@ -1,7 +1,7 @@
-﻿using ApplicationName.Worker.Contracts.Specifications;
-using Dawn;
+﻿using System;
+using ApplicationName.Worker.Contracts.Specifications;
+using CommunityToolkit.Diagnostics;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace ApplicationName.Worker.Application.Documents;
 
@@ -15,7 +15,7 @@ public sealed class ExampleDocument : DocumentBase
     public ExampleDocument(IExampleSpecification spec)
         : this()
     {
-        Guard.Argument(spec, nameof(spec)).NotNull();
+        Guard.IsNotNull(spec);
 
         Id = Guid.NewGuid();
         Created = Updated = DateTime.UtcNow;
@@ -25,8 +25,8 @@ public sealed class ExampleDocument : DocumentBase
 
     public void Update(IExampleSpecification spec)
     {
-        Guard.Argument(spec, nameof(spec)).NotNull();
-        Guard.Argument(spec.Name, nameof(spec.Name)).NotNull().NotWhiteSpace();
+        Guard.IsNotNull(spec);
+        Guard.IsNotNullOrWhiteSpace(spec.Name);
 
         Name = spec.Name;
     }
