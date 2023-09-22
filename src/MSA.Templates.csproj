@@ -1,13 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageType>Template</PackageType>
-    <PackageId>MSA.Templates</PackageId>
     <Title>MSA Templates</Title>
-    <Description>Templates to use when creating an application for MSA.</Description>
-    <PackageTags>dotnet-new;templates</PackageTags>
-    <TargetFramework>netstandard2.0</TargetFramework>
-
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>content</ContentTargetFolders>
@@ -15,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**;templates\**\dist\**;templates\**\node_modules\**;templates\**\.angular\**;templates\**\.vs\**" />
     <Compile Remove="**\*" />
   </ItemGroup>
 
@@ -24,6 +19,28 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>MSA.Templates</PackageId>
+    <PackageType>Template</PackageType>
+    <Authors>ftechmax</Authors>
+    <Description>Templates to use when creating an application using a microservice architecture</Description>
+    <Copyright>Copyright © 2023 ftechmax</Copyright>
+    <PackageProjectUrl>https://github.com/ftechmax/msa-templates</PackageProjectUrl>
+    <PackageIcon>logo-64.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/ftechmax/msa-templates</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>dotnet-new;templates</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageOutputPath>../artifacts/</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../logo-64.png" Pack="true" PackagePath="\"/>
+    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
+    <None Include="../README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
