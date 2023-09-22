@@ -1,6 +1,6 @@
-# msa-templates
+# Microservice Architecture Templates
 
-A set of templates to build an application following specific microservice architecture guidelines that have evolved over the years
+This project contains a set of templates to build an application following specific microservice architecture guidelines that have evolved over the years
 
 [![NuGet](https://img.shields.io/nuget/v/MSA.Templates.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/MSA.Templates/)
 [![Release](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml/badge.svg)](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml)
@@ -8,7 +8,7 @@ A set of templates to build an application following specific microservice archi
 
 ## Table of contents
 
-- [msa-templates](#msa-templates)
+- [Microservice Architecture Templates](#microservice-architecture-templates)
   - [Table of contents](#table-of-contents)
   - [Template Installation](#template-installation)
   - [Microservice Architecture Worker](#microservice-architecture-worker)
