@@ -16,5 +16,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build
-        run: dotnet build ./src/MSA.Templates.sln
+      - name: Test api
+        run: dotnet test ./src/templates/msa-api/ApplicationName.Api.sln
+
+      - name: Test worker
+        run: dotnet test ./src/templates/msa-worker/ApplicationName.Worker.sln
+
+      - name: Build package
+        run: dotnet pack ./src/MSA.Templates.sln -c Release

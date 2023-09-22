@@ -1,4 +1,4 @@
-name: Release package
+name: Release
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   release:
-    name: Release package
+    name: Release
     runs-on: [ubuntu-latest]
     container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
     permissions:
@@ -34,12 +34,23 @@ jobs:
         uses: gittools/actions/gitversion/execute@v0
         with:
           useConfigFile: true
+
+      - name: Run dotnet tests and coverage
+        run: |-
+          dotnet test ./src/templates/msa-api/ApplicationName.Api.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test ./src/templates/msa-worker/ApplicationName.Worker.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
       - name: Create package
         run: dotnet pack ./src/MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Publish package
         run: |-
-          dotnet nuget push $GITHUB_WORKSPACE/**/*.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push ${{ github.workspace }}/**/*.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create release
         uses: ncipollo/release-action@v1
