@@ -77,7 +77,7 @@ public static class Program
 
         services.AddOpenTelemetry().WithTracing(cfg => cfg
             .SetResourceBuilder(appResourceBuilder)
-            .AddSource("MassTransit")
+            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
             .AddMongoDBInstrumentation()
             .AddOtlpExporter(configure =>
             {

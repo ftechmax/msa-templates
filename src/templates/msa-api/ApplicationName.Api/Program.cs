@@ -115,7 +115,7 @@ public static class Program
             {
                 options.RecordException = true;
             })
-            .AddSource("MassTransit")
+            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
             .AddMongoDBInstrumentation()
             .AddRedisInstrumentation()
             .AddOtlpExporter(configure =>
