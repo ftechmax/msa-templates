@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>Create msa test 1</Title>    
+            <Author>ftechmax</Author>
+            <Description>creates an argdefender test</Description>
+            <Shortcut>msatest1</Shortcut> 
+        </Header>
+        <Snippet>
+            <Code Language="CSharp">
+                <![CDATA[$typeName$[] $varName$ = new $typeName$[100];
+                for(int $i$ = 0; $i$ < $varName$.Length; $i$++)
+                {
+                  $varName$[$i$] = default($typeName$);
+                }]]>
+            </Code>
+            <Declarations>      
+                <Literal>      
+                    <ID>varName</ID>      
+                    <ToolTip>variable name.</ToolTip>         
+                    <Default>arr</Default>        
+                </Literal>
+                <Literal>      
+                    <ID>typeName</ID>      
+                    <ToolTip>type name.</ToolTip>         
+                    <Default>Object</Default>        
+                </Literal>
+                 <Literal>      
+                    <ID>i</ID>      
+                    <ToolTip>iterator name.</ToolTip>         
+                    <Default>i</Default>        
+                </Literal>
+             </Declarations> 	
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
