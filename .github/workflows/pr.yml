@@ -9,7 +9,7 @@ jobs:
   build:
     name: Build merge result
     runs-on: [ubuntu-latest]
-    container: mcr.microsoft.com/dotnet/sdk:7.0-alpine
+    container: mcr.microsoft.com/dotnet/sdk:6.0-alpine
     steps:
       - name: Checkout
         uses: actions/checkout@v3
