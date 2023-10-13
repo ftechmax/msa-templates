@@ -32,4 +32,9 @@
     <ProjectReference Include="..\ApplicationName.Api.Infrastructure\ApplicationName.Api.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+    <_Parameter1>$(AssemblyName).Test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
