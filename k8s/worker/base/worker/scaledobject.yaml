@@ -1,0 +1,26 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: applicationname-worker
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: applicationname-worker
+  pollingInterval: 1
+  cooldownPeriod: 300
+  minReplicaCount: 0
+  maxReplicaCount: 1
+  advanced:
+    restoreToOriginalReplicaCount: true
+  triggers:
+    - type: rabbitmq
+      metadata:
+        protocol: amqp
+        mode: QueueLength
+        value: '1'
+        queueName: ApplicationName.Worker
+        vhostName: /
+        unsafeSsl: 'true'
+      authenticationRef:
+        name: keda-trigger-auth-rabbitmq
+        kind: ClusterTriggerAuthentication
