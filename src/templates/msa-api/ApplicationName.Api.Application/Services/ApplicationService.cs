@@ -6,8 +6,8 @@ using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Commands;
 using ApplicationName.Api.Contracts.Dtos;
+using ArgDefender;
 using AutoMapper;
-using CommunityToolkit.Diagnostics;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -37,8 +37,8 @@ public sealed class ApplicationService : IApplicationService
 
     public async Task<ExampleResultDto> GetAsync(GetExampleDto dto)
     {
-        Guard.IsNotNull(dto);
-        Guard.IsNotDefault(dto.Id);
+        Guard.Argument(dto).NotNull();
+        Guard.Argument(dto.Id).NotDefault();
 
         var key = GetKey(dto.Id);
         var result = await _protoCacheRepository.GetAsync<ExampleResultDto>(key);

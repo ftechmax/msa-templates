@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.2.1" />
-    <PackageReference Include="MassTransit.Abstractions" Version="8.1.0" />
-    <PackageReference Include="MongoDB.Bson" Version="2.21.0" />
+    <PackageReference Include="ArgDefender" Version="1.0.0" />
+    <PackageReference Include="MassTransit.Abstractions" Version="8.1.1" />
+    <PackageReference Include="MongoDB.Bson" Version="2.22.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using FluentValidation;
 using MassTransit;
+using MassTransit.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
