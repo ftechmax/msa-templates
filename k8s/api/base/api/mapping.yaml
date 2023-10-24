@@ -9,8 +9,12 @@ spec:
   service: applicationname-api:80
   hostname: HOSTNAME
   cors:
-    origins:
-      - PROJECT_URL
+    origins: []
     methods:
-      - POST
+      - OPTIONS
       - GET
+      - POST
+      - PUT
+      - DELETE
+    headers:
+      - 'content-type'
