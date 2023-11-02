@@ -9,6 +9,7 @@ using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using FluentValidation;
 using MassTransit;
+using MassTransit.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,7 +116,7 @@ public static class Program
             {
                 options.RecordException = true;
             })
-            .AddSource("MassTransit")
+            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
             .AddMongoDBInstrumentation()
             .AddRedisInstrumentation()
             .AddOtlpExporter(configure =>

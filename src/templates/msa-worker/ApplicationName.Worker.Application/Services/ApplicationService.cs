@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts.Commands;
-using CommunityToolkit.Diagnostics;
+using ArgDefender;
 
 namespace ApplicationName.Worker.Application.Services;
 
@@ -16,7 +16,7 @@ public class ApplicationService : IApplicationService
 
     public async Task<ExampleDocument> HandleAsync(IExampleCommand command)
     {
-        Guard.IsNotNull(command);
+        Guard.Argument(command).NotNull();
 
         var document = await _documentRepository.GetAsync<ExampleDocument>();
         if (document == default)

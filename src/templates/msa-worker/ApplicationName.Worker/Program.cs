@@ -8,6 +8,7 @@ using ApplicationName.Worker.Consumers;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using MassTransit;
+using MassTransit.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -77,7 +78,7 @@ public static class Program
 
         services.AddOpenTelemetry().WithTracing(cfg => cfg
             .SetResourceBuilder(appResourceBuilder)
-            .AddSource("MassTransit")
+            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
             .AddMongoDBInstrumentation()
             .AddOtlpExporter(configure =>
             {

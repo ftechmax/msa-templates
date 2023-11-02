@@ -18,6 +18,7 @@ spec:
       annotations:
         prometheus.io.scrape: 'true'
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: applicationname-worker
           image: applicationname-worker

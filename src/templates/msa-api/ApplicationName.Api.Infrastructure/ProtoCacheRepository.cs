@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using ApplicationName.Api.Application.Repositories;
-using CommunityToolkit.Diagnostics;
+using ArgDefender;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace ApplicationName.Api.Infrastructure;
@@ -19,7 +19,7 @@ public sealed class ProtoCacheRepository : IProtoCacheRepository
 
     public async Task<T> GetAsync<T>(string key)
     {
-        Guard.IsNotNullOrWhiteSpace(key);
+        Guard.Argument(key).NotNull().NotWhiteSpace();
 
         var bytes = await _distributedCache.GetAsync(key);
         if (bytes == default)
@@ -33,8 +33,8 @@ public sealed class ProtoCacheRepository : IProtoCacheRepository
 
     public async Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions options = default) where T : class
     {
-        Guard.IsNotNullOrWhiteSpace(key);
-        Guard.IsNotNull(obj);
+        Guard.Argument(key).NotNull().NotWhiteSpace();
+        Guard.Argument(obj).NotNull();
 
         await using var ms = new MemoryStream();
 

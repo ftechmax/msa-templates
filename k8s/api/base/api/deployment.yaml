@@ -18,11 +18,13 @@ spec:
       annotations:
         prometheus.io.scrape: 'true'
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: applicationname-api
           image: applicationname-api
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
           env:
             - name: rabbitmq__host
               valueFrom:

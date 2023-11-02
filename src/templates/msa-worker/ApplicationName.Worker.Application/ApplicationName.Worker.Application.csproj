@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,13 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.2.1" />
-    <PackageReference Include="MassTransit.Abstractions" Version="8.1.0" />
-    <PackageReference Include="MongoDB.Bson" Version="2.21.0" />
+    <PackageReference Include="ArgDefender" Version="1.1.0" />
+    <PackageReference Include="MassTransit.Abstractions" Version="8.1.1" />
+    <PackageReference Include="MongoDB.Bson" Version="2.22.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ApplicationName.Worker.Contracts\ApplicationName.Worker.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+    <_Parameter1>$(AssemblyName).Test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
