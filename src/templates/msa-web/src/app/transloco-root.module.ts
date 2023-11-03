@@ -1,44 +1,24 @@
-import { HttpClient } from '@angular/common/http';
 import {
-  TRANSLOCO_LOADER,
-  Translation,
-  TranslocoLoader,
-  TRANSLOCO_CONFIG,
-  translocoConfig,
-  TranslocoModule,
+  provideTransloco,
+  TranslocoModule
 } from '@ngneat/transloco';
-import { Inject, Injectable, NgModule } from '@angular/core';
-import { environment } from '../environments/environment';
-import { TranslocoMessageFormatModule } from '@ngneat/transloco-messageformat';
+import { isDevMode, NgModule } from '@angular/core';
+import { TranslocoHttpLoader } from './transloco-loader';
 
-@Injectable({ providedIn: 'root' })
-export class TranslocoHttpLoader implements TranslocoLoader {
-  constructor(
-    private http: HttpClient,
-    @Inject('INTERNATIONALIZATION_API_URL') private baseUrl: string
-  ) {}
-
-  getTranslation(langPath: string) {
-    return this.http.get<Translation>(
-      `${this.baseUrl}/i18n/safety-generator/${langPath}.json`
-    );
-  }
-}
 
 @NgModule({
-  exports: [TranslocoModule],
-  imports: [TranslocoMessageFormatModule.forRoot()],
+  exports: [ TranslocoModule ],
   providers: [
-    {
-      provide: TRANSLOCO_CONFIG,
-      useValue: translocoConfig({
-        availableLangs: ['en'],
-        defaultLang: 'en',
-        reRenderOnLangChange: false,
-        prodMode: environment.production,
+      provideTransloco({
+        config: {
+          availableLangs: ['en'],
+          defaultLang: 'en',
+          // Remove this option if your application doesn't support changing language in runtime.
+          reRenderOnLangChange: true,
+          prodMode: !isDevMode(),
+        },
+        loader: TranslocoHttpLoader
       }),
-    },
-    { provide: TRANSLOCO_LOADER, useClass: TranslocoHttpLoader },
   ],
 })
 export class TranslocoRootModule {}
