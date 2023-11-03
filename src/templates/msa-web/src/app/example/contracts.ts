@@ -12,3 +12,8 @@ export interface IExampleCreatedEvent {
   correlationId: string;
   id: string;
 }
+
+export interface IExampleUpdatedEvent {
+  correlationId: string;
+  id: string;
+}

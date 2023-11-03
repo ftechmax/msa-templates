@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ExampleCollectionDto, ExampleDetailsDto } from './example-contracts';
+import { ExampleCollectionDto, ExampleDetailsDto } from './contracts';
 
 const endpoint: string = 'examples';
 

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ExampleCollectionDto } from '../example-contracts';
+import { ExampleCollectionDto } from '../contracts';
 import { Subscription } from 'rxjs';
 import { EventService } from '../event.service';
 import { ExampleHttpClient } from '../example.httpclient';
@@ -13,24 +13,32 @@ export class CollectionComponent implements OnInit, OnDestroy {
   private event$: Subscription | undefined;
 
   constructor(
-    private apiHttpClient: ExampleHttpClient,
+    private httpClient: ExampleHttpClient,
     private eventService: EventService
   ) {}
 
   ngOnInit(): void {
     this.load();
+    this.subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe();
+  }
+
+  private load() {
+    this.httpClient.getCollection().subscribe((response) => {
+      this.model = response;
+    });
+  }
+
+  private subscribe() {
     this.event$ = this.eventService.ExampleCreatedEvent.pipe().subscribe(() => {
       this.load();
     });
   }
 
-  ngOnDestroy(): void {
+  private unsubscribe() {
     this.event$?.unsubscribe();
-  }
-
-  private load() {
-    this.apiHttpClient.getCollection().subscribe((response) => {
-      this.model = response;
-    });
   }
 }
