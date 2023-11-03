@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ExampleCollectionDto } from '../example-contracts';
 import { Subscription } from 'rxjs';
-import { ExampleEventService } from '../example-event.service';
+import { EventService } from '../event.service';
 import { ExampleHttpClient } from '../example.httpclient';
 
 @Component({
@@ -14,7 +14,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiHttpClient: ExampleHttpClient,
-    private eventService: ExampleEventService
+    private eventService: EventService
   ) {}
 
   ngOnInit(): void {

@@ -4,10 +4,8 @@ import { IExampleCreatedEvent } from './example-contracts';
 import { HubConnection } from '@microsoft/signalr';
 import { SignalRService } from '../core/signalr.service';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ExampleEventService {
+@Injectable()
+export class EventService {
   public ExampleCreatedEvent: Subject<IExampleCreatedEvent>;
 
   constructor(signalrService: SignalRService) {
