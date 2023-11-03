@@ -1,0 +1,8 @@
+<div class="row mt-4">
+  <div class="col">
+    <h1>{{ titleText }}</h1>
+  </div>
+  <div *ngIf="buttonText" class="col d-flex justify-content-end">
+    <button [disabled]="!enabled" (click)="openDialog()" class="flex-grow-0 align-self-start ms-3" mat-flat-button color="accent">{{ buttonText }}</button>
+  </div>
+</div>

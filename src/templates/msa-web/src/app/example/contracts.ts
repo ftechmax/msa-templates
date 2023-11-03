@@ -1,11 +1,14 @@
 export interface ExampleCollectionDto {
-  id: string;
+  //id: string;
+  position: number;
   name: string;
 }
 
 export interface ExampleDetailsDto {
   name: string;
-  description: string;
+  position: number;
+  weight: number;
+  symbol: string;
 }
 
 export interface IExampleCreatedEvent {

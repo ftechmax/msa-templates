@@ -5,7 +5,7 @@ import { ExampleHttpClient } from '../example.httpclient';
 import { v4 as uuidv4 } from 'uuid';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AddValidationErrors } from 'src/app/core/validation-errors';
+import { addValidationErrors } from 'src/app/core/validation-errors';
 
 @Component({
   templateUrl: './create.component.html',
@@ -44,7 +44,7 @@ export class CreateComponent implements OnInit, OnDestroy {
 
     this.httpClient.create(this.form.value).subscribe({
       error: (response) => {
-        AddValidationErrors(response, this.form!);
+        addValidationErrors(response, this.form!);
         this.submitting = false;
       },
     });

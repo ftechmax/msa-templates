@@ -1,0 +1,36 @@
+.toolbar-item-spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar-container {
+  height: 4rem;
+}
+
+.app-container {
+  width: 100%;
+  height: 100%;
+}
+
+.sidenav-header {
+  height: 4rem;
+  line-height: 4rem;
+  padding: 0 16px;
+  background-color: #242424;
+  color: #efefef;
+}
+
+.app-sidenav {
+  min-width: 230px;
+}
+
+.sidenav-content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.content-container {
+  position: relative;
+  flex: auto;
+  margin: 0 16px;
+}
