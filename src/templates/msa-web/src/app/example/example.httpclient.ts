@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ExampleCollectionDto, ExampleDetailsDto } from './example-api';
+import { ExampleCollectionDto, ExampleDetailsDto } from './example-contracts';
 
 const endpoint: string = 'examples';
 
 @Injectable()
-export class ExampleApiHttpClient {
+export class ExampleHttpClient {
   constructor(
     private http: HttpClient,
     @Inject('BASE_API_URL') private baseUrl: string

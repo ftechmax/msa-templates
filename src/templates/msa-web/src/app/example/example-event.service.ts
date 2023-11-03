@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { IExampleCreatedEvent } from './example-api';
+import { IExampleCreatedEvent } from './example-contracts';
 import { HubConnection } from '@microsoft/signalr';
 import { SignalRService } from '../core/signalr.service';
 

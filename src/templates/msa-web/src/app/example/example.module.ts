@@ -5,12 +5,12 @@ import { ExampleRoutingModule } from './example-routing.module';
 import { CollectionComponent } from './collection/collection.component';
 import { DetailsComponent } from './details/details.component';
 import { CreateComponent } from './create/create.component';
-import { ExampleApiHttpClient } from './example-api.httpclient';
+import { ExampleHttpClient } from './example.httpclient';
 import { ExampleEventService } from './example-event.service';
 
 @NgModule({
   declarations: [CollectionComponent, DetailsComponent, CreateComponent],
   imports: [CommonModule, ExampleRoutingModule],
-  providers: [ExampleApiHttpClient, ExampleEventService],
+  providers: [ExampleHttpClient, ExampleEventService],
 })
 export class ExampleModule {}
