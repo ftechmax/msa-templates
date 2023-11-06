@@ -40,7 +40,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
   }
 
   onClick(row: ExampleCollectionDto) {
-    this.router.navigate(['../details'], {
+    this.router.navigate(['/example/details'], {
       queryParams: {
         id: row.position,
       },
