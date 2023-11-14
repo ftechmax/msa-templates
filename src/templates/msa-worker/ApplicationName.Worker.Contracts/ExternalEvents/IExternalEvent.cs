@@ -1,7 +1,13 @@
-﻿// ReSharper disable once CheckNamespace
+﻿using System;
+
+// ReSharper disable once CheckNamespace
 namespace Other.Worker.Contracts.Commands;
 
 public interface IExternalEvent
 {
-    string Name { get; }
+    Guid CorrelationId { get; }
+
+    Guid Id { get; }
+
+    int Code { get; }
 }

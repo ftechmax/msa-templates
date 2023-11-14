@@ -1,10 +1,18 @@
-﻿using ApplicationName.Worker.Application.Documents;
+﻿using System.Threading.Tasks;
+using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Worker.Application.Services;
 
 public interface IApplicationService
 {
-    Task<ExampleDocument> HandleAsync(IExampleCommand command);
+    Task<ExampleCreated> HandleAsync(ICreateExampleCommand command);
+
+    Task<ExampleUpdated> HandleAsync(IUpdateExampleCommand command);
+
+    Task<ExampleEntityAdded> HandleAsync(IAddExampleEntityCommand command);
+
+    Task<ExampleEntityUpdated> HandleAsync(IUpdateExampleEntityCommand command);
+
+    Task<ExampleRemoteCodeSet> HandleAsync(ISetExampleRemoteCodeCommand command);
 }

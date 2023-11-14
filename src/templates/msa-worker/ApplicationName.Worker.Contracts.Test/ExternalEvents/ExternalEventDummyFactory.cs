@@ -1,3 +1,4 @@
+using System;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
@@ -11,10 +12,12 @@ public class ExternalEventDummyFactory : DummyFactory<IExternalEvent>
 
     protected override IExternalEvent Create()
     {
-        var @event = _fixture.Create<IExternalEvent>();
+        var result = _fixture.Create<IExternalEvent>();
 
-        A.CallTo(() => @event.Name).Returns(_fixture.Create<string>());
+        A.CallTo(() => result.CorrelationId).Returns(_fixture.Create<Guid>());
+        A.CallTo(() => result.Id).Returns(_fixture.Create<Guid>());
+        A.CallTo(() => result.Code).Returns(_fixture.Create<int>());
 
-        return @event;
+        return result;
     }
 }

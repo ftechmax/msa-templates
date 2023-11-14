@@ -1,8 +1,9 @@
 ﻿using System;
+using ApplicationName.Worker.Contracts.Events;
 
-namespace ApplicationName.Worker.Contracts.Events;
+namespace ApplicationName.Worker.Contracts.Commands;
 
-public interface IExampleUpdatedEvent
+public interface IUpdateExampleCommand
 {
     Guid CorrelationId { get; }
 

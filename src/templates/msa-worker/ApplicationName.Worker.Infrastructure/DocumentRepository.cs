@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
@@ -18,11 +20,13 @@ public class DocumentRepository : IDocumentRepository
         _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
     }
 
-    public async Task<T> GetAsync<T>() where T : DocumentBase
+    public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
+        Guard.Argument(expr).NotNull();
+
         var collection = GetCollection<T>();
 
-        var cursor = await collection.FindAsync(_ => true);
+        var cursor = await collection.FindAsync(expr);
 
         return await cursor.SingleOrDefaultAsync();
     }

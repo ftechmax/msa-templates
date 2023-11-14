@@ -1,14 +1,14 @@
-﻿using ApplicationName.Worker.Application.Services;
+﻿using System.Threading.Tasks;
+using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Contracts.Events;
 using ApplicationName.Worker.Events;
 using AutoMapper;
 using MassTransit;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Worker.Consumers;
 
-public class CommandHandler : IConsumer<IExampleCommand>
+public class CommandHandler : IConsumer<ICreateExampleCommand>, IConsumer<IUpdateExampleCommand>, IConsumer<IAddExampleEntityCommand>, IConsumer<IUpdateExampleEntityCommand>, IConsumer<ISetExampleRemoteCodeCommand>
 {
     private readonly IApplicationService _applicationService;
 
@@ -20,19 +20,58 @@ public class CommandHandler : IConsumer<IExampleCommand>
         _mapper = mapper;
     }
 
-    public async Task Consume(ConsumeContext<IExampleCommand> context)
+    public async Task Consume(ConsumeContext<ICreateExampleCommand> context)
     {
-        var document = await _applicationService.HandleAsync(context.Message);
-
-        if (document.Created == document.Updated)
+        var domainEvent = await _applicationService.HandleAsync(context.Message);
+        if (domainEvent != default)
         {
-            var @event = _mapper.Map<ExampleCreatedEvent>(document);
+            var @event = _mapper.Map<ExampleCreatedEvent>(domainEvent);
+            @event.CorrelationId = context.Message.CorrelationId;
             await context.Publish<IExampleCreatedEvent>(@event);
         }
-        else
+    }
+
+    public async Task Consume(ConsumeContext<IUpdateExampleCommand> context)
+    {
+        var domainEvent = await _applicationService.HandleAsync(context.Message);
+        if (domainEvent != default)
         {
-            var @event = _mapper.Map<ExampleUpdatedEvent>(document);
+            var @event = _mapper.Map<ExampleUpdatedEvent>(domainEvent);
+            @event.CorrelationId = context.Message.CorrelationId;
             await context.Publish<IExampleUpdatedEvent>(@event);
+        }
+    }
+
+    public async Task Consume(ConsumeContext<IAddExampleEntityCommand> context)
+    {
+        var domainEvent = await _applicationService.HandleAsync(context.Message);
+        if (domainEvent != default)
+        {
+            var @event = _mapper.Map<ExampleEntityAddedEvent>(domainEvent);
+            @event.CorrelationId = context.Message.CorrelationId;
+            await context.Publish<IExampleEntityAddedEvent>(@event);
+        }
+    }
+
+    public async Task Consume(ConsumeContext<IUpdateExampleEntityCommand> context)
+    {
+        var domainEvent = await _applicationService.HandleAsync(context.Message);
+        if (domainEvent != default)
+        {
+            var @event = _mapper.Map<ExampleEntityUpdatedEvent>(domainEvent);
+            @event.CorrelationId = context.Message.CorrelationId;
+            await context.Publish<IExampleEntityUpdatedEvent>(@event);
+        }
+    }
+
+    public async Task Consume(ConsumeContext<ISetExampleRemoteCodeCommand> context)
+    {
+        var domainEvent = await _applicationService.HandleAsync(context.Message);
+        if (domainEvent != default)
+        {
+            var @event = _mapper.Map<ExampleRemoteCodeSetEvent>(domainEvent);
+            @event.CorrelationId = context.Message.CorrelationId;
+            await context.Publish<IExampleRemoteCodeSetEvent>(@event);
         }
     }
 }

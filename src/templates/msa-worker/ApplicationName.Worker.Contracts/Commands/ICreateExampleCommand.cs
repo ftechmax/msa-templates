@@ -1,12 +1,11 @@
 ﻿using System;
+using ApplicationName.Worker.Contracts.Events;
 
-namespace ApplicationName.Worker.Contracts.Events;
+namespace ApplicationName.Worker.Contracts.Commands;
 
-public interface IExampleCreatedEvent
+public interface ICreateExampleCommand
 {
     Guid CorrelationId { get; }
-
-    Guid Id { get; }
 
     string Name { get; }
 

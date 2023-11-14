@@ -9,7 +9,6 @@ using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using MassTransit;
 using MassTransit.Logging;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -51,7 +50,8 @@ public static class Program
         // MassTransit
         services.AddMassTransit(i =>
         {
-            EndpointConvention.Map<IExampleCommand>(new Uri($"queue:{typeof(Program).Namespace}"));
+            var uri = new Uri($"queue:{ServiceName}");
+            EndpointConvention.Map<ISetExampleRemoteCodeCommand>(uri);
 
             i.AddConsumer<ExternalEventHandler>();
             i.AddConsumer<CommandHandler>();
@@ -82,7 +82,7 @@ public static class Program
             .AddMongoDBInstrumentation()
             .AddOtlpExporter(configure =>
             {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
+                configure.Endpoint = new Uri($"{configuration["OpenTelemetry:Endpoint"]}");
             })
         );
 
@@ -91,7 +91,7 @@ public static class Program
             .AddRuntimeInstrumentation()
             .AddOtlpExporter(configure =>
             {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
+                configure.Endpoint = new Uri($"{configuration["OpenTelemetry:Endpoint"]}");
             })
         );
 
@@ -113,7 +113,7 @@ public static class Program
                     .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration.GetValue<string>("OpenTelemetry:Endpoint"));
+                    opts.Endpoint = new Uri($"{configuration["OpenTelemetry:Endpoint"]}");
                 });
         });
     }

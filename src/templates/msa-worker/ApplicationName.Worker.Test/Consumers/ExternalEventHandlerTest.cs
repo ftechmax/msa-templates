@@ -34,7 +34,7 @@ public class ExternalEventHandlerTest
         _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>()).CreateMapper();
         _fixture.Register(() => _mapper);
 
-        EndpointConvention.Map<IExampleCommand>(new Uri("queue:test"));
+        EndpointConvention.Map<ICreateExampleCommand>(new Uri("queue:test"));
 
         _sendEndPoint = _fixture.Freeze<ISendEndpoint>();
         _context = _fixture.Freeze<ConsumeContext<IExternalEvent>>();
@@ -50,9 +50,9 @@ public class ExternalEventHandlerTest
         var @event = A.Dummy<IExternalEvent>();
         A.CallTo(() => _context.Message).ReturnsLazily(() => @event);
 
-        var capturedCommand = default(IExampleCommand);
-        A.CallTo(() => _sendEndPoint.Send(A<IExampleCommand>._, A<CancellationToken>._)).Invokes(
-            (IExampleCommand arg0, CancellationToken _) =>
+        var capturedCommand = default(ICreateExampleCommand);
+        A.CallTo(() => _sendEndPoint.Send(A<ICreateExampleCommand>._, A<CancellationToken>._)).Invokes(
+            (ICreateExampleCommand arg0, CancellationToken _) =>
             {
                 capturedCommand = arg0;
             });
@@ -61,7 +61,7 @@ public class ExternalEventHandlerTest
         await _subjectUnderTest.Consume(_context);
 
         // Assert
-        A.CallTo(() => _sendEndPoint.Send(A<IExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _sendEndPoint.Send(A<ICreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         capturedCommand.Should()
             .NotBeNull()
             .And.BeEquivalentTo(@event);

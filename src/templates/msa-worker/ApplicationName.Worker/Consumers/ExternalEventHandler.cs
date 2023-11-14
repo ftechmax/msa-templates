@@ -1,9 +1,9 @@
-﻿using ApplicationName.Worker.Commands;
+﻿using System.Threading.Tasks;
+using ApplicationName.Worker.Commands;
 using ApplicationName.Worker.Contracts.Commands;
 using AutoMapper;
 using MassTransit;
 using Other.Worker.Contracts.Commands;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Worker.Consumers;
 
@@ -18,7 +18,7 @@ public class ExternalEventHandler : IConsumer<IExternalEvent>
 
     public Task Consume(ConsumeContext<IExternalEvent> context)
     {
-        var command = _mapper.Map<ExampleCommand>(context.Message);
-        return context.Send<IExampleCommand>(command);
+        var command = _mapper.Map<SetExampleRemoteCodeCommand>(context.Message);
+        return context.Send<ISetExampleRemoteCodeCommand>(command);
     }
 }
