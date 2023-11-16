@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{A992FA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FBFBC271-7A9D-415D-9111-588090E7F200}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{66504BBE-278C-4BE0-A252-2B9EF9F093CD}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Api.Application", "ApplicationName.Api.Application\ApplicationName.Api.Application.csproj", "{9B6452FB-8C63-4CCC-8AC7-C275101055E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Api.Infrastructure", "ApplicationName.Api.Infrastructure\ApplicationName.Api.Infrastructure.csproj", "{C42CCE5C-B569-44F5-A7A0-70BC9E96C86B}"
@@ -21,8 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Api.Applica
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Api.Contracts.Test", "ApplicationName.Api.Contracts.Test\ApplicationName.Api.Contracts.Test.csproj", "{0FA48181-DBB8-49D3-AFD0-8CE2580106D5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{66504BBE-278C-4BE0-A252-2B9EF9F093CD}"
+#if (UseShared)
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "..\shared\ApplicationName.Shared\ApplicationName.Shared.shproj", "{E8BE18A2-8B36-4644-8A76-5EC98A4F86E8}"
 EndProject
+#endif
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,9 @@ Global
 		{8018AA23-ACF7-417C-9BDA-31646F1BD032} = {A992FA55-47D5-434B-8554-C00FF1EEB29F}
 		{E4C1A29B-AB50-4AC7-967D-0518120A992F} = {FBFBC271-7A9D-415D-9111-588090E7F200}
 		{0FA48181-DBB8-49D3-AFD0-8CE2580106D5} = {FBFBC271-7A9D-415D-9111-588090E7F200}
+#if (UseShared)
+		{E8BE18A2-8B36-4644-8A76-5EC98A4F86E8} = {66504BBE-278C-4BE0-A252-2B9EF9F093CD}
+#endif
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {204D76D3-597F-415A-A0F0-2FA565A4B856}

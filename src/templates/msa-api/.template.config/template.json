@@ -15,6 +15,12 @@
   "preferNameDirectory": true,
   "primaryOutputs": [{ "path": "ApplicationName.sln" }],
   "symbols": {
+    "UseShared": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": ""
+    },
     "DevelopmentRegistry": {
       "isRequired": true,
       "type": "parameter",
