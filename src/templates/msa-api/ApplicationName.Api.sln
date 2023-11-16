@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Api.Applica
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Api.Contracts.Test", "ApplicationName.Api.Contracts.Test\ApplicationName.Api.Contracts.Test.csproj", "{0FA48181-DBB8-49D3-AFD0-8CE2580106D5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{66504BBE-278C-4BE0-A252-2B9EF9F093CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

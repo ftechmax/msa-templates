@@ -4,5 +4,7 @@ public static class ApplicationConstants
 {
     public const string DatabaseName = "ApplicationName";
 
-    public const string ExampleCacheKey = "ExampleDocument";
+    public const string ExampleCollectionCacheKey = "example-collection";
+
+    public const string ExampleDetailsCacheKey = "example-details";
 }

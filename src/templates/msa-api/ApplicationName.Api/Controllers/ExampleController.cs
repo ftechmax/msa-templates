@@ -1,7 +1,9 @@
-﻿using ApplicationName.Api.Application.Services;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Api.Controllers;
 
@@ -9,22 +11,34 @@ namespace ApplicationName.Api.Controllers;
 [Route("[controller]")]
 public class ExampleController : ControllerBase
 {
-    private readonly IApplicationService _applicationService;
+    private readonly IExampleService _applicationService;
 
-    public ExampleController(IApplicationService applicationService)
+    public ExampleController(IExampleService applicationService)
     {
         _applicationService = applicationService;
     }
 
     [HttpGet]
-    public Task<ExampleResultDto> Get([FromQuery] GetExampleDto dto)
+    public Task<IEnumerable<ExampleCollectionDto>> GetCollection()
     {
-        return _applicationService.GetAsync(dto);
+        return _applicationService.GetCollectionAsync();
+    }
+
+    [HttpGet("{id}")]
+    public Task<ExampleDetailsDto> Get(Guid id)
+    {
+        return _applicationService.GetAsync(id);
     }
 
     [HttpPost]
     public Task Post([FromBody] CreateExampleDto dto)
     {
         return _applicationService.HandleAsync(dto);
+    }
+
+    [HttpPut("{id}")]
+    public Task Put(Guid id, [FromBody] UpdateExampleDto dto)
+    {
+        return _applicationService.HandleAsync(id, dto);
     }
 }

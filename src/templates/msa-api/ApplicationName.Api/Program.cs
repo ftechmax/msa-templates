@@ -4,12 +4,13 @@ using System.Net;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
-using ApplicationName.Api.Contracts.Commands;
 using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.Logging;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,7 +74,7 @@ public static class Program
         services.AddMassTransit(i =>
         {
             var uri = new Uri("queue:ApplicationName.Worker");
-            EndpointConvention.Map<IExampleCommand>(uri);
+            EndpointConvention.Map<ICreateExampleCommand>(uri);
 
             i.AddConsumer<LocalEventHandler>();
 
@@ -100,6 +101,22 @@ public static class Program
             options.Configuration = configuration["redis:config"];
             options.InstanceName = $"{configuration["redis:instance"]}_";
         });
+
+        // Api
+        services.AddHealthChecks();
+        services.AddControllers();
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<CreateExampleDtoValidator>();
+
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        services.AddFluentValidationRulesToSwagger();
+        services.AddResponseCompression();
+
+        // Application
+        services.AddScoped<IExampleService, ExampleService>();
+        services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
         var appResourceBuilder = ResourceBuilder.CreateDefault()
@@ -134,19 +151,6 @@ public static class Program
                 configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
             })
         );
-
-        // Api
-        services.AddHealthChecks();
-        services.AddControllers();
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-        services.AddResponseCompression();
-        services.AddValidatorsFromAssemblyContaining<CreateExampleDtoValidator>();
-
-        // Application
-        services.AddScoped<IApplicationService, ApplicationService>();
-        services.AddScoped<IDocumentRepository, DocumentRepository>();
-        services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
     }
 
     private static void Configure(WebApplication app)
@@ -162,6 +166,8 @@ public static class Program
         app.UseResponseCompression();
 
         app.MapControllers();
+
+        app.MapHub<ApiHub>("/api-hub");
 
         app.MapHealthChecks("/healthz");
     }

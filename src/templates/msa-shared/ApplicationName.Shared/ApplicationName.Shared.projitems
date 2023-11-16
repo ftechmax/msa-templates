@@ -9,6 +9,8 @@
     <Import_RootNamespace>ApplicationName.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Contracts\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Aggregates\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Events\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Commands\" />
   </ItemGroup>
 </Project>

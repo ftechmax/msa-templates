@@ -2,7 +2,7 @@
 
 namespace ApplicationName.Api.Contracts.Dtos;
 
-public class GetExampleDto
+public class UpdateExampleDto
 {
     public Guid Id { get; set; }
 }

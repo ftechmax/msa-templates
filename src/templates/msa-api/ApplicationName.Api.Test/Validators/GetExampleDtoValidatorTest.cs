@@ -27,7 +27,7 @@ public class GetExampleDtoValidatorTest
     public void Validate_With_Valid_Dto()
     {
         // Arrange
-        var dto = _fixture.Create<GetExampleDto>();
+        var dto = _fixture.Create<UpdateExampleDto>();
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -40,7 +40,7 @@ public class GetExampleDtoValidatorTest
     public void Validate_With_Invalid_Id()
     {
         // Arrange
-        var dto = _fixture.Create<GetExampleDto>();
+        var dto = _fixture.Create<UpdateExampleDto>();
         dto.Id = Guid.Empty;
 
         // Act

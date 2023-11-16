@@ -14,7 +14,7 @@ public class ExampleControllerTest
 {
     private IFixture _fixture;
 
-    private IApplicationService _applicationService;
+    private IExampleService _applicationService;
 
     private ExampleController _subjectUnderTest;
 
@@ -22,7 +22,7 @@ public class ExampleControllerTest
     public void Setup()
     {
         _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
-        _applicationService = _fixture.Freeze<IApplicationService>();
+        _applicationService = _fixture.Freeze<IExampleService>();
         _subjectUnderTest = _fixture.Build<ExampleController>().OmitAutoProperties().Create();
     }
 
@@ -30,8 +30,8 @@ public class ExampleControllerTest
     public async Task Get_With_Valid_Dto()
     {
         // Arrange
-        var dto = _fixture.Create<GetExampleDto>();
-        var returnDto = _fixture.Create<ExampleResultDto>();
+        var dto = _fixture.Create<UpdateExampleDto>();
+        var returnDto = _fixture.Create<ExampleDetailsDto>();
 
         A.CallTo(() => _applicationService.GetAsync(dto)).ReturnsLazily(() => returnDto);
 

@@ -32,7 +32,7 @@ public class ApplicationServiceTest
 
     private ISendEndpoint _sendEndpoint;
 
-    private ApplicationService _subjectUnderTest;
+    private ExampleService _subjectUnderTest;
 
     [SetUp]
     public void Setup()
@@ -47,23 +47,23 @@ public class ApplicationServiceTest
         _mapper = mappingConfig.CreateMapper();
         _fixture.Register(() => _mapper);
 
-        _subjectUnderTest = _fixture.Create<ApplicationService>();
+        _subjectUnderTest = _fixture.Create<ExampleService>();
     }
 
     [Test]
     public async Task GetAsync_From_Cache()
     {
         // Arrange
-        var request = _fixture.Create<GetExampleDto>();
-        var dto = _fixture.Create<ExampleResultDto>();
+        var request = _fixture.Create<UpdateExampleDto>();
+        var dto = _fixture.Create<ExampleDetailsDto>();
 
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleResultDto>(A<string>._)).ReturnsLazily(() => dto);
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).ReturnsLazily(() => dto);
 
         // Act
         var result = await _subjectUnderTest.GetAsync(request);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleResultDto>($"{ApplicationConstants.ExampleCacheKey}_{request.Id:D}")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>($"{ApplicationConstants.ExampleCacheKey}_{request.Id:D}")).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync<ExampleDocument>(A<Guid>._)).MustNotHaveHappened();
 
         result.Should()
@@ -75,23 +75,23 @@ public class ApplicationServiceTest
     public async Task GetAsync_From_Repository()
     {
         // Arrange
-        var request = _fixture.Create<GetExampleDto>();
+        var request = _fixture.Create<UpdateExampleDto>();
         var document = GenerateDocument();
 
         A.CallTo(() => _documentRepository.GetAsync<ExampleDocument>(A<Guid>._)).ReturnsLazily(() => document);
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleResultDto>(A<string>._)).Returns(default(ExampleResultDto));
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).Returns(default(ExampleDetailsDto));
 
         // Act
         var result = await _subjectUnderTest.GetAsync(request);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleResultDto>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleResultDto>($"{ApplicationConstants.ExampleCacheKey}_{request.Id:D}")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>($"{ApplicationConstants.ExampleCacheKey}_{request.Id:D}")).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync<ExampleDocument>(request.Id)).MustHaveHappenedOnceExactly();
 
         result.Should()
             .NotBeNull()
-            .And.BeOfType<ExampleResultDto>()
+            .And.BeOfType<ExampleDetailsDto>()
             .And.BeEquivalentTo(document, i => i.ExcludingMissingMembers());
     }
 
@@ -99,17 +99,17 @@ public class ApplicationServiceTest
     public async Task GetAsync_Without_Document()
     {
         // Arrange
-        var request = _fixture.Create<GetExampleDto>();
+        var request = _fixture.Create<UpdateExampleDto>();
 
         A.CallTo(() => _documentRepository.GetAsync<ExampleDocument>(A<Guid>._)).ReturnsLazily(() => default(ExampleDocument));
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleResultDto>(A<string>._)).Returns(default(ExampleResultDto));
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).Returns(default(ExampleDetailsDto));
 
         // Act
         var result = await _subjectUnderTest.GetAsync(request);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleResultDto>._, A<DistributedCacheEntryOptions>._)).MustNotHaveHappened();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleResultDto>(A<string>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<DistributedCacheEntryOptions>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync<ExampleDocument>(A<Guid>._)).MustHaveHappenedOnceExactly();
 
         result.Should().BeNull();
@@ -121,9 +121,9 @@ public class ApplicationServiceTest
         // Arrange
         var request = _fixture.Create<CreateExampleDto>();
 
-        var capturedCommand = default(IExampleCommand);
-        A.CallTo(() => _sendEndpoint.Send(A<IExampleCommand>._, A<CancellationToken>._)).Invokes(
-            (IExampleCommand arg0, CancellationToken _) =>
+        var capturedCommand = default(ICreateExampleCommand);
+        A.CallTo(() => _sendEndpoint.Send(A<ICreateExampleCommand>._, A<CancellationToken>._)).Invokes(
+            (ICreateExampleCommand arg0, CancellationToken _) =>
             {
                 capturedCommand = arg0;
             });
@@ -132,7 +132,7 @@ public class ApplicationServiceTest
         await _subjectUnderTest.HandleAsync(request);
 
         // Assert
-        A.CallTo(() => _sendEndpoint.Send(A<IExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _sendEndpoint.Send(A<ICreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
         capturedCommand.Should().NotBeNull();
         capturedCommand.Name.Should().NotBeNullOrWhiteSpace().And.Be(request.Name);

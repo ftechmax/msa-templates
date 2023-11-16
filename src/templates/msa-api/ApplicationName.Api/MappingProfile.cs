@@ -9,7 +9,9 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<CreateExampleDto, ExampleCommand>();
-        CreateMap<ExampleDocument, ExampleResultDto>();
+        CreateMap<CreateExampleDto, CreateExampleCommand>();
+        CreateMap<UpdateExampleDto, UpdateExampleCommand>();
+        CreateMap<ExampleDocument, ExampleDetailsDto>();
+        CreateMap<ExampleDocument, ExampleCollectionDto>();
     }
 }
