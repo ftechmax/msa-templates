@@ -9,11 +9,11 @@ using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using MassTransit;
 using MassTransit.Logging;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -43,9 +43,13 @@ public static class Program
     {
         var configuration = context.Configuration;
 
-        var connectionString = $"mongodb://{configuration["mongodb:username"]}:{configuration["mongodb:password"]}@{configuration["mongodb:host"]}:27017";
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(connectionString));
+        // MongoDB
+        var connectionString = new MongoUrl($"mongodb://{configuration["mongodb:username"]}:{configuration["mongodb:password"]}@{configuration["mongodb:host"]}:27017");
+        var clientSettings = MongoClientSettings.FromUrl(connectionString);
+        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
+        services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
 
+        // AutoMapper
         services.AddAutoMapper(i => i.AddProfile<MappingProfile>());
 
         // MassTransit
@@ -79,10 +83,9 @@ public static class Program
         services.AddOpenTelemetry().WithTracing(cfg => cfg
             .SetResourceBuilder(appResourceBuilder)
             .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
-            .AddMongoDBInstrumentation()
             .AddOtlpExporter(configure =>
             {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
+                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
             })
         );
 
@@ -91,7 +94,7 @@ public static class Program
             .AddRuntimeInstrumentation()
             .AddOtlpExporter(configure =>
             {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
+                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
             })
         );
 
@@ -113,7 +116,7 @@ public static class Program
                     .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration.GetValue<string>("OpenTelemetry:Endpoint"));
+                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
                 });
         });
     }
