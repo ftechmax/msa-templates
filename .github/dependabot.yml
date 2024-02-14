@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/src/templates/msa-web"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/src/templates/msa-api"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/src/templates/msa-api/ApplicationName.Api"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "nuget"
+    directory: "/src/templates/msa-worker"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/src/templates/msa-worker/ApplicationName.Worker"
+    schedule:
+      interval: "monthly"
