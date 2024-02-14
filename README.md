@@ -26,7 +26,7 @@ dotnet new -i MSA.Templates
 
 ## Microservice Architecture Worker
 
-This creates a layered .net 6 application specifically designed for handling domain events and is preconfigured to run in a Kubernetes environment.
+This creates a layered .net application specifically designed for handling domain events and is preconfigured to run in a Kubernetes environment.
 
 ```mermaid
 graph LR;
