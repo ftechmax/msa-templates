@@ -26,7 +26,7 @@
     "@ngneat/transloco-messageformat": "^4.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.5.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.13.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.0",
