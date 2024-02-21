@@ -18,15 +18,15 @@ jobs:
           fetch-depth: 0
 
       - name: Test api
-        run: dotnet test ./src/templates/msa-api/ApplicationName.Api.sln
+        run: dotnet test ./src/templates/api/ApplicationName.Api.sln
 
       - name: Test worker
-        run: dotnet test ./src/templates/msa-worker/ApplicationName.Worker.sln
+        run: dotnet test ./src/templates/worker/ApplicationName.Worker.sln
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
         with:
-          versionSpec: "5.x"
+          versionSpec: '5.x'
           preferLatestVersion: true
 
       - name: Determine Version

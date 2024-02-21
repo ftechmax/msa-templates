@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - "main"
+      - 'main'
     paths:
       - 'src/**'
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
         with:
-          versionSpec: "5.x"
+          versionSpec: '5.x'
           preferLatestVersion: true
 
       - name: Determine Version
@@ -37,8 +37,8 @@ jobs:
 
       - name: Run dotnet tests and coverage
         run: |-
-          dotnet test ./src/templates/msa-api/ApplicationName.Api.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-          dotnet test ./src/templates/msa-worker/ApplicationName.Worker.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test ./src/templates/api/ApplicationName.Api.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test ./src/templates/worker/ApplicationName.Worker.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Create package
         run: dotnet pack ./src/MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
@@ -56,7 +56,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.gitversion.outputs.semVer }}
-          commit: "main"
+          commit: 'main'
           name: Release ${{ steps.gitversion.outputs.semVer }}
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
