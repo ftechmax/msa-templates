@@ -30,4 +30,10 @@
 	  <ProjectReference Include="..\ApplicationName.Worker.Contracts\ApplicationName.Worker.Contracts.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Commands\" />
+	</ItemGroup>
+
+	<Import Project="..\..\shared\ApplicationName.Shared.Test\ApplicationName.Shared.Test.projitems" Label="Shared" />
+
 </Project>

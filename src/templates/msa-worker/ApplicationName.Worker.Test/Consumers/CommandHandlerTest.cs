@@ -1,11 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
+using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
-using ApplicationName.Worker.Contracts.Commands;
-using ApplicationName.Worker.Contracts.Events;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using AutoMapper;

@@ -1,6 +1,6 @@
 ﻿using System;
-using ApplicationName.Worker.Contracts.Commands;
-using ApplicationName.Worker.Contracts.Events;
+using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Api.Application.Commands;
 

@@ -9,4 +9,11 @@
     <PackageReference Include="protobuf-net" Version="3.2.30" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\" />
+    <Folder Include="Events\" />
+  </ItemGroup>
+
+  <Import Project="..\..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems" Label="Shared" />
+
 </Project>

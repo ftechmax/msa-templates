@@ -1,4 +1,4 @@
-﻿using ApplicationName.Worker.Contracts.Events;
+﻿using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Worker.Events;
 

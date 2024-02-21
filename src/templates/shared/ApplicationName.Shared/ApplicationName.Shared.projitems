@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e8be18a2-8b36-4644-8a76-5ec98a4f86e8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>ApplicationName.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IAggregate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExampleValueObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExampleEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExample.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\IAddExampleEntityCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\ICreateExampleCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\ISetExampleRemoteCodeCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\IUpdateExampleCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\IUpdateExampleEntityCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleCreatedEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleEntityAddedEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleEntityUpdatedEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleRemoteCodeSetEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleUpdatedEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleValueObjectEventData.cs" />
+  </ItemGroup>
+</Project>

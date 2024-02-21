@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Commands;
-using ApplicationName.Worker.Contracts.Commands;
 using AutoMapper;
 using MassTransit;
 using Other.Worker.Contracts.Commands;

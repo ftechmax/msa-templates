@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationName.Worker.Cont
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{42561B62-367F-412F-8912-E67B0BB78ED4}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ApplicationName.Shared", "..\shared\ApplicationName.Shared\ApplicationName.Shared.shproj", "{E8BE18A2-8B36-4644-8A76-5EC98A4F86E8}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ApplicationName.Shared.Test", "..\shared\ApplicationName.Shared.Test\ApplicationName.Shared.Test.shproj", "{C4278FE3-EB08-46A1-A832-B6ABF15ACF76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,8 +73,14 @@ Global
 		{26B54F52-4270-455C-B82B-B535F39EF484} = {A86E0ECB-E0AA-408A-88A2-BE63EE19EE9D}
 		{B3BABD28-5ABE-4523-8E6A-1A74986F0B1C} = {A86E0ECB-E0AA-408A-88A2-BE63EE19EE9D}
 		{4777D933-0243-4E46-ACE0-91A2E0362C15} = {A86E0ECB-E0AA-408A-88A2-BE63EE19EE9D}
+		{E8BE18A2-8B36-4644-8A76-5EC98A4F86E8} = {42561B62-367F-412F-8912-E67B0BB78ED4}
+		{C4278FE3-EB08-46A1-A832-B6ABF15ACF76} = {42561B62-367F-412F-8912-E67B0BB78ED4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A7D439A6-0EA5-4C21-AA26-A10C9806F1D3}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\shared\ApplicationName.Shared.Test\ApplicationName.Shared.Test.projitems*{c4278fe3-eb08-46a1-a832-b6abf15acf76}*SharedItemsImports = 13
+		..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems*{e8be18a2-8b36-4644-8a76-5ec98a4f86e8}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

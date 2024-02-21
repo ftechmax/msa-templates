@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33712.159
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ApplicationName.Shared", "ApplicationName.Shared\ApplicationName.Shared.shproj", "{E8BE18A2-8B36-4644-8A76-5EC98A4F86E8}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ApplicationName.Shared.Test", "ApplicationName.Shared.Test\ApplicationName.Shared.Test.shproj", "{C4278FE3-EB08-46A1-A832-B6ABF15ACF76}"
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9909018D-3014-4AC0-8C25-A2B843BD47AD}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ApplicationName.Shared.Test\ApplicationName.Shared.Test.projitems*{c4278fe3-eb08-46a1-a832-b6abf15acf76}*SharedItemsImports = 13
+		ApplicationName.Shared\ApplicationName.Shared.projitems*{e8be18a2-8b36-4644-8a76-5ec98a4f86e8}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal

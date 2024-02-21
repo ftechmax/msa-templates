@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.DomainEvents;
-using ApplicationName.Worker.Contracts.Commands;
 using ArgDefender;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ApplicationName.Worker.Application.Documents;
 
-public sealed class ExampleDocument : DocumentBase
+public sealed class ExampleDocument : DocumentBase, IExample
 {
     [BsonConstructor]
     private ExampleDocument()
@@ -85,9 +86,14 @@ public sealed class ExampleDocument : DocumentBase
 
     [BsonElement("Examples")] private readonly List<ExampleEntity> _examples = new();
 
+    [BsonIgnore]
     public IReadOnlyCollection<ExampleEntity> Examples => _examples.AsReadOnly();
 
     public ExampleValueObject ExampleValueObject { get; private set; }
 
     public int? RemoteCode { get; private set; }
+
+    IReadOnlyCollection<IExampleEntity> IExample.Examples => Examples;
+
+    IExampleValueObject IExample.ExampleValueObject => throw new NotImplementedException();
 }

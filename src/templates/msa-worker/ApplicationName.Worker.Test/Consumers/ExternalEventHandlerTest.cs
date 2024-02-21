@@ -1,5 +1,8 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Consumers;
-using ApplicationName.Worker.Contracts.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using AutoMapper;
@@ -8,9 +11,6 @@ using FluentAssertions;
 using MassTransit;
 using NUnit.Framework;
 using Other.Worker.Contracts.Commands;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Worker.Test.Consumers;
 

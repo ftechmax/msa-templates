@@ -1,13 +1,13 @@
-﻿using ApplicationName.Api.Application.Repositories;
+﻿using System.Threading.Tasks;
+using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Consumers;
 using ApplicationName.Api.Contracts;
-using ApplicationName.Api.Contracts.Events;
+using ApplicationName.Shared.Events;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
 using MassTransit;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Api.Test.Consumers
 {
@@ -32,19 +32,19 @@ namespace ApplicationName.Api.Test.Consumers
             }
 
             [Test]
-            public async Task Consume_IExampleEvent()
+            public async Task Consume_IExampleCreatedEvent()
             {
                 // Arrange
-                var @event = A.Dummy<IExampleEvent>();
+                var @event = A.Dummy<IExampleCreatedEvent>();
 
-                var context = _fixture.Create<ConsumeContext<IExampleEvent>>();
+                var context = _fixture.Create<ConsumeContext<IExampleCreatedEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);
 
                 // Act
                 await _subjectUnderTest.Consume(context);
 
                 // Assert
-                A.CallTo(() => _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCacheKey)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
             }
         }
     }

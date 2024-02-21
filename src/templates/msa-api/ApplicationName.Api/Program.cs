@@ -6,6 +6,7 @@ using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
 using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
+using ApplicationName.Shared.Commands;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MassTransit;

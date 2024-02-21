@@ -1,14 +1,19 @@
 ﻿using System.Threading.Tasks;
+using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.Services;
-using ApplicationName.Worker.Contracts.Commands;
-using ApplicationName.Worker.Contracts.Events;
 using ApplicationName.Worker.Events;
 using AutoMapper;
 using MassTransit;
 
 namespace ApplicationName.Worker.Consumers;
 
-public class CommandHandler : IConsumer<ICreateExampleCommand>, IConsumer<IUpdateExampleCommand>, IConsumer<IAddExampleEntityCommand>, IConsumer<IUpdateExampleEntityCommand>, IConsumer<ISetExampleRemoteCodeCommand>
+public class CommandHandler :
+    IConsumer<ICreateExampleCommand>,
+    IConsumer<IUpdateExampleCommand>,
+    IConsumer<IAddExampleEntityCommand>,
+    IConsumer<IUpdateExampleEntityCommand>,
+    IConsumer<ISetExampleRemoteCodeCommand>
 {
     private readonly IApplicationService _applicationService;
 

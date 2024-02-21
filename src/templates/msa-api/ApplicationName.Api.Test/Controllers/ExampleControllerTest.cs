@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Api.Controllers;
@@ -6,7 +8,6 @@ using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
 using FluentAssertions;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Api.Test.Controllers;
 
@@ -30,16 +31,16 @@ public class ExampleControllerTest
     public async Task Get_With_Valid_Dto()
     {
         // Arrange
-        var dto = _fixture.Create<UpdateExampleDto>();
+        var id = _fixture.Create<Guid>();
         var returnDto = _fixture.Create<ExampleDetailsDto>();
 
-        A.CallTo(() => _applicationService.GetAsync(dto)).ReturnsLazily(() => returnDto);
+        A.CallTo(() => _applicationService.GetAsync(id)).ReturnsLazily(() => returnDto);
 
         // Act
-        var result = await _subjectUnderTest.Get(dto);
+        var result = await _subjectUnderTest.Get(id);
 
         // Assert
-        A.CallTo(() => _applicationService.GetAsync(dto)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _applicationService.GetAsync(id)).MustHaveHappenedOnceExactly();
 
         result.Should()
             .NotBeNull()

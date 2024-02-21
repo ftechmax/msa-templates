@@ -7,7 +7,7 @@ using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
-using ApplicationName.Worker.Contracts.Commands;
+using ApplicationName.Shared.Commands;
 using ArgDefender;
 using AutoMapper;
 using MassTransit;

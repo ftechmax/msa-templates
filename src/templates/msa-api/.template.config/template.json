@@ -6,7 +6,7 @@
     "language": "C#",
     "type": "solution"
   },
-  "name": ".NET 6 API microservice",
+  "name": ".NET API microservice",
   "description": "A WebApi microservice solution",
   "identity": "Dotnet.MSA.API",
   "shortName": "msa-api",

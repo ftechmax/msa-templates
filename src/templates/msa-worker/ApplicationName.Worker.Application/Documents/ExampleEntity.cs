@@ -1,11 +1,12 @@
 ﻿using System;
-using ApplicationName.Worker.Contracts.Commands;
+using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Commands;
 using ArgDefender;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ApplicationName.Worker.Application.Documents;
 
-public sealed class ExampleEntity
+public sealed class ExampleEntity : IExampleEntity
 {
     [BsonConstructor]
     private ExampleEntity()

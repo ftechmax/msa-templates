@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
-using ApplicationName.Api.Contracts.Events;
+using ApplicationName.Shared.Events;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ApplicationName.Api.Consumers;
 
-public class LocalEventHandler : IConsumer<IExampleEvent>
+public class LocalEventHandler : IConsumer<IExampleCreatedEvent>
 {
     private readonly IHubContext<ApiHub> _hub;
 
@@ -19,11 +19,11 @@ public class LocalEventHandler : IConsumer<IExampleEvent>
         _protoCacheRepository = protoCacheRepository;
     }
 
-    public async Task Consume(ConsumeContext<IExampleEvent> context)
+    public async Task Consume(ConsumeContext<IExampleCreatedEvent> context)
     {
-        await _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCacheKey);
+        await _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCollectionCacheKey);
 
-        await _hub.Clients.All.SendAsync(nameof(IExampleEvent), new
+        await _hub.Clients.All.SendAsync(nameof(IExampleCreatedEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id,

@@ -6,7 +6,7 @@
     "language": "C#",
     "type": "solution"
   },
-  "name": ".NET 6 worker microservice",
+  "name": ".NET worker microservice",
   "description": "A worker microservice solution",
   "identity": "Dotnet.MSA.Worker",
   "shortName": "msa-worker",
