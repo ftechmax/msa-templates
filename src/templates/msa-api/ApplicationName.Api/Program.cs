@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -56,18 +57,20 @@ public static class Program
                 .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration.GetValue<string>("OpenTelemetry:Endpoint"));
+                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
                 });
         });
     }
 
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        // Mongodb
-        var connectionString = $"mongodb://{configuration["mongodb:username"]}:{configuration["mongodb:password"]}@{configuration["mongodb:host"]}:27017";
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(connectionString));
+        // MongoDB
+        var connectionString = new MongoUrl($"mongodb://{configuration["mongodb:username"]}:{configuration["mongodb:password"]}@{configuration["mongodb:host"]}:27017");
+        var clientSettings = MongoClientSettings.FromUrl(connectionString);
+        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
+        services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
 
-        // Automapper
+        // AutoMapper
         services.AddAutoMapper(i => i.AddProfile<MappingProfile>());
 
         // MassTransit + RabbitMQ
@@ -94,7 +97,7 @@ public static class Program
         });
 
         // Redis
-        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:config"], true);
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:config"]!, true);
         services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
         services.AddStackExchangeRedisCache(options =>
         {
@@ -134,11 +137,10 @@ public static class Program
                 options.RecordException = true;
             })
             .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
-            .AddMongoDBInstrumentation()
             .AddRedisInstrumentation()
             .AddOtlpExporter(configure =>
             {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
+                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
             })
         );
 
@@ -148,7 +150,7 @@ public static class Program
             .AddHttpClientInstrumentation()
             .AddOtlpExporter(configure =>
             {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]);
+                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
             })
         );
     }
