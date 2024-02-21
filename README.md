@@ -24,6 +24,17 @@ Install the `MSA.Templates` package:
 dotnet new install MSA.Templates
 ```
 
+## TL;DR
+
+```console
+mkdir -p ./src ./k8s
+cd ./src
+dotnet new msa-shared -n Awesome -o shared
+dotnet new msa-worker -n Awesome -o worker
+dotnet new msa-api -n Awesome -o api
+dotnet new msa-web -n Awesome -o web
+```
+
 ## Microservice Architecture Worker
 
 This creates a layered .net application specifically designed for handling domain events and is preconfigured to run in a Kubernetes environment.
@@ -34,7 +45,6 @@ graph LR;
     A-->Wb;
     A-->W;
     W[Worker]-->A;
-    Wb-->i18n
     style W fill:#555
 ```
 
@@ -56,7 +66,6 @@ graph LR;
     A-->Wb;
     A-->W;
     W[Worker]-->A;
-    Wb-->i18n
     style A fill:#555
 ```
 
@@ -78,7 +87,6 @@ graph LR;
     A-->Wb;
     A-->W;
     W[Worker]-->A;
-    Wb-->i18n
     style Wb fill:#555
 ```
 

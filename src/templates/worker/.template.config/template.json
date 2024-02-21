@@ -15,34 +15,6 @@
   "preferNameDirectory": true,
   "primaryOutputs": [{ "path": "ApplicationName.sln" }],
   "symbols": {
-    "DevelopmentRegistry": {
-      "isRequired": true,
-      "type": "parameter",
-      "datatype": "string",
-      "replaces": "{{DEV_REGISTRY}}",
-      "description": "The fqdn of the docker registry used for development"
-    },
-    "DevelopmentHostname": {
-      "isRequired": true,
-      "type": "parameter",
-      "datatype": "string",
-      "replaces": "{{DEV_HOSTNAME}}",
-      "description": "The domain name of the wildcard dns entry for development"
-    },
-    "ProductionRegistry": {
-      "isRequired": true,
-      "type": "parameter",
-      "datatype": "string",
-      "replaces": "{{REGISTRY}}",
-      "description": "The fqdn of the docker registry used for production"
-    },
-    "ProductionHostname": {
-      "isRequired": true,
-      "type": "parameter",
-      "datatype": "string",
-      "replaces": "{{HOSTNAME}}",
-      "description": "The domain name of the wildcard dns entry for production"
-    },
     "RabbitMqSecret": {
       "type": "parameter",
       "datatype": "string",
