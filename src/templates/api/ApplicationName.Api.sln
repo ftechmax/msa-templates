@@ -80,6 +80,8 @@ Global
 		SolutionGuid = {204D76D3-597F-415A-A0F0-2FA565A4B856}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\shared\ApplicationName.Shared.Test\ApplicationName.Shared.Test.projitems*{0fa48181-dbb8-49d3-afd0-8ce2580106d5}*SharedItemsImports = 5
+		..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems*{8018aa23-acf7-417c-9bda-31646f1bd032}*SharedItemsImports = 5
 		..\shared\ApplicationName.Shared.Test\ApplicationName.Shared.Test.projitems*{c4278fe3-eb08-46a1-a832-b6abf15acf76}*SharedItemsImports = 13
 		..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems*{e8be18a2-8b36-4644-8a76-5ec98a4f86e8}*SharedItemsImports = 13
 	EndGlobalSection
