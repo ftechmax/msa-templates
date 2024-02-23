@@ -7,4 +7,4 @@ resources:
 images:
   - name: applicationname-worker
     newName: 192.168.100.2:32000/applicationname-worker
-    newTag: 'latest'
+    newTag: latest

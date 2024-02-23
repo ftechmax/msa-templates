@@ -23,7 +23,8 @@ spec:
         - name: applicationname-worker
           image: applicationname-worker
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
           env:
             - name: rabbitmq__host
               valueFrom:

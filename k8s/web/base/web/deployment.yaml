@@ -22,7 +22,8 @@ spec:
         - name: applicationname-web
           image: applicationname-web
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
           env:
             - name: APPLICATIONNAME_URL
               valueFrom:
