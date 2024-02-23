@@ -4,6 +4,7 @@ using System.Linq;
 using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.DomainEvents;
+using ApplicationName.Worker.Contracts.Commands;
 using ArgDefender;
 using MongoDB.Bson.Serialization.Attributes;
 

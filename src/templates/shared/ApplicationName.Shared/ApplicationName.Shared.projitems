@@ -15,7 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExample.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\IAddExampleEntityCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\ICreateExampleCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\ISetExampleRemoteCodeCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\IUpdateExampleCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\IUpdateExampleEntityCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleCreatedEvent.cs" />

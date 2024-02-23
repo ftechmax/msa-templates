@@ -1,5 +1,5 @@
 ﻿using System;
-using ApplicationName.Shared.Commands;
+using ApplicationName.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker.Commands
 {

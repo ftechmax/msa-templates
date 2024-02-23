@@ -1,3 +1,4 @@
+using System;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Api.Validators;
 using AutoFixture;
@@ -5,22 +6,21 @@ using AutoFixture.AutoFakeItEasy;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
-using System;
 
 namespace ApplicationName.Api.Test.Validators;
 
-public class GetExampleDtoValidatorTest
+public class UpdateExampleDtoValidatorTest
 {
     private IFixture _fixture;
 
-    private GetExampleDtoValidator _subjectUnderTest;
+    private UpdateExampleDtoValidator _subjectUnderTest;
 
     [SetUp]
     public void Setup()
     {
         _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 
-        _subjectUnderTest = _fixture.Create<GetExampleDtoValidator>();
+        _subjectUnderTest = _fixture.Create<UpdateExampleDtoValidator>();
     }
 
     [Test]

@@ -2,6 +2,7 @@
 using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
+using ApplicationName.Worker.Contracts.Commands;
 using ArgDefender;
 
 namespace ApplicationName.Worker.Application.Services;

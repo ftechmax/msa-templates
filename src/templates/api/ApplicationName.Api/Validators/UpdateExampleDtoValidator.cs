@@ -3,10 +3,9 @@ using FluentValidation;
 
 namespace ApplicationName.Api.Validators;
 
-// ReSharper disable once ClassNeverInstantiated.Global
-public class GetExampleDtoValidator : AbstractValidator<UpdateExampleDto>
+public class UpdateExampleDtoValidator : AbstractValidator<UpdateExampleDto>
 {
-    public GetExampleDtoValidator()
+    public UpdateExampleDtoValidator()
     {
         RuleFor(i => i.Id).NotEmpty();
     }

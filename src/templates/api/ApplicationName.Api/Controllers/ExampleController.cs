@@ -9,36 +9,41 @@ namespace ApplicationName.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ExampleController : ControllerBase
+public class ExampleController(IExampleService applicationService) : ControllerBase
 {
-    private readonly IExampleService _applicationService;
-
-    public ExampleController(IExampleService applicationService)
-    {
-        _applicationService = applicationService;
-    }
-
     [HttpGet]
     public Task<IEnumerable<ExampleCollectionDto>> GetCollection()
     {
-        return _applicationService.GetCollectionAsync();
+        return applicationService.GetCollectionAsync();
     }
 
     [HttpGet("{id}")]
     public Task<ExampleDetailsDto> Get(Guid id)
     {
-        return _applicationService.GetAsync(id);
+        return applicationService.GetAsync(id);
     }
 
     [HttpPost]
     public Task Post([FromBody] CreateExampleDto dto)
     {
-        return _applicationService.HandleAsync(dto);
+        return applicationService.HandleAsync(dto);
     }
 
     [HttpPut("{id}")]
     public Task Put(Guid id, [FromBody] UpdateExampleDto dto)
     {
-        return _applicationService.HandleAsync(id, dto);
+        return applicationService.HandleAsync(id, dto);
+    }
+
+    [HttpPost("{id}/entities")]
+    public Task Put(Guid id, [FromBody] AddExampleEntityDto dto)
+    {
+        return applicationService.HandleAsync(id, dto);
+    }
+
+    [HttpPut("{id}/entities/{entityId}")]
+    public Task Put(Guid id, Guid entityId, [FromBody] UpdateExampleEntityDto dto)
+    {
+        return applicationService.HandleAsync(id, entityId, dto);
     }
 }

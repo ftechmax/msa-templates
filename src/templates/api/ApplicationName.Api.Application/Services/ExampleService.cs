@@ -99,4 +99,23 @@ public sealed class ExampleService : IExampleService
         var command = _mapper.Map<UpdateExampleCommand>(dto);
         return _sendEndpoint.Send<IUpdateExampleCommand>(command);
     }
+
+    public Task HandleAsync(Guid id, AddExampleEntityDto dto)
+    {
+        Guard.Argument(id).NotDefault();
+        Guard.Argument(dto).NotNull();
+
+        var command = _mapper.Map<AddExampleEntityCommand>(dto);
+        return _sendEndpoint.Send<IAddExampleEntityCommand>(command);
+    }
+
+    public Task HandleAsync(Guid id, Guid entityId, UpdateExampleEntityDto dto)
+    {
+        Guard.Argument(id).NotDefault();
+        Guard.Argument(entityId).NotDefault();
+        Guard.Argument(dto).NotNull();
+
+        var command = _mapper.Map<UpdateExampleEntityCommand>(dto);
+        return _sendEndpoint.Send<IUpdateExampleEntityCommand>(command);
+    }
 }

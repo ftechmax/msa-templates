@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace ApplicationName.Api.Validators;
 
-public class CreateExampleDtoValidator : AbstractValidator<CreateExampleDto>
+public class AddExampleEntityDtoValidator : AbstractValidator<AddExampleEntityDto>
 {
-    public CreateExampleDtoValidator()
+    public AddExampleEntityDtoValidator()
     {
         RuleFor(i => i.Name).NotEmpty();
     }
