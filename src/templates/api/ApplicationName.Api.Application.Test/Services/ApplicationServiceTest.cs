@@ -7,8 +7,8 @@ using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts;
-using ApplicationName.Api.Contracts.Documents;
 using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
@@ -57,14 +57,15 @@ public class ApplicationServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var dto = _fixture.Create<ExampleDetailsDto>();
+        var cacheKey = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
 
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).ReturnsLazily(() => dto);
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).ReturnsLazily(() => dto);
 
         // Act
         var result = await _subjectUnderTest.GetAsync(id);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>($"{ApplicationConstants.ExampleDetailsCacheKey}_{id:D}")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustNotHaveHappened();
 
         result.Should()
@@ -78,16 +79,17 @@ public class ApplicationServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var document = GenerateDocument();
+        var cacheKey = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
 
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).ReturnsLazily(() => document);
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).Returns(default(ExampleDetailsDto));
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
 
         // Act
         var result = await _subjectUnderTest.GetAsync(id);
 
         // Assert
         A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>($"{ApplicationConstants.ExampleDetailsCacheKey}_{id:D}")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
 
         result.Should()
@@ -147,10 +149,10 @@ public class ApplicationServiceTest
         var mapper = new MapperConfiguration(configure =>
         {
             configure.ShouldMapProperty = i => i.PropertyType.IsPublic || i.PropertyType.IsNotPublic;
-            configure.CreateMap<IDocumentBase, ExampleDocument>();
+            configure.CreateMap<IAggregate, ExampleDocument>();
         }).CreateMapper();
 
-        mapper.Map(A.Dummy<IDocumentBase>(), instance);
+        mapper.Map(A.Dummy<IAggregate>(), instance);
 
         var propertyInfo = instance.GetType().GetProperty(nameof(ExampleDocument.Name));
         propertyInfo.SetValue(instance, Convert.ChangeType(_fixture.Create<string>(), propertyInfo.PropertyType), null);

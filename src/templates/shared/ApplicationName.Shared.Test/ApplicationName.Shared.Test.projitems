@@ -9,10 +9,10 @@
     <Import_RootNamespace>ApplicationName.Shared.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Aggregates\" />
     <Folder Include="$(MSBuildThisFileDirectory)Events\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\AggregateDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CreateExampleCommandDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleValueObjectEventDataDummyFactory.cs" />
   </ItemGroup>

@@ -1,10 +1,12 @@
-﻿using ApplicationName.Api.Application.Commands;
+﻿using System.Diagnostics.CodeAnalysis;
+using ApplicationName.Api.Application.Commands;
 using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Contracts.Dtos;
 using AutoMapper;
 
 namespace ApplicationName.Api;
 
+[ExcludeFromCodeCoverage]
 public class MappingProfile : Profile
 {
     public MappingProfile()

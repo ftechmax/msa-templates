@@ -1,10 +1,10 @@
-﻿using ApplicationName.Api.Contracts.Documents;
+﻿using System;
+using ApplicationName.Shared.Aggregates;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace ApplicationName.Api.Application.Documents;
 
-public abstract class DocumentBase : IDocumentBase
+public abstract class DocumentBase : IAggregate
 {
     [BsonId]
     public Guid Id { get; protected set; }
