@@ -1,10 +1,11 @@
-﻿using ApplicationName.Shared.Events;
+﻿using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Events;
 using ArgDefender;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ApplicationName.Worker.Application.Documents;
 
-public sealed class ExampleValueObject
+public sealed class ExampleValueObject : IExampleValueObject
 {
     [BsonConstructor]
     private ExampleValueObject()

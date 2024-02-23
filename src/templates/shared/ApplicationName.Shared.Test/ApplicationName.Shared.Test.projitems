@@ -9,6 +9,9 @@
     <Import_RootNamespace>ApplicationName.Shared.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleDummyFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleEntityDummyFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleValueObjectDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\AggregateDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\UpdateExampleEntityCommandDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\AddExampleEntityCommandDummyFactory.cs" />

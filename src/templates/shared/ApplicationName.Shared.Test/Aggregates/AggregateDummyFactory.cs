@@ -6,7 +6,7 @@ using FakeItEasy;
 
 namespace ApplicationName.Shared.Test.Aggregates;
 
-internal class AggregateDummyFactory : DummyFactory<IAggregate>
+public class AggregateDummyFactory : DummyFactory<IAggregate>
 {
     private readonly IFixture _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ApplicationName.Shared.Test.Commands;
+using ApplicationName.Shared.Test.Aggregates;
 using FakeItEasy;
 
 namespace ApplicationName.Api.Application.Test;
@@ -11,7 +11,7 @@ public class TestBootstrap : DefaultBootstrapper
     {
         return new[]
         {
-            typeof(CreateExampleCommandDummyFactory).Assembly.Location
+            typeof(AggregateDummyFactory).Assembly.Location
         };
     }
 }

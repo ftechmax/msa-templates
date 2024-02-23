@@ -7,7 +7,7 @@ using FakeItEasy;
 
 namespace ApplicationName.Shared.Test.Commands;
 
-public class UpdateExampleCommandDummyFactory : DummyFactory<IUpdateExampleCommand>
+internal class UpdateExampleCommandDummyFactory : DummyFactory<IUpdateExampleCommand>
 {
     private readonly IFixture _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 

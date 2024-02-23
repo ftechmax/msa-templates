@@ -6,7 +6,7 @@ using FakeItEasy;
 
 namespace ApplicationName.Shared.Test.Commands;
 
-public class UpdateExampleEntityCommandDummyFactory : DummyFactory<IUpdateExampleEntityCommand>
+internal class UpdateExampleEntityCommandDummyFactory : DummyFactory<IUpdateExampleEntityCommand>
 {
     private readonly IFixture _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 

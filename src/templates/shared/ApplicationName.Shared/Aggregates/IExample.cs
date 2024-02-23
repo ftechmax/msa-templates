@@ -2,7 +2,7 @@
 
 namespace ApplicationName.Shared.Aggregates;
 
-public interface IExample
+public interface IExample : IAggregate
 {
     string Name { get; }
 
