@@ -1,0 +1,13 @@
+{
+  "name": "migrate",
+  "version": "1.0.0",
+  "scripts": {
+    "migrate": "node migrate.js",
+    "migrate-dev": "(for /F \"tokens=*\" %i in (.env) do set %i) && node migrate.js"
+  },
+  "dependencies": {
+    "migrate": "^1.8.0",
+    "mongodb": "^5.8.0"
+  },
+  "devDependencies": {}
+}
