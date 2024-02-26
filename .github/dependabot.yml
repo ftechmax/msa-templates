@@ -4,11 +4,25 @@ updates:
     directory: "/src/templates/msa-web"
     schedule:
       interval: "weekly"
+    groups:
+      angular:
+        patterns:
+        - "*"
+        update-types:
+        - "minor"
+        - "patch"
 
   - package-ecosystem: "nuget"
     directory: "/src/templates/msa-api"
     schedule:
       interval: "weekly"
+    groups:
+      nuget:
+        patterns:
+        - "*"
+        update-types:
+        - "minor"
+        - "patch"
 
   - package-ecosystem: "docker"
     directory: "/src/templates/msa-api/ApplicationName.Api"
@@ -19,6 +33,13 @@ updates:
     directory: "/src/templates/msa-worker"
     schedule:
       interval: "weekly"
+    groups:
+      nuget:
+        patterns:
+        - "*"
+        update-types:
+        - "minor"
+        - "patch"
 
   - package-ecosystem: "docker"
     directory: "/src/templates/msa-worker/ApplicationName.Worker"
