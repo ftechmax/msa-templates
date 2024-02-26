@@ -22,7 +22,7 @@
     "@fortawesome/angular-fontawesome": "^0.14.1",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
-    "@ngneat/transloco": "^4.3.0",
+    "@ngneat/transloco": "^6.0.4",
     "@ngneat/transloco-messageformat": "^4.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.6.2",
