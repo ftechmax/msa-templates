@@ -33,9 +33,11 @@ public sealed class ExampleEntity : IExampleEntity
         SomeValue = command.SomeValue;
     }
 
-    public Guid Id { get; private set; }
+    [BsonElement]
+    public Guid Id { get; }
 
-    public string Name { get; private set; }
+    [BsonElement]
+    public string Name { get; }
 
     public float SomeValue { get; private set; }
 }

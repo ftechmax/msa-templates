@@ -81,11 +81,13 @@ public sealed class ExampleDocument : DocumentBase, IExample
         return (document, new ExampleCreated(document));
     }
 
-    public string Name { get; private set; }
+    [BsonElement]
+    public string Name { get; }
 
     public string Description { get; private set; }
 
-    [BsonElement("Examples")] private readonly List<ExampleEntity> _examples = new();
+    [BsonElement(nameof(Examples))]
+    private readonly List<ExampleEntity> _examples = new();
 
     [BsonIgnore]
     public IReadOnlyCollection<ExampleEntity> Examples => _examples.AsReadOnly();
@@ -94,7 +96,9 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
     public int? RemoteCode { get; private set; }
 
+    [BsonIgnore]
     IReadOnlyCollection<IExampleEntity> IExample.Examples => Examples;
 
-    IExampleValueObject IExample.ExampleValueObject => throw new NotImplementedException();
+    [BsonIgnore]
+    IExampleValueObject IExample.ExampleValueObject => ExampleValueObject;
 }
