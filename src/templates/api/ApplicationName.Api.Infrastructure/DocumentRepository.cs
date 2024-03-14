@@ -8,14 +8,9 @@ using MongoDB.Driver;
 namespace ApplicationName.Api.Infrastructure;
 
 [ExcludeFromCodeCoverage]
-public sealed class DocumentRepository : IDocumentRepository
+public sealed class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
 {
-    private readonly IMongoDatabase _mongoDatabase;
-
-    public DocumentRepository(IMongoClient mongoClient)
-    {
-        _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
-    }
+    private readonly IMongoDatabase _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
 
     public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {

@@ -6,22 +6,15 @@ using ArgDefender;
 
 namespace ApplicationName.Worker.Application.Services;
 
-public class ApplicationService : IApplicationService
+public class ApplicationService(IDocumentRepository documentRepository) : IApplicationService
 {
-    private readonly IDocumentRepository _documentRepository;
-
-    public ApplicationService(IDocumentRepository documentRepository)
-    {
-        _documentRepository = documentRepository;
-    }
-
     public async Task<ExampleCreated> HandleAsync(ICreateExampleCommand command)
     {
         Guard.Argument(command).NotNull();
 
         var (aggregate, domainEvent) = ExampleDocument.Create(command);
 
-        await _documentRepository.UpsertAsync(aggregate);
+        await documentRepository.UpsertAsync(aggregate);
 
         return domainEvent;
     }
@@ -31,11 +24,11 @@ public class ApplicationService : IApplicationService
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Id).NotDefault();
 
-        var document = await _documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
+        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
         var domainEvent = document.Update(command);
 
-        await _documentRepository.UpsertAsync(document);
+        await documentRepository.UpsertAsync(document);
 
         return domainEvent;
     }
@@ -45,11 +38,11 @@ public class ApplicationService : IApplicationService
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Id).NotDefault();
 
-        var document = await _documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
+        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
         var domainEvent = document.AddExampleEntity(command);
 
-        await _documentRepository.UpsertAsync(document);
+        await documentRepository.UpsertAsync(document);
 
         return domainEvent;
     }
@@ -59,11 +52,11 @@ public class ApplicationService : IApplicationService
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Id).NotDefault();
 
-        var document = await _documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
+        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
         var domainEvent = document.UpdateExampleEntity(command);
 
-        await _documentRepository.UpsertAsync(document);
+        await documentRepository.UpsertAsync(document);
 
         return domainEvent;
     }
@@ -73,11 +66,11 @@ public class ApplicationService : IApplicationService
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Id).NotDefault();
 
-        var document = await _documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
+        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
         var domainEvent = document.SetRemoteCode(command);
 
-        await _documentRepository.UpsertAsync(document);
+        await documentRepository.UpsertAsync(document);
 
         return domainEvent;
     }
