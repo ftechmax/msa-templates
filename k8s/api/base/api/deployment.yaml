@@ -47,4 +47,4 @@ spec:
                   name: '{{MONGODB-SECRET-NAME}}'
                   key: connectionString.standard
             - name: redis__connection-string
-              value: redis.redis-system.svc
+              value: '{{REDIS-SERVICE}}'

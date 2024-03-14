@@ -28,6 +28,13 @@
       "defaultValue": "mongodb-user-password",
       "replaces": "{{MONGODB-SECRET-NAME}}",
       "description": "The name of the MongoDB secret"
+    },
+    "RedisService": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "redis.redis-system",
+      "replaces": "{{REDIS-SERVICE}}",
+      "description": "The redis service"
     }
   }
 }
