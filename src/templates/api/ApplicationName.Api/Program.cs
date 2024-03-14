@@ -66,10 +66,12 @@ public static class Program
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         // MongoDB
-        var connectionString = new MongoUrl($"mongodb://{configuration["mongodb:username"]}:{configuration["mongodb:password"]}@{configuration["mongodb:host"]}:27017");
-        var clientSettings = MongoClientSettings.FromUrl(connectionString);
+        var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
+
+        // SignalR
+        services.AddSignalR();
 
         // AutoMapper
         services.AddAutoMapper(i => i.AddProfile<MappingProfile>());
@@ -98,11 +100,11 @@ public static class Program
         });
 
         // Redis
-        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:config"]!, true);
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:connection-string"]!, true);
         services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration["redis:config"];
+            options.Configuration = configuration["redis:connection-string"];
             options.InstanceName = $"{configuration["redis:instance"]}_";
         });
 
