@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Threading.Tasks;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
@@ -9,9 +7,6 @@ using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using MassTransit;
 using MassTransit.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using OpenTelemetry.Logs;

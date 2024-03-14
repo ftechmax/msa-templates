@@ -1,4 +1,3 @@
-using System;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using AutoFixture;

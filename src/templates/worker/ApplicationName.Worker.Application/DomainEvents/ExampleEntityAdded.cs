@@ -1,5 +1,4 @@
-﻿using System;
-using ApplicationName.Worker.Application.Documents;
+﻿using ApplicationName.Worker.Application.Documents;
 
 namespace ApplicationName.Worker.Application.DomainEvents;
 

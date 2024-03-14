@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ApplicationName.Shared.Commands;
+﻿using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
 

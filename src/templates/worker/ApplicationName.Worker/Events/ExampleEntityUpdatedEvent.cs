@@ -1,5 +1,4 @@
-﻿using System;
-using ApplicationName.Shared.Events;
+﻿using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Worker.Events;
 

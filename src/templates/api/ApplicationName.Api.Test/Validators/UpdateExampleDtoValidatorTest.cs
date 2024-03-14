@@ -1,4 +1,3 @@
-using System;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Api.Validators;
 using AutoFixture;

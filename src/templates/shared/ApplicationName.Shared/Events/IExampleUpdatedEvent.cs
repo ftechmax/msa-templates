@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApplicationName.Shared.Events;
+﻿namespace ApplicationName.Shared.Events;
 
 public interface IExampleUpdatedEvent
 {

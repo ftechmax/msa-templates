@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Threading.Tasks;
 using ApplicationName.Api.Application.Repositories;
 using ArgDefender;
 using Microsoft.Extensions.Caching.Distributed;
@@ -8,20 +6,13 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace ApplicationName.Api.Infrastructure;
 
 [ExcludeFromCodeCoverage]
-public sealed class ProtoCacheRepository : IProtoCacheRepository
+public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : IProtoCacheRepository
 {
-    private readonly IDistributedCache _distributedCache;
-
-    public ProtoCacheRepository(IDistributedCache distributedCache)
-    {
-        _distributedCache = distributedCache;
-    }
-
     public async Task<T> GetAsync<T>(string key)
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
 
-        var bytes = await _distributedCache.GetAsync(key);
+        var bytes = await distributedCache.GetAsync(key);
         if (bytes == default)
         {
             return default;
@@ -41,11 +32,11 @@ public sealed class ProtoCacheRepository : IProtoCacheRepository
         ProtoBuf.Serializer.Serialize(ms, obj);
         ms.Position = 0;
 
-        await _distributedCache.SetAsync(key, ms.ToArray(), options);
+        await distributedCache.SetAsync(key, ms.ToArray(), options);
     }
 
     public Task RemoveAsync(string key)
     {
-        return _distributedCache.RemoveAsync(key);
+        return distributedCache.RemoveAsync(key);
     }
 }

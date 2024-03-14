@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApplicationName.Worker.Contracts.Commands;
+﻿namespace ApplicationName.Worker.Contracts.Commands;
 
 public interface ISetExampleRemoteCodeCommand
 {

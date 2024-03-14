@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApplicationName.Shared.Aggregates;
+﻿namespace ApplicationName.Shared.Aggregates;
 
 public interface IExampleEntity
 {

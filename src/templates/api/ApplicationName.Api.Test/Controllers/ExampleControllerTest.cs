@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Api.Controllers;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts;

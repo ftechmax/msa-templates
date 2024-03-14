@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using ApplicationName.Worker.Consumers;
 using ApplicationName.Worker.Contracts.Commands;
 using AutoFixture;

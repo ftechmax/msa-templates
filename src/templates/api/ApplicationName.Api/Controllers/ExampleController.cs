@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ApplicationName.Api.Application.Services;
+﻿using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts.Dtos;
 using Microsoft.AspNetCore.Mvc;
 

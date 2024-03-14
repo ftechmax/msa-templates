@@ -1,4 +1,3 @@
-using System;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;

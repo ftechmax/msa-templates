@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ApplicationName.Api.Application.Repositories;
+﻿using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Shared.Events;
 using MassTransit;

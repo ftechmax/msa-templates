@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.Documents;

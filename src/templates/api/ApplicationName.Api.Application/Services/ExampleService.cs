@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ApplicationName.Api.Application.Commands;
+﻿using ApplicationName.Api.Application.Commands;
 using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;

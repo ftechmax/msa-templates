@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApplicationName.Api.Contracts.Dtos;
+﻿namespace ApplicationName.Api.Contracts.Dtos;
 
 public class UpdateExampleDto
 {

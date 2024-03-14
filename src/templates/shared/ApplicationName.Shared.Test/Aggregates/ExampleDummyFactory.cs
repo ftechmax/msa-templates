@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ApplicationName.Shared.Aggregates;
+﻿using ApplicationName.Shared.Aggregates;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;

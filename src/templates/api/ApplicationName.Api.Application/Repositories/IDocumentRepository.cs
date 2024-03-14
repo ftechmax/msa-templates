@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using ApplicationName.Api.Application.Documents;
 
 namespace ApplicationName.Api.Application.Repositories;

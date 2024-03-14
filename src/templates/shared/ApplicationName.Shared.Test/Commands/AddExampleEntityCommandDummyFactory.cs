@@ -1,4 +1,3 @@
-using System;
 using ApplicationName.Shared.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;

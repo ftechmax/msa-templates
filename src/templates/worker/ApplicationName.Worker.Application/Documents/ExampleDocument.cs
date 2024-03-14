@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ApplicationName.Shared.Aggregates;
+﻿using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
