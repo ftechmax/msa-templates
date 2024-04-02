@@ -7,5 +7,5 @@ spec:
   prefix: /
   rewrite: /
   service: applicationname-web:80
-  host: HOSTNAME
+  host: '^applicationname\..+$'
   host_regex: true

@@ -7,7 +7,7 @@ spec:
   prefix: /api/
   rewrite: /
   service: applicationname-api:80
-  host: HOSTNAME
+  host: '^applicationname\..+$'
   host_regex: true
   cors:
     origins: ['*']
