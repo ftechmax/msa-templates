@@ -10,7 +10,9 @@ jobs:
     if: github.event.pull_request.draft == false
     name: Tests
     runs-on: [ubuntu-latest]
-    container: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    container: 
+      image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+      options: --user 1001
     steps:
       - name: Checkout
         uses: actions/checkout@v4
