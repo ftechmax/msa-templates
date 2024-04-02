@@ -4,7 +4,6 @@ updates:
     directory: '/src/templates/web'
     schedule:
       interval: 'monthly'
-    target-branch: 'develop'
     groups:
       angular:
         applies-to: security-updates
@@ -17,8 +16,7 @@ updates:
   - package-ecosystem: 'nuget'
     directory: '/src/templates/api'
     schedule:
-      interval: 'weekly'
-    target-branch: 'develop'
+      interval: 'monthly'
     groups:
       nuget:
         patterns:
@@ -30,8 +28,7 @@ updates:
   - package-ecosystem: 'nuget'
     directory: '/src/templates/worker'
     schedule:
-      interval: 'weekly'
-    target-branch: 'develop'
+      interval: 'monthly'
     groups:
       nuget:
         patterns:
@@ -44,16 +41,13 @@ updates:
     directory: '/src/templates/web'
     schedule:
       interval: 'monthly'
-    target-branch: 'develop'
 
   - package-ecosystem: 'docker'
     directory: '/src/templates/api/ApplicationName.Api'
     schedule:
       interval: 'monthly'
-    target-branch: 'develop'
 
   - package-ecosystem: 'docker'
     directory: '/src/templates/worker/ApplicationName.Worker'
     schedule:
       interval: 'monthly'
-    target-branch: 'develop'
