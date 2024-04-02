@@ -5,7 +5,6 @@
 export const environment = {
   production: false,
   apiUrl: 'http://applicationname.kube.local',
-  internationalizationUrl: 'http://internationalization.kube.local',
 };
 
 /*
