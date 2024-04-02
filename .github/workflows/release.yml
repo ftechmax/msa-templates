@@ -12,7 +12,9 @@ jobs:
   release:
     name: Release
     runs-on: [ubuntu-latest]
-    container: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    container: 
+      image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+      options: --user 1001
     permissions:
       contents: write
       packages: write

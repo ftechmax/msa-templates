@@ -13,7 +13,7 @@ server {
 
     location ^~ /config.js {
         add_header Content-Type text/javascript;
-        return 200 'var appConfig = { apiUrl: \'${APPLICATIONNAME_URL}\', internationalizationUrl: \'${INTERNATIONALIZATION_URL}\' };';
+        return 200 'var appConfig = { apiUrl: \'${APPLICATIONNAME_URL}\' };';
     }
 
     # redirect server error pages to the static page /50x.html

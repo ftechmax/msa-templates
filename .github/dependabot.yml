@@ -3,22 +3,46 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/src/templates/web'
     schedule:
-      interval: 'weekly'
+      interval: 'monthly'
+    groups:
+      angular:
+        applies-to: security-updates
+        patterns:
+            - "*" 
+        update-types:
+        - "minor"
+        - "patch"
 
   - package-ecosystem: 'nuget'
     directory: '/src/templates/api'
     schedule:
       interval: 'weekly'
-
-  - package-ecosystem: 'docker'
-    directory: '/src/templates/api/ApplicationName.Api'
-    schedule:
-      interval: 'monthly'
+    groups:
+      nuget:
+        applies-to: security-updates
+        patterns:
+            - "*" 
+        update-types:
+        - "minor"
+        - "patch"
 
   - package-ecosystem: 'nuget'
     directory: '/src/templates/worker'
     schedule:
       interval: 'weekly'
+    groups:
+      nuget:
+        applies-to: security-updates
+        patterns:
+            - "*" 
+        update-types:
+        - "minor"
+        - "patch"
+
+  - package-ecosystem: 'docker'
+    directory: '/src/templates/api/ApplicationName.Api'
+    schedule:
+      interval: 'monthly'
 
   - package-ecosystem: 'docker'
     directory: '/src/templates/worker/ApplicationName.Worker'
