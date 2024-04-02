@@ -1,0 +1,11 @@
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: applicationname-web
+spec:
+  prefix: /
+  rewrite: /
+  service: applicationname-web:80
+  host: '^applicationname\..+$'
+  host_regex: true

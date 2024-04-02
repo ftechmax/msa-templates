@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "ftechmax",
+  "classifications": ["Web", "WebAPI", "MSA"],
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "name": "Angular web microservice",
+  "description": "A web microservice project",
+  "identity": "Dotnet.MSA.Web",
+  "shortName": "msa-web",
+  "defaultName": "web1",
+  "sourceName": "ApplicationName",
+  "preferNameDirectory": false,
+  "symbols": {}
+}

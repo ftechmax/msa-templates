@@ -1,0 +1,4 @@
+version: 0.1
+env:
+  - name: redis__connection-string
+    value: $(services:{{REDIS-SERVICE}})

@@ -3,34 +3,37 @@ name: Pull request
 on:
   merge_group:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, ready_for_review]
 
 jobs:
-  build:
+  test:
+    if: github.event.pull_request.draft == false
     name: Tests
     runs-on: [ubuntu-latest]
-    container: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    container: 
+      image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+      options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Test api
-        run: dotnet test ./src/templates/msa-api/ApplicationName.Api.sln
+        run: dotnet test ./src/templates/api/ApplicationName.Api.sln
 
       - name: Test worker
-        run: dotnet test ./src/templates/msa-worker/ApplicationName.Worker.sln
+        run: dotnet test ./src/templates/worker/ApplicationName.Worker.sln
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0
+        uses: gittools/actions/gitversion/setup@v1.1.1
         with:
-          versionSpec: "5.x"
+          versionSpec: '5.x'
           preferLatestVersion: true
 
       - name: Determine Version
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0
+        uses: gittools/actions/gitversion/execute@v1.1.1
         with:
           useConfigFile: true
 

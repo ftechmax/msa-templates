@@ -4,7 +4,7 @@ This project contains a set of templates to build an application following speci
 
 [![NuGet](https://img.shields.io/nuget/v/MSA.Templates.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/MSA.Templates/)
 [![Release](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml/badge.svg)](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml)
-[![codecov](https://codecov.io/gh/ftechmax/msa-templates/graph/badge.svg?token=I4QI609IIQ)](https://codecov.io/gh/ftechmax/msa-templates)  
+[![codecov](https://codecov.io/gh/ftechmax/msa-templates/graph/badge.svg?token=I4QI609IIQ)](https://codecov.io/gh/ftechmax/msa-templates)
 
 ## Table of contents
 
@@ -21,7 +21,18 @@ This project contains a set of templates to build an application following speci
 Install the `MSA.Templates` package:
 
 ```console
-dotnet new -i MSA.Templates
+dotnet new install MSA.Templates
+```
+
+## TL;DR
+
+```console
+mkdir -p ./src ./k8s
+cd ./src
+dotnet new msa-shared -n Awesome -o shared
+dotnet new msa-worker -n Awesome -o worker
+dotnet new msa-api -n Awesome -o api
+dotnet new msa-web -n Awesome -o web
 ```
 
 ## Microservice Architecture Worker
@@ -34,7 +45,6 @@ graph LR;
     A-->Wb;
     A-->W;
     W[Worker]-->A;
-    Wb-->i18n
     style W fill:#555
 ```
 
@@ -56,7 +66,6 @@ graph LR;
     A-->Wb;
     A-->W;
     W[Worker]-->A;
-    Wb-->i18n
     style A fill:#555
 ```
 
@@ -78,7 +87,6 @@ graph LR;
     A-->Wb;
     A-->W;
     W[Worker]-->A;
-    Wb-->i18n
     style Wb fill:#555
 ```
 
