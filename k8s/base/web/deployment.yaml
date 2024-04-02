@@ -18,9 +18,20 @@ spec:
       annotations:
         prometheus.io.scrape: 'true'
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: applicationname-web
-          image: applicationname-web
+          image: applicationname-web:latest
+          imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - all
           ports:
             - name: http
               containerPort: 8080
@@ -30,11 +41,6 @@ spec:
                 configMapKeyRef:
                   name: applicationname-web-config
                   key: applicationname-url
-            - name: INTERNATIONALIZATION_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: applicationname-web-config
-                  key: internationalization-url
           volumeMounts:
             - mountPath: /var/cache/nginx/
               name: cache
@@ -44,6 +50,12 @@ spec:
               name: confd
             - mountPath: /var/run/
               name: run
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 3
           resources:
             limits:
               memory: 25Mi

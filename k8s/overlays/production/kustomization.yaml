@@ -4,9 +4,13 @@ kind: Kustomization
 namespace: default
 resources:
   - ./../../base
-patches:
-  - path: './patches/worker/patch-security-context.yaml'
 images:
   - name: applicationname-worker
     newName: '{{REGISTRY}}/applicationname-worker'
+    newTag: '{{IMAGE_TAG}}'
+  - name: applicationname-api
+    newName: '{{REGISTRY}}/applicationname-api'
+    newTag: '{{IMAGE_TAG}}'
+  - name: applicationname-web
+    newName: '{{REGISTRY}}/applicationname-web'
     newTag: '{{IMAGE_TAG}}'

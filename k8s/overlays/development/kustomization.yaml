@@ -26,6 +26,12 @@ patches:
       kind: Mapping
       name: applicationname-api-hub
 images:
+  - name: applicationname-worker
+    newName: '{{DEV_REGISTRY}}/applicationname-worker'
+    newTag: '{{IMAGE_TAG}}'
   - name: applicationname-api
     newName: '{{DEV_REGISTRY}}/applicationname-api'
+    newTag: '{{IMAGE_TAG}}'
+  - name: applicationname-web
+    newName: '{{DEV_REGISTRY}}/applicationname-web'
     newTag: '{{IMAGE_TAG}}'

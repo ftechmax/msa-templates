@@ -2,26 +2,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: applicationname-worker
+  name: applicationname-api
   labels:
-    app: applicationname-worker
+    app: applicationname-api
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: applicationname-worker
+      app: applicationname-api
   template:
     metadata:
       labels:
-        app: applicationname-worker
+        app: applicationname-api
       annotations:
         prometheus.io.scrape: 'true'
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: applicationname-worker
-          image: applicationname-worker
+        - name: applicationname-api
+          image: applicationname-api:latest
+          imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10000
+            runAsGroup: 20000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - all
           ports:
             - name: http
               containerPort: 8080
@@ -46,3 +56,18 @@ spec:
                 secretKeyRef:
                   name: '{{MONGODB-SECRET-NAME}}'
                   key: connectionString.standard
+            - name: redis__connection-string
+              value: '{{REDIS-SERVICE}}'
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources:
+            limits:
+              memory: 100Mi
+              cpu: 100m
+            requests:
+              memory: 30Mi
+              cpu: 10m
