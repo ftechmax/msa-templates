@@ -6,11 +6,11 @@ resources:
   - ./../../base
 images:
   - name: applicationname-worker
-    newName: '{{DEV_REGISTRY}}/applicationname-worker'
+    newName: '{{REGISTRY}}/applicationname-worker'
     newTag: '{{IMAGE_TAG}}'
   - name: applicationname-api
-    newName: '{{DEV_REGISTRY}}/applicationname-api'
+    newName: '{{REGISTRY}}/applicationname-api'
     newTag: '{{IMAGE_TAG}}'
   - name: applicationname-web
-    newName: '{{DEV_REGISTRY}}/applicationname-web'
+    newName: '{{REGISTRY}}/applicationname-web'
     newTag: '{{IMAGE_TAG}}'
