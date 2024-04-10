@@ -14,8 +14,8 @@ param (
 $kebabCaseServiceName = ($ServiceName -creplace '([A-Z])', '-$1' -replace '^-', '' -replace ' ', '-').toLower()
 Write-Host "Service name: $kebabCaseServiceName"
 
-$ProjectFolder = (Join-Path -Path $DestinationFolder -ChildPath $ServiceName)
-if (-not (Test-Path -Path $ProjectFolder)) {
+$ProjectFolder = (Join-Path -Path $DestinationFolder -ChildPath $kebabCaseServiceName)
+if (-not (Test-Path -Path $ProjectFolder -ErrorAction SilentlyContinue)) {
     New-Item -ItemType Directory -Path $ProjectFolder | Out-Null
     Write-Host "Created project folder: $ProjectFolder"
 } else {
