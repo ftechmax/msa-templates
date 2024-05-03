@@ -6,10 +6,59 @@ on:
     types: [opened, synchronize, ready_for_review]
 
 jobs:
-  test:
+  test-api:
     if: github.event.pull_request.draft == false
-    name: Build and test api / worker
+    name: Test api
     runs-on: [ubuntu-latest]
+    container: 
+      image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Test api
+        run: dotnet test ./src/templates/api/ApplicationName.Api.sln
+
+  test-worker:
+    if: github.event.pull_request.draft == false
+    name: Test worker
+    runs-on: [ubuntu-latest]
+    container: 
+      image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test worker
+        run: dotnet test ./src/templates/worker/ApplicationName.Worker.sln
+
+  test-web:
+    if: github.event.pull_request.draft == false
+    name: Test web
+    runs-on: ubuntu-latest
+    container: 
+      image: node:lts-alpine
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          cd ./src/templates/web
+          npm ci
+          
+      # - name: Run Unit Tests
+      #   run: npm run test
+        
+      - name: Build Application
+        run: |
+          cd ./src/templates/web
+          npm run build
+
+  test-package:
+    if: github.event.pull_request.draft == false
+    name: Build package
+    runs-on: [ubuntu-latest]
+    needs: [test-api, test-worker, test-web]
     container: 
       image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
       options: --user 1001
@@ -18,12 +67,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Test api
-        run: dotnet test ./src/templates/api/ApplicationName.Api.sln
-
-      - name: Test worker
-        run: dotnet test ./src/templates/worker/ApplicationName.Worker.sln
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v1.1.1
@@ -39,20 +82,3 @@ jobs:
 
       - name: Build package
         run: dotnet pack ./src/MSA.Templates.sln -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
-
-  test-web:
-    name: Build and test web
-    runs-on: ubuntu-latest
-    container: 
-      image: node:lts-alpine
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: npm ci
-          
-      # - name: Run Unit Tests
-      #   run: npm run test
-        
-      - name: Build Application
-        run: npm run build

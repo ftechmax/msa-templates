@@ -11,6 +11,7 @@ This project contains a set of templates to build an application following speci
 - [Microservice Architecture Templates](#microservice-architecture-templates)
   - [Table of contents](#table-of-contents)
   - [Template Installation](#template-installation)
+  - [Quick start](#quick-start)
   - [Microservice Architecture Worker](#microservice-architecture-worker)
   - [Microservice Architecture API](#microservice-architecture-api)
   - [Microservice Architecture Web](#microservice-architecture-web)
@@ -18,17 +19,32 @@ This project contains a set of templates to build an application following speci
 
 ## Template Installation
 
-Install the `MSA.Templates` package:
+Install the latest version of the `MSA.Templates` package:
 
 ```console
 dotnet new install MSA.Templates
 ```
 
-## TL;DR
+## Quick start
+
+using the script
 
 ```console
-mkdir -p ./src ./k8s
-cd ./src
+.\generator.ps1 `
+-ServiceName Awesome `
+-RabbitMqUserSecret rabbitmq-default-user `
+-MongoDbUserSecret mongodb-admin-user `
+-RedisServiceName redis `
+-RedisServiceNamespace redis-system `
+-DestinationFolder c:/git
+```
+
+or manually
+
+```console
+mkdir -p c:/git/awesome/src
+cp ./k8s c:/git/awesome/
+cd c:/git/awesome/src
 dotnet new msa-shared -n Awesome -o shared
 dotnet new msa-worker -n Awesome -o worker
 dotnet new msa-api -n Awesome -o api
