@@ -30,7 +30,7 @@ dotnet new install MSA.Templates
 using the script
 
 ```console
-.\tools\generator.ps1 `
+.\generator.ps1 `
 -ServiceName Awesome `
 -RabbitMqUserSecret rabbitmq-default-user `
 -MongoDbUserSecret mongodb-admin-user `
