@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     if: github.event.pull_request.draft == false
-    name: Tests
+    name: Build and test api / worker
     runs-on: [ubuntu-latest]
     container: 
       image: mcr.microsoft.com/dotnet/sdk:8.0-alpine
@@ -39,3 +39,20 @@ jobs:
 
       - name: Build package
         run: dotnet pack ./src/MSA.Templates.sln -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
+
+  test-web:
+    name: Build and test web
+    runs-on: ubuntu-latest
+    container: 
+      image: node:lts-alpine
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: npm ci
+          
+      # - name: Run Unit Tests
+      #   run: npm run test
+        
+      - name: Build Application
+        run: npm run build
