@@ -23,7 +23,7 @@ if (-not (Test-Path -Path $ProjectFolder -ErrorAction SilentlyContinue)) {
 }
 
 Copy-Item -Path "./k8s" -Destination $ProjectFolder -Recurse -Force
-Get-ChildItem -Path "$ServiceName/k8s" -Recurse | ForEach-Object {
+Get-ChildItem -Path "$DestinationFolder/$ServiceName/k8s" -Recurse | ForEach-Object {
     if (-not $_.PSIsContainer) {
         $filePath = $_.FullName
         Write-Host "Processing $filePath"
