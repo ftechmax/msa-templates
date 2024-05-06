@@ -8,5 +8,5 @@ public static class ApplicationConstants
 
     public const string ExampleCollectionCacheKey = "example-collection";
 
-    public const string ExampleDetailsCacheKey = "example-details";
+    public static string ExampleDetailsCacheKey(Guid id) => $"example-details_{id:N}";
 }

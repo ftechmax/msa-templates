@@ -7,7 +7,7 @@ public record UpdateExampleCommand : IUpdateExampleCommand
 {
     public Guid CorrelationId { get; init; }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
     public string Description { get; init; }
 

@@ -43,7 +43,7 @@ public sealed class ExampleService(
     {
         Guard.Argument(id).NotDefault();
 
-        var key = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
+        var key = ApplicationConstants.ExampleDetailsCacheKey(id);
 
         var result = await protoCacheRepository.GetAsync<ExampleDetailsDto>(key);
         if (result != default)
@@ -79,6 +79,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<UpdateExampleCommand>(dto);
+        command.Set(id);
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
         await sendEndpoint.Send<IUpdateExampleCommand>(command);
     }
@@ -89,6 +90,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<AddExampleEntityCommand>(dto);
+        command.Set(id);
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
         await sendEndpoint.Send<IAddExampleEntityCommand>(command);
     }
@@ -100,6 +102,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<UpdateExampleEntityCommand>(dto);
+        command.Set(id, entityId);
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
         await sendEndpoint.Send<IUpdateExampleEntityCommand>(command);
     }

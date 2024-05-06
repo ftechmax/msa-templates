@@ -6,7 +6,7 @@ public record AddExampleEntityCommand : IAddExampleEntityCommand
 {
     public Guid CorrelationId { get; init; }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
     public string Name { get; init; }
 

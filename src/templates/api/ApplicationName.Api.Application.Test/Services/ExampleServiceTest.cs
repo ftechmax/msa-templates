@@ -59,7 +59,7 @@ public class ExampleServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var dto = _fixture.Create<ExampleDetailsDto>();
-        var cacheKey = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
+        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
 
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).ReturnsLazily(() => dto);
 
@@ -81,7 +81,7 @@ public class ExampleServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var document = GenerateDocument();
-        var cacheKey = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
+        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
 
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).ReturnsLazily(() => document);
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
