@@ -10,4 +10,16 @@ public record ExampleDetailsDto
 
     [ProtoMember(2)]
     public string Name { get; init; }
+
+    [ProtoMember(3)]
+    public string Description { get; init; }
+
+    [ProtoMember(4)]
+    public List<ExampleEntityDto> Examples { get; init; } = [];
+
+    [ProtoMember(5)]
+    public ExampleValueObjectDto ExampleValueObject { get; init; }
+
+    [ProtoMember(6)]
+    public int? RemoteCode { get; init; }
 }

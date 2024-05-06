@@ -11,13 +11,17 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        // API -> Application
         CreateMap<CreateExampleDto, CreateExampleCommand>();
         CreateMap<UpdateExampleDto, UpdateExampleCommand>();
         CreateMap<AddExampleEntityDto, AddExampleEntityCommand>();
         CreateMap<UpdateExampleEntityDto, UpdateExampleEntityCommand>();
         CreateMap<ExampleValueObjectDto, ExampleValueObjectEventData>();
 
+        // Application -> API
         CreateMap<ExampleDocument, ExampleCollectionDto>();
         CreateMap<ExampleDocument, ExampleDetailsDto>();
+        CreateMap<ExampleEntity, ExampleEntityDto>();
+        CreateMap<ExampleValueObject, ExampleValueObjectDto>();
     }
 }

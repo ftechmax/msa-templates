@@ -10,4 +10,7 @@ public record ExampleCollectionDto
 
     [ProtoMember(2)]
     public string Name { get; init; }
+
+    [ProtoMember(3)]
+    public string Description { get; init; }
 }
