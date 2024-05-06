@@ -79,7 +79,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<UpdateExampleCommand>(dto);
-        command.Set(id);
+        command.Id = id;
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
         await sendEndpoint.Send<IUpdateExampleCommand>(command);
     }
@@ -90,7 +90,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<AddExampleEntityCommand>(dto);
-        command.Set(id);
+        command.Id = id;
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
         await sendEndpoint.Send<IAddExampleEntityCommand>(command);
     }
@@ -102,7 +102,8 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<UpdateExampleEntityCommand>(dto);
-        command.Set(id, entityId);
+        command.Id = id;
+        command.EntityId = entityId;
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
         await sendEndpoint.Send<IUpdateExampleEntityCommand>(command);
     }

@@ -42,7 +42,6 @@ public class AddExampleEntityDtoValidatorTest
         var dto = new AddExampleEntityDto
         {
             CorrelationId = Guid.Empty,
-            Id = _fixture.Create<Guid>(),
             Name = _fixture.Create<string>(),
             SomeValue = _fixture.Create<float>()
         };
@@ -53,30 +52,6 @@ public class AddExampleEntityDtoValidatorTest
         // Assert
         result.IsValid.Should().BeFalse();
         result.ShouldHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldNotHaveValidationErrorFor(i => i.Id);
-        result.ShouldNotHaveValidationErrorFor(i => i.Name);
-        result.ShouldNotHaveValidationErrorFor(i => i.SomeValue);
-    }
-
-    [Test]
-    public void Validate_With_Invalid_Id()
-    {
-        // Arrange
-        var dto = new AddExampleEntityDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Id = Guid.Empty,
-            Name = _fixture.Create<string>(),
-            SomeValue = _fixture.Create<float>()
-        };
-
-        // Act
-        var result = _subjectUnderTest.TestValidate(dto);
-
-        // Assert
-        result.IsValid.Should().BeFalse();
-        result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldHaveValidationErrorFor(i => i.Id);
         result.ShouldNotHaveValidationErrorFor(i => i.Name);
         result.ShouldNotHaveValidationErrorFor(i => i.SomeValue);
     }
@@ -91,7 +66,6 @@ public class AddExampleEntityDtoValidatorTest
         var dto = new AddExampleEntityDto
         {
             CorrelationId = _fixture.Create<Guid>(),
-            Id = _fixture.Create<Guid>(),
             Name = testCase,
             SomeValue = _fixture.Create<float>()
         };
@@ -102,7 +76,6 @@ public class AddExampleEntityDtoValidatorTest
         // Assert
         result.IsValid.Should().BeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldNotHaveValidationErrorFor(i => i.Id);
         result.ShouldHaveValidationErrorFor(i => i.Name);
         result.ShouldNotHaveValidationErrorFor(i => i.SomeValue);
     }
@@ -117,7 +90,6 @@ public class AddExampleEntityDtoValidatorTest
         var dto = new AddExampleEntityDto
         {
             CorrelationId = _fixture.Create<Guid>(),
-            Id = _fixture.Create<Guid>(),
             Name = _fixture.Create<string>(),
             SomeValue = testCase
         };
@@ -128,7 +100,6 @@ public class AddExampleEntityDtoValidatorTest
         // Assert
         result.IsValid.Should().BeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldNotHaveValidationErrorFor(i => i.Id);
         result.ShouldNotHaveValidationErrorFor(i => i.Name);
         result.ShouldHaveValidationErrorFor(i => i.SomeValue);
     }

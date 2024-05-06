@@ -42,7 +42,6 @@ public class UpdateExampleDtoValidatorTest
         var dto = new UpdateExampleDto
         {
             CorrelationId = Guid.Empty,
-            Id = _fixture.Create<Guid>(),
             Description = _fixture.Create<string>(),
             ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
         };
@@ -53,30 +52,6 @@ public class UpdateExampleDtoValidatorTest
         // Assert
         result.IsValid.Should().BeFalse();
         result.ShouldHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldNotHaveValidationErrorFor(i => i.Id);
-        result.ShouldNotHaveValidationErrorFor(i => i.Description);
-        result.ShouldNotHaveValidationErrorFor(i => i.ExampleValueObject);
-    }
-
-    [Test]
-    public void Validate_With_Invalid_Id()
-    {
-        // Arrange
-        var dto = new UpdateExampleDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Id = Guid.Empty,
-            Description = _fixture.Create<string>(),
-            ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
-        };
-
-        // Act
-        var result = _subjectUnderTest.TestValidate(dto);
-
-        // Assert
-        result.IsValid.Should().BeFalse();
-        result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldHaveValidationErrorFor(i => i.Id);
         result.ShouldNotHaveValidationErrorFor(i => i.Description);
         result.ShouldNotHaveValidationErrorFor(i => i.ExampleValueObject);
     }
@@ -91,7 +66,6 @@ public class UpdateExampleDtoValidatorTest
         var dto = new UpdateExampleDto
         {
             CorrelationId = _fixture.Create<Guid>(),
-            Id = _fixture.Create<Guid>(),
             Description = testCase,
             ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
         };
@@ -102,7 +76,6 @@ public class UpdateExampleDtoValidatorTest
         // Assert
         result.IsValid.Should().BeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldNotHaveValidationErrorFor(i => i.Id);
         result.ShouldHaveValidationErrorFor(i => i.Description);
         result.ShouldNotHaveValidationErrorFor(i => i.ExampleValueObject);
     }
@@ -114,7 +87,6 @@ public class UpdateExampleDtoValidatorTest
         var dto = new UpdateExampleDto
         {
             CorrelationId = _fixture.Create<Guid>(),
-            Id = _fixture.Create<Guid>(),
             Description = _fixture.Create<string>(),
             ExampleValueObject = default
         };
@@ -125,7 +97,6 @@ public class UpdateExampleDtoValidatorTest
         // Assert
         result.IsValid.Should().BeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
-        result.ShouldNotHaveValidationErrorFor(i => i.Id);
         result.ShouldNotHaveValidationErrorFor(i => i.Description);
         result.ShouldHaveValidationErrorFor(i => i.ExampleValueObject);
     }
