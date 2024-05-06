@@ -10,15 +10,12 @@ public record ExampleCreated : DomainEvent
         Timestamp = DateTime.UtcNow;
         Name = aggregate.Name;
         Description = aggregate.Description;
-        ExampleValueObjectCode = aggregate.ExampleValueObject.Code;
-        ExampleValueObjectValue = aggregate.ExampleValueObject.Value;
+        ExampleValueObject = new ExampleValueObjectEvent(aggregate.ExampleValueObject);
     }
 
     public string Name { get; init; }
 
     public string Description { get; init; }
 
-    public string ExampleValueObjectCode { get; init; }
-
-    public double ExampleValueObjectValue { get; init; }
+    public ExampleValueObjectEvent ExampleValueObject { get; init; }
 }
