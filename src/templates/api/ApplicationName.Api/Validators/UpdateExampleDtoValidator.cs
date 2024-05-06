@@ -7,6 +7,9 @@ public class UpdateExampleDtoValidator : AbstractValidator<UpdateExampleDto>
 {
     public UpdateExampleDtoValidator()
     {
+        RuleFor(i => i.CorrelationId).NotEmpty();
         RuleFor(i => i.Id).NotEmpty();
+        RuleFor(i => i.Description).NotEmpty();
+        RuleFor(i => i.ExampleValueObject).NotNull();
     }
 }

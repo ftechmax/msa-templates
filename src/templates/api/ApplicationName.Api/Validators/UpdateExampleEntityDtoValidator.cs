@@ -7,6 +7,9 @@ public class UpdateExampleEntityDtoValidator : AbstractValidator<UpdateExampleEn
 {
     public UpdateExampleEntityDtoValidator()
     {
-        RuleFor(i => i.Name).NotEmpty();
+        RuleFor(i => i.CorrelationId).NotEmpty();
+        RuleFor(i => i.Id).NotEmpty();
+        RuleFor(i => i.EntityId).NotEmpty();
+        RuleFor(i => i.SomeValue).GreaterThan(0);
     }
 }
