@@ -41,22 +41,6 @@ public static class Program
         app.Run();
     }
 
-    private static void ConfigureLogging(ILoggingBuilder builder, IConfiguration configuration)
-    {
-        builder.AddOpenTelemetry(configure =>
-        {
-            configure.IncludeScopes = true;
-            configure.ParseStateValues = true;
-            configure.IncludeFormattedMessage = true;
-            configure.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
-                .AddOtlpExporter(opts =>
-                {
-                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
-                });
-        });
-    }
-
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         // MongoDB
@@ -78,17 +62,17 @@ public static class Program
 
             i.AddConsumer<LocalEventHandler>();
 
-            i.UsingRabbitMq((context, cfg) =>
+            i.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(configuration["rabbitmq:host"], configuration["rabbitmq:vhost"], h =>
                 {
-                    h.Username(configuration["rabbitmq:username"]);
-                    h.Password(configuration["rabbitmq:password"]);
+                    h.Username(configuration["rabbitmq:username"]!);
+                    h.Password(configuration["rabbitmq:password"]!);
                 });
 
                 cfg.ReceiveEndpoint(ServiceName, e =>
                 {
-                    e.ConfigureConsumer<LocalEventHandler>(context);
+                    e.ConfigureConsumer<LocalEventHandler>(ctx);
                 });
             });
         });
@@ -105,6 +89,7 @@ public static class Program
         // Api
         services.AddHealthChecks();
         services.AddControllers();
+
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<CreateExampleDtoValidator>();
 
@@ -119,36 +104,36 @@ public static class Program
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
+        var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
-        services.AddOpenTelemetry().WithTracing(builder => builder
-            .SetResourceBuilder(appResourceBuilder)
-            .AddAspNetCoreInstrumentation(options =>
-            {
-                options.Filter = req => !(req.Request.Path.Equals("/healthz") || req.Request.Path.Equals("/metrics") || req.Request.Path.StartsWithSegments("/swagger"));
-                options.RecordException = true;
-            })
-            .AddHttpClientInstrumentation(options =>
-            {
-                options.RecordException = true;
-            })
-            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
-            .AddRedisInstrumentation()
-            .AddOtlpExporter(configure =>
-            {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
-            })
-        );
-
-        services.AddOpenTelemetry().WithMetrics(builder => builder
-            .SetResourceBuilder(appResourceBuilder)
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddOtlpExporter(configure =>
-            {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
-            })
+        services.AddOpenTelemetry()
+            .WithTracing(builder => builder
+                .SetResourceBuilder(appResourceBuilder)
+                .AddAspNetCoreInstrumentation(options =>
+                {
+                    options.Filter = req => !(req.Request.Path.Equals("/healthz") || req.Request.Path.Equals("/metrics") || req.Request.Path.StartsWithSegments("/swagger"));
+                    options.RecordException = true;
+                })
+                .AddHttpClientInstrumentation(options =>
+                {
+                    options.RecordException = true;
+                })
+                .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
+                .AddRedisInstrumentation()
+                .AddOtlpExporter(configure =>
+                {
+                    configure.Endpoint = otlpEndpoint;
+                }))
+            .WithMetrics(builder => builder
+                .SetResourceBuilder(appResourceBuilder)
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddOtlpExporter(configure =>
+                {
+                    configure.Endpoint = otlpEndpoint;
+                })
         );
     }
 
@@ -161,13 +146,26 @@ public static class Program
         }
 
         app.UseAuthorization();
-
         app.UseResponseCompression();
 
         app.MapControllers();
-
-        app.MapHub<ApiHub>("/api-hub");
-
         app.MapHealthChecks("/healthz");
+        app.MapHub<ApiHub>("/api-hub");
+    }
+
+    private static void ConfigureLogging(ILoggingBuilder builder, IConfiguration configuration)
+    {
+        builder.AddOpenTelemetry(configure =>
+        {
+            configure.IncludeScopes = true;
+            configure.ParseStateValues = true;
+            configure.IncludeFormattedMessage = true;
+            configure.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
+                .AddOtlpExporter(opts =>
+                {
+                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+                });
+        });
     }
 }

@@ -27,9 +27,13 @@ if (-not (Test-Path -Path $ProjectFolder -ErrorAction SilentlyContinue)) {
 }
 
 # Generate projects
+Write-Host "Generating src/shared"
 dotnet new msa-shared -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/shared')
+Write-Host "Generating src/worker"
 dotnet new msa-worker -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/worker')
+Write-Host "Generating src/api"
 dotnet new msa-api -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/api')
+Write-Host "Generating src/web"
 dotnet new msa-web -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/web')
 
 # Patch k8s folder

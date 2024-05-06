@@ -39,8 +39,7 @@ public static class Program
         var configuration = context.Configuration;
 
         // MongoDB
-        var connectionString = new MongoUrl($"mongodb://{configuration["mongodb:username"]}:{configuration["mongodb:password"]}@{configuration["mongodb:host"]}:27017");
-        var clientSettings = MongoClientSettings.FromUrl(connectionString);
+        var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
 
@@ -56,47 +55,47 @@ public static class Program
             i.AddConsumer<ExternalEventHandler>();
             i.AddConsumer<CommandHandler>();
 
-            i.UsingRabbitMq((context, cfg) =>
+            i.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(configuration["rabbitmq:host"], configuration["rabbitmq:vhost"], h =>
                 {
-                    h.Username(configuration["rabbitmq:username"]);
-                    h.Password(configuration["rabbitmq:password"]);
+                    h.Username(configuration["rabbitmq:username"]!);
+                    h.Password(configuration["rabbitmq:password"]!);
                 });
 
                 cfg.ReceiveEndpoint($"{typeof(Program).Namespace}", e =>
                 {
-                    e.ConfigureConsumer<ExternalEventHandler>(context);
-                    e.ConfigureConsumer<CommandHandler>(context);
+                    e.ConfigureConsumer<ExternalEventHandler>(ctx);
+                    e.ConfigureConsumer<CommandHandler>(ctx);
                 });
             });
         });
 
-        // OpenTelemetry
-        var appResourceBuilder = ResourceBuilder.CreateDefault()
-            .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
-
-        services.AddOpenTelemetry().WithTracing(cfg => cfg
-            .SetResourceBuilder(appResourceBuilder)
-            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
-            .AddOtlpExporter(configure =>
-            {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
-            })
-        );
-
-        services.AddOpenTelemetry().WithMetrics(cfg => cfg
-            .SetResourceBuilder(appResourceBuilder)
-            .AddRuntimeInstrumentation()
-            .AddOtlpExporter(configure =>
-            {
-                configure.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
-            })
-        );
-
         // Application
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IApplicationService, ApplicationService>();
+
+        // OpenTelemetry
+        var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var appResourceBuilder = ResourceBuilder.CreateDefault()
+            .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
+
+        services.AddOpenTelemetry()
+            .WithTracing(cfg => cfg
+                .SetResourceBuilder(appResourceBuilder)
+                .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
+                .AddOtlpExporter(configure =>
+                {
+                    configure.Endpoint = otlpEndpoint;
+                }))
+            .WithMetrics(cfg => cfg
+                .SetResourceBuilder(appResourceBuilder)
+                .AddRuntimeInstrumentation()
+                .AddOtlpExporter(configure =>
+                {
+                    configure.Endpoint = otlpEndpoint;
+                })
+        );
     }
 
     private static void ConfigureLogging(HostBuilderContext context, ILoggingBuilder builder)
