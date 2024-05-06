@@ -1,10 +1,10 @@
-﻿using ApplicationName.Worker.Application.Documents;
+﻿using ApplicationName.Shared.Aggregates;
 
 namespace ApplicationName.Worker.Application.DomainEvents;
 
-public class ExampleUpdated : DomainEvent
+public record ExampleUpdated : DomainEvent
 {
-    public ExampleUpdated(ExampleDocument aggregate)
+    public ExampleUpdated(IExample aggregate)
     {
         Id = aggregate.Id;
         Timestamp = DateTime.UtcNow;
@@ -13,9 +13,9 @@ public class ExampleUpdated : DomainEvent
         ExampleValueObjectValue = aggregate.ExampleValueObject.Value;
     }
 
-    public string Description { get; }
+    public string Description { get; init; }
 
-    public string ExampleValueObjectCode { get; }
+    public string ExampleValueObjectCode { get; init; }
 
-    public double ExampleValueObjectValue { get; }
+    public double ExampleValueObjectValue { get; init; }
 }

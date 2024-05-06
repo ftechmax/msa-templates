@@ -23,9 +23,7 @@ public sealed class ExampleValueObject : IExampleValueObject
         Value = eventData.Value;
     }
 
-    [BsonElement]
-    public string Code { get; }
+    public string Code { get; init; }
 
-    [BsonElement]
-    public double Value { get; }
+    public double Value { get; init; }
 }

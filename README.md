@@ -33,7 +33,7 @@ using the script
 .\generator.ps1 `
 -ServiceName AwesomeApp `
 -RabbitMqUserSecret rabbitmq-default-user `
--MongoDbUserSecret mongodb-admin-user `
+-MongoDbUserSecret mongodb-server-admin-admin `
 -RedisServiceName redis `
 -RedisServiceNamespace redis-system `
 -DestinationFolder c:/git

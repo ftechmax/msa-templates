@@ -46,7 +46,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         Guard.Argument(command).NotNull();
 
         var entity = new ExampleEntity(command);
-        _examples.Add(entity);
+        Examples.Add(entity);
 
         return new ExampleEntityAdded(Id, entity);
     }
@@ -56,7 +56,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         Guard.Argument(command).NotNull();
         Guard.Argument(command.EntityId).NotDefault();
 
-        var entity = _examples.Single(i => i.Id == command.EntityId);
+        var entity = Examples.Single(i => i.Id == command.EntityId);
         entity.Update(command);
 
         return new ExampleEntityUpdated(Id, entity);
@@ -69,7 +69,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
         RemoteCode = command.RemoteCode;
 
-        return new ExampleRemoteCodeSet(this);
+        return new ExampleRemoteCodeSet(Id, RemoteCode.Value);
     }
 
     public static (ExampleDocument aggregate, ExampleCreated domainEvent) Create(ICreateExampleCommand command)
@@ -78,16 +78,11 @@ public sealed class ExampleDocument : DocumentBase, IExample
         return (document, new ExampleCreated(document));
     }
 
-    [BsonElement]
-    public string Name { get; }
+    public string Name { get; init; }
 
     public string Description { get; private set; }
 
-    [BsonElement(nameof(Examples))]
-    private readonly List<ExampleEntity> _examples = new();
-
-    [BsonIgnore]
-    public IReadOnlyCollection<ExampleEntity> Examples => _examples.AsReadOnly();
+    public List<ExampleEntity> Examples { get; init; } = [];
 
     public ExampleValueObject ExampleValueObject { get; private set; }
 
