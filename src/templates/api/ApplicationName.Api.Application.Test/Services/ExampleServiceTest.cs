@@ -28,6 +28,8 @@ public class ExampleServiceTest
 
     private IMapper _mapper;
 
+    private ISendEndpointProvider _sendEndpointProvider;
+
     private ISendEndpoint _sendEndpoint;
 
     private ExampleService _subjectUnderTest;
@@ -39,7 +41,10 @@ public class ExampleServiceTest
 
         _documentRepository = _fixture.Freeze<IDocumentRepository>();
         _protoCacheRepository = _fixture.Freeze<IProtoCacheRepository>();
+
+        _sendEndpointProvider = _fixture.Freeze<ISendEndpointProvider>();
         _sendEndpoint = _fixture.Freeze<ISendEndpoint>();
+        A.CallTo(() => _sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint)).Returns(_sendEndpoint);
 
         var mappingConfig = new MapperConfiguration(cfg => { cfg.AddProfile(new MappingProfile()); });
         _mapper = mappingConfig.CreateMapper();
