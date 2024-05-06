@@ -13,7 +13,11 @@ public class MappingProfile : Profile
     {
         CreateMap<CreateExampleDto, CreateExampleCommand>();
         CreateMap<UpdateExampleDto, UpdateExampleCommand>();
-        CreateMap<ExampleDocument, ExampleDetailsDto>();
+        CreateMap<AddExampleEntityDto, AddExampleEntityCommand>();
+        CreateMap<UpdateExampleEntityDto, UpdateExampleEntityCommand>();
+        CreateMap<ExampleValueObjectDto, ExampleValueObjectEventData>();
+
         CreateMap<ExampleDocument, ExampleCollectionDto>();
+        CreateMap<ExampleDocument, ExampleDetailsDto>();
     }
 }

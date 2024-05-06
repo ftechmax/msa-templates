@@ -18,7 +18,7 @@ using NUnit.Framework;
 
 namespace ApplicationName.Api.Application.Test.Services;
 
-public class ApplicationServiceTest
+public class ExampleServiceTest
 {
     private IFixture _fixture;
 
