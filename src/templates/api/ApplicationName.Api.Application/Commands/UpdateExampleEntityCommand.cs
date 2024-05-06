@@ -2,13 +2,13 @@
 
 namespace ApplicationName.Api.Application.Commands;
 
-public class UpdateExampleEntityCommand : IUpdateExampleEntityCommand
+public record UpdateExampleEntityCommand : IUpdateExampleEntityCommand
 {
-    public Guid CorrelationId { get; set; }
+    public Guid CorrelationId { get; init; }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public Guid EntityId { get; set; }
+    public Guid EntityId { get; init; }
 
-    public float SomeValue { get; set; }
+    public float SomeValue { get; init; }
 }

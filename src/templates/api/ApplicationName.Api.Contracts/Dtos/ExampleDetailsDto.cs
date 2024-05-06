@@ -3,8 +3,11 @@
 namespace ApplicationName.Api.Contracts.Dtos;
 
 [ProtoContract]
-public class ExampleDetailsDto
+public record ExampleDetailsDto
 {
     [ProtoMember(1)]
-    public string Name { get; set; }
+    public Guid Id { get; init; }
+
+    [ProtoMember(2)]
+    public string Name { get; init; }
 }

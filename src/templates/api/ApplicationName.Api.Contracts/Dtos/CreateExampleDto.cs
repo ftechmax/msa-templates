@@ -1,6 +1,12 @@
 ﻿namespace ApplicationName.Api.Contracts.Dtos;
 
-public class CreateExampleDto
+public record CreateExampleDto
 {
-    public string Name { get; set; }
+    public Guid CorrelationId { get; init; }
+
+    public string Name { get; init; }
+
+    public string Description { get; init; }
+
+    public ExampleValueObjectDto ExampleValueObject { get; init; }
 }
