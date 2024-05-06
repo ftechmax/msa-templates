@@ -44,6 +44,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
         {
             context.Message.CorrelationId,
             context.Message.Id,
+            context.Message.EntityId
         });
     }
 
@@ -55,6 +56,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
         {
             context.Message.CorrelationId,
             context.Message.Id,
+            context.Message.EntityId
         });
     }
 
@@ -65,7 +67,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
         await hub.Clients.All.SendAsync(nameof(IExampleRemoteCodeSetEvent), new
         {
             context.Message.CorrelationId,
-            context.Message.Id,
+            context.Message.Id
         });
     }
 }

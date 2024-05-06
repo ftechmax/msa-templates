@@ -8,12 +8,12 @@ public record ExampleEntityAdded : DomainEvent
     {
         Id = aggregateId;
         Timestamp = DateTime.UtcNow;
-        ExampleId = entity.Id;
+        EntityId = entity.Id;
         Name = entity.Name;
         SomeValue = entity.SomeValue;
     }
 
-    public Guid ExampleId { get; init; }
+    public Guid EntityId { get; init; }
 
     public string Name { get; init; }
 
