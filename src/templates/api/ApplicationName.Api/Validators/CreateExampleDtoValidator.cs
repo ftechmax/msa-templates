@@ -10,6 +10,6 @@ public class CreateExampleDtoValidator : AbstractValidator<CreateExampleDto>
         RuleFor(i => i.CorrelationId).NotEmpty();
         RuleFor(i => i.Name).NotEmpty();
         RuleFor(i => i.Description).NotEmpty();
-        RuleFor(i => i.ExampleValueObject).NotNull();
+        RuleFor(i => i.ExampleValueObject).NotNull().SetValidator(new ExampleValueObjectDtoValidator());
     }
 }
