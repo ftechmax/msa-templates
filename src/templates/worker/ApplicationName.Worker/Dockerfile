@@ -9,7 +9,7 @@ ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /src
 COPY . .
-WORKDIR "/src/ApplicationName.Worker"
+WORKDIR "/src/worker/ApplicationName.Worker"
 RUN dotnet publish "ApplicationName.Worker.csproj" -c Release -o /app/publish
 
 FROM base AS final
