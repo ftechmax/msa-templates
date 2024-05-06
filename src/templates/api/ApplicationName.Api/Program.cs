@@ -41,22 +41,6 @@ public static class Program
         app.Run();
     }
 
-    private static void ConfigureLogging(ILoggingBuilder builder, IConfiguration configuration)
-    {
-        builder.AddOpenTelemetry(configure =>
-        {
-            configure.IncludeScopes = true;
-            configure.ParseStateValues = true;
-            configure.IncludeFormattedMessage = true;
-            configure.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
-                .AddOtlpExporter(opts =>
-                {
-                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
-                });
-        });
-    }
-
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         // MongoDB
@@ -167,5 +151,21 @@ public static class Program
         app.MapControllers();
         app.MapHealthChecks("/healthz");
         app.MapHub<ApiHub>("/api-hub");
+    }
+
+    private static void ConfigureLogging(ILoggingBuilder builder, IConfiguration configuration)
+    {
+        builder.AddOpenTelemetry(configure =>
+        {
+            configure.IncludeScopes = true;
+            configure.ParseStateValues = true;
+            configure.IncludeFormattedMessage = true;
+            configure.SetResourceBuilder(ResourceBuilder.CreateDefault()
+                .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
+                .AddOtlpExporter(opts =>
+                {
+                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+                });
+        });
     }
 }
