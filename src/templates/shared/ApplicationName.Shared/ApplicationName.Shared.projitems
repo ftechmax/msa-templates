@@ -23,5 +23,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleRemoteCodeSetEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleUpdatedEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleValueObjectEventData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Projections\ExampleEntityProjection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Projections\ExampleProjection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Projections\ExampleValueObjectProjection.cs" />
   </ItemGroup>
 </Project>
