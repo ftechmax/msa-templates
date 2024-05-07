@@ -32,11 +32,9 @@ public sealed class ExampleEntity : IExampleEntity
         SomeValue = command.SomeValue;
     }
 
-    [BsonElement]
-    public Guid Id { get; }
+    public Guid Id { get; init; }
 
-    [BsonElement]
-    public string Name { get; }
+    public string Name { get; init; }
 
     public float SomeValue { get; private set; }
 }

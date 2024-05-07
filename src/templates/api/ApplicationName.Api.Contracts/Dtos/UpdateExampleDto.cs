@@ -1,6 +1,10 @@
 ﻿namespace ApplicationName.Api.Contracts.Dtos;
 
-public class UpdateExampleDto
+public record UpdateExampleDto
 {
-    public Guid Id { get; set; }
+    public Guid CorrelationId { get; init; }
+
+    public string Description { get; init; }
+
+    public ExampleValueObjectDto ExampleValueObject { get; init; }
 }

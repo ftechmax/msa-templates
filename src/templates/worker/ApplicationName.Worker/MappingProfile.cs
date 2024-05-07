@@ -16,6 +16,7 @@ public class MappingProfile : Profile
 
         CreateMap<ExampleCreated, ExampleCreatedEvent>();
         CreateMap<ExampleUpdated, ExampleUpdatedEvent>();
+        CreateMap<ExampleValueObjectEvent, ExampleValueObjectEventData>();
         CreateMap<ExampleEntityAdded, ExampleEntityAddedEvent>();
         CreateMap<ExampleEntityUpdated, ExampleEntityUpdatedEvent>();
         CreateMap<ExampleRemoteCodeSet, ExampleRemoteCodeSetEvent>();

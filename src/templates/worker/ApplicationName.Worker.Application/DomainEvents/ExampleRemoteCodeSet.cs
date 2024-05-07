@@ -1,15 +1,13 @@
-﻿using ApplicationName.Worker.Application.Documents;
+﻿namespace ApplicationName.Worker.Application.DomainEvents;
 
-namespace ApplicationName.Worker.Application.DomainEvents;
-
-public class ExampleRemoteCodeSet : DomainEvent
+public record ExampleRemoteCodeSet : DomainEvent
 {
-    public ExampleRemoteCodeSet(ExampleDocument aggregate)
+    public ExampleRemoteCodeSet(Guid aggregateId, int remoteCode)
     {
-        Id = aggregate.Id;
+        Id = aggregateId;
         Timestamp = DateTime.UtcNow;
-        RemoteCode = aggregate.RemoteCode!.Value;
+        RemoteCode = remoteCode;
     }
 
-    public int RemoteCode { get; set; }
+    public int RemoteCode { get; init; }
 }

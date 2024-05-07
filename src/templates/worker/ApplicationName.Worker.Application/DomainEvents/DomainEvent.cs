@@ -1,8 +1,8 @@
 ﻿namespace ApplicationName.Worker.Application.DomainEvents;
 
-public abstract class DomainEvent
+public abstract record DomainEvent
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public DateTime Timestamp { get; set; }
+    public DateTime Timestamp { get; init; }
 }

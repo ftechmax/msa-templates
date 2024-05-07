@@ -1,6 +1,10 @@
 ﻿namespace ApplicationName.Api.Contracts.Dtos;
 
-public class AddExampleEntityDto
+public record AddExampleEntityDto
 {
-    public string Name { get; set; }
+    public Guid CorrelationId { get; init; }
+
+    public string Name { get; init; }
+
+    public float SomeValue { get; init; }
 }

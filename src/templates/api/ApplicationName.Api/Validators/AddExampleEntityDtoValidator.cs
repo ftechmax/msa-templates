@@ -7,6 +7,8 @@ public class AddExampleEntityDtoValidator : AbstractValidator<AddExampleEntityDt
 {
     public AddExampleEntityDtoValidator()
     {
+        RuleFor(i => i.CorrelationId).NotEmpty();
         RuleFor(i => i.Name).NotEmpty();
+        RuleFor(i => i.SomeValue).GreaterThan(0);
     }
 }
