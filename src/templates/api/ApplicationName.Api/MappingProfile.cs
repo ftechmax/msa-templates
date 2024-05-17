@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Api.Application.Commands;
-using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Shared.Projections;
 using AutoMapper;
 
 namespace ApplicationName.Api;
@@ -19,9 +19,9 @@ public class MappingProfile : Profile
         CreateMap<ExampleValueObjectDto, ExampleValueObjectEventData>();
 
         // Application -> API
-        CreateMap<ExampleDocument, ExampleCollectionDto>();
-        CreateMap<ExampleDocument, ExampleDetailsDto>();
-        CreateMap<ExampleEntity, ExampleEntityDto>();
-        CreateMap<ExampleValueObject, ExampleValueObjectDto>();
+        CreateMap<ExampleProjection, ExampleCollectionDto>();
+        CreateMap<ExampleProjection, ExampleDetailsDto>();
+        CreateMap<ExampleEntityProjection, ExampleEntityDto>();
+        CreateMap<ExampleValueObjectProjection, ExampleValueObjectDto>();
     }
 }

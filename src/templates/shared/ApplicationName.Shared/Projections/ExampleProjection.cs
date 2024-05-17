@@ -5,30 +5,21 @@ using ProtoBuf;
 namespace ApplicationName.Shared.Projections;
 
 [ProtoContract]
-public record ExampleProjection : IExample
+public record ExampleProjection : ProjectionBase, IExample
 {
     [ProtoMember(1)]
-    public Guid Id { get; init; }
-
-    [ProtoMember(2)]
-    public DateTime Created { get; init; }
-
-    [ProtoMember(3)]
-    public DateTime Updated { get; init; }
-
-    [ProtoMember(4)]
     public string Name { get; init; }
 
-    [ProtoMember(5)]
+    [ProtoMember(2)]
     public string Description { get; init; }
 
-    [ProtoMember(6)]
+    [ProtoMember(3)]
     public Collection<ExampleEntityProjection> Examples { get; init; } = [];
 
-    [ProtoMember(7)]
+    [ProtoMember(4)]
     public ExampleValueObjectProjection ExampleValueObject { get; init; }
 
-    [ProtoMember(8)]
+    [ProtoMember(5)]
     public int? RemoteCode { get; init; }
 
     IReadOnlyCollection<IExampleEntity> IExample.Examples => Examples;

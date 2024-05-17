@@ -1,18 +1,16 @@
 ﻿using ApplicationName.Api.Application.Commands;
-using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Projections;
 using ArgDefender;
 using AutoMapper;
 using MassTransit;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace ApplicationName.Api.Application.Services;
 
 public sealed class ExampleService(
-    IDocumentRepository documentRepository,
     IProtoCacheRepository protoCacheRepository,
     IMapper mapper,
     ISendEndpointProvider sendEndpointProvider)
@@ -26,15 +24,15 @@ public sealed class ExampleService(
             return result;
         }
 
-        var documents = await documentRepository.GetAllAsync<ExampleDocument>(_ => true);
-        if (!documents.Any())
+        var projections = await protoCacheRepository.GetAllAsync<ExampleProjection>(nameof(ExampleProjection));
+        if (!projections.Any())
         {
-            return new List<ExampleCollectionDto>();
+            return [];
         }
 
-        result = mapper.Map<IEnumerable<ExampleCollectionDto>>(documents);
+        result = mapper.Map<IEnumerable<ExampleCollectionDto>>(projections);
 
-        await protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, result, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(1) });
+        await protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, result, TimeSpan.FromDays(1));
 
         return result;
     }
@@ -51,15 +49,15 @@ public sealed class ExampleService(
             return result;
         }
 
-        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == id);
-        if (document == default)
+        var projection = await protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}");
+        if (projection == default)
         {
             return default;
         }
 
-        result = mapper.Map<ExampleDetailsDto>(document);
+        result = mapper.Map<ExampleDetailsDto>(projection);
 
-        await protoCacheRepository.SetAsync(key, result, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(1) });
+        await protoCacheRepository.SetAsync(key, result, TimeSpan.FromDays(1));
 
         return result;
     }
