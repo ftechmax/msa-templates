@@ -4,6 +4,16 @@ kind: Kustomization
 namespace: default
 resources:
   - ./../../base
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/containers/0/securityContext
+      - op: remove
+        path: /spec/template/spec/containers/0/livenessProbe
+      - op: remove
+        path: /spec/template/spec/containers/0/resources
 images:
   - name: applicationname-worker
     newName: 192.168.100.2:32000/applicationname-worker

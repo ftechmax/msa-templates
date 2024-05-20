@@ -1,21 +1,21 @@
-﻿using ApplicationName.Worker.Application.Documents;
+﻿using ApplicationName.Shared.Aggregates;
 
 namespace ApplicationName.Worker.Application.DomainEvents;
 
-public class ExampleEntityAdded : DomainEvent
+public record ExampleEntityAdded : DomainEvent
 {
-    public ExampleEntityAdded(Guid aggregateId, ExampleEntity entity)
+    public ExampleEntityAdded(Guid aggregateId, IExampleEntity entity)
     {
         Id = aggregateId;
         Timestamp = DateTime.UtcNow;
-        ExampleId = entity.Id;
+        EntityId = entity.Id;
         Name = entity.Name;
         SomeValue = entity.SomeValue;
     }
 
-    public Guid ExampleId { get; set; }
+    public Guid EntityId { get; init; }
 
-    public string Name { get; set; }
+    public string Name { get; init; }
 
-    public float SomeValue { get; set; }
+    public float SomeValue { get; init; }
 }

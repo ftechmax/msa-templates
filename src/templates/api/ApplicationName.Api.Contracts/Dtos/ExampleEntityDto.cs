@@ -3,7 +3,7 @@
 namespace ApplicationName.Api.Contracts.Dtos;
 
 [ProtoContract]
-public record ExampleCollectionDto
+public record ExampleEntityDto
 {
     [ProtoMember(1)]
     public Guid Id { get; init; }
@@ -12,5 +12,5 @@ public record ExampleCollectionDto
     public string Name { get; init; }
 
     [ProtoMember(3)]
-    public string Description { get; init; }
+    public float SomeValue { get; init; }
 }

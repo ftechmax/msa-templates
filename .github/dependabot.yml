@@ -6,48 +6,46 @@ updates:
       interval: 'monthly'
     groups:
       angular:
+        applies-to: version-updates
+        patterns:
+        - '*' 
+        update-types:
+        - 'minor'
+        - 'patch'
+      angular-security:
         applies-to: security-updates
         patterns:
-            - '*' 
+        - '*' 
         update-types:
         - 'minor'
         - 'patch'
 
   - package-ecosystem: 'nuget'
-    directory: '/src/templates/api'
+    directories:
+      - '/src/templates/api'
+      - '/src/templates/worker'
     schedule:
       interval: 'monthly'
     groups:
       nuget:
+        applies-to: version-updates
         patterns:
-            - '*' 
+        - '*' 
+        update-types:
+        - 'minor'
+        - 'patch'
+      nuget-security:
+        applies-to: security-updates
+        patterns:
+        - '*' 
         update-types:
         - 'minor'
         - 'patch'
 
-  - package-ecosystem: 'nuget'
-    directory: '/src/templates/worker'
-    schedule:
-      interval: 'monthly'
-    groups:
-      nuget:
-        patterns:
-            - '*' 
-        update-types:
-        - 'minor'
-        - 'patch'
-
   - package-ecosystem: 'docker'
-    directory: '/src/templates/web'
-    schedule:
-      interval: 'monthly'
-
-  - package-ecosystem: 'docker'
-    directory: '/src/templates/api/ApplicationName.Api'
-    schedule:
-      interval: 'monthly'
-
-  - package-ecosystem: 'docker'
-    directory: '/src/templates/worker/ApplicationName.Worker'
+    directories: 
+      - '/src/templates/web'
+      - '/src/templates/api/ApplicationName.Api'
+      - '/src/templates/worker/ApplicationName.Worker'
     schedule:
       interval: 'monthly'

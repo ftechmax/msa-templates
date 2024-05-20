@@ -18,7 +18,7 @@ using NUnit.Framework;
 
 namespace ApplicationName.Api.Application.Test.Services;
 
-public class ApplicationServiceTest
+public class ExampleServiceTest
 {
     private IFixture _fixture;
 
@@ -27,6 +27,8 @@ public class ApplicationServiceTest
     private IProtoCacheRepository _protoCacheRepository;
 
     private IMapper _mapper;
+
+    private ISendEndpointProvider _sendEndpointProvider;
 
     private ISendEndpoint _sendEndpoint;
 
@@ -39,7 +41,10 @@ public class ApplicationServiceTest
 
         _documentRepository = _fixture.Freeze<IDocumentRepository>();
         _protoCacheRepository = _fixture.Freeze<IProtoCacheRepository>();
+
+        _sendEndpointProvider = _fixture.Freeze<ISendEndpointProvider>();
         _sendEndpoint = _fixture.Freeze<ISendEndpoint>();
+        A.CallTo(() => _sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint)).Returns(_sendEndpoint);
 
         var mappingConfig = new MapperConfiguration(cfg => { cfg.AddProfile(new MappingProfile()); });
         _mapper = mappingConfig.CreateMapper();
@@ -54,7 +59,7 @@ public class ApplicationServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var dto = _fixture.Create<ExampleDetailsDto>();
-        var cacheKey = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
+        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
 
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).ReturnsLazily(() => dto);
 
@@ -76,7 +81,7 @@ public class ApplicationServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var document = GenerateDocument();
-        var cacheKey = $"{ApplicationConstants.ExampleDetailsCacheKey}_{id:N}";
+        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
 
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).ReturnsLazily(() => document);
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));

@@ -3,15 +3,15 @@ using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Api.Application.Commands;
 
-public class CreateExampleCommand : ICreateExampleCommand
+public record CreateExampleCommand : ICreateExampleCommand
 {
-    public Guid CorrelationId { get; set; }
+    public Guid CorrelationId { get; init; }
 
-    public string Name { get; set; }
+    public string Name { get; init; }
 
-    public string Description { get; set; }
+    public string Description { get; init; }
 
-    public ExampleValueObjectEventData ExampleValueObject { get; set; }
+    public ExampleValueObjectEventData ExampleValueObject { get; init; }
 
     IExampleValueObjectEventData ICreateExampleCommand.ExampleValueObject => ExampleValueObject;
 }

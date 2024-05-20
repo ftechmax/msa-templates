@@ -14,7 +14,8 @@ public class ExampleEntityUpdatedEventDummyFactory : DummyFactory<IExampleEntity
         var result = _fixture.Create<IExampleEntityUpdatedEvent>();
 
         A.CallTo(() => result.CorrelationId).Returns(_fixture.Create<Guid>());
-        //A.CallTo(() => result.Id).Returns(_fixture.Create<Guid>());
+        A.CallTo(() => result.Id).Returns(_fixture.Create<Guid>());
+        A.CallTo(() => result.EntityId).Returns(_fixture.Create<Guid>());
         //A.CallTo(() => result.Name).Returns(_fixture.Create<string>());
         //A.CallTo(() => result.Description).Returns(_fixture.Create<string>());
         //A.CallTo(() => result.ExampleValueObject).Returns(A.Dummy<IExampleValueObjectEventData>());

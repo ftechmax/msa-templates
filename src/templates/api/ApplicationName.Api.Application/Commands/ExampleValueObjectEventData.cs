@@ -2,9 +2,9 @@
 
 namespace ApplicationName.Api.Application.Commands;
 
-public class ExampleValueObjectEventData : IExampleValueObjectEventData
+public record ExampleValueObjectEventData : IExampleValueObjectEventData
 {
-    public string Code { get; set; }
+    public string Code { get; init; }
 
-    public double Value { get; set; }
+    public double Value { get; init; }
 }

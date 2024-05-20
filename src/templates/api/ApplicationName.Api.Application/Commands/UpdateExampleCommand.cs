@@ -3,15 +3,15 @@ using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Api.Application.Commands;
 
-public class UpdateExampleCommand : IUpdateExampleCommand
+public record UpdateExampleCommand : IUpdateExampleCommand
 {
-    public Guid CorrelationId { get; set; }
+    public Guid CorrelationId { get; init; }
 
     public Guid Id { get; set; }
 
-    public string Description { get; set; }
+    public string Description { get; init; }
 
-    public ExampleValueObjectEventData ExampleValueObject { get; set; }
+    public ExampleValueObjectEventData ExampleValueObject { get; init; }
 
     IExampleValueObjectEventData IUpdateExampleCommand.ExampleValueObject => ExampleValueObject;
 }
