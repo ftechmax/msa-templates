@@ -1,4 +1,4 @@
-﻿namespace ApplicationName.Api.Contracts.Dtos;
+namespace ApplicationName.Api.Contracts.Dtos;
 
 public record UpdateExampleDto
 {

@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Commands;
 
 namespace ApplicationName.Api.Application.Commands;
 

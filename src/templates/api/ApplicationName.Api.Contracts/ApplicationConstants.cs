@@ -1,4 +1,4 @@
-﻿namespace ApplicationName.Api.Contracts;
+namespace ApplicationName.Api.Contracts;
 
 public static class ApplicationConstants
 {

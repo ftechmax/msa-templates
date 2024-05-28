@@ -1,4 +1,4 @@
-﻿using ApplicationName.Api.Application.Repositories;
+using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Consumers;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Shared.Events;

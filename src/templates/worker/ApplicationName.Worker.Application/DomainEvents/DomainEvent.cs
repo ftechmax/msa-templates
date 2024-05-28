@@ -1,4 +1,4 @@
-﻿namespace ApplicationName.Worker.Application.DomainEvents;
+namespace ApplicationName.Worker.Application.DomainEvents;
 
 public abstract record DomainEvent
 {

@@ -1,4 +1,4 @@
-﻿using ApplicationName.Worker.Commands;
+using ApplicationName.Worker.Commands;
 using ApplicationName.Worker.Contracts.Commands;
 using AutoMapper;
 using MassTransit;

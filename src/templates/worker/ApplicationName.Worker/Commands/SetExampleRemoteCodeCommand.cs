@@ -1,4 +1,4 @@
-﻿using ApplicationName.Worker.Contracts.Commands;
+using ApplicationName.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker.Commands
 {

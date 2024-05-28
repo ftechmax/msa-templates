@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Application.Services;

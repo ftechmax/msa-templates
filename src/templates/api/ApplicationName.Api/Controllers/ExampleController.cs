@@ -1,4 +1,4 @@
-﻿using ApplicationName.Api.Application.Services;
+using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts.Dtos;
 using Microsoft.AspNetCore.Mvc;
 

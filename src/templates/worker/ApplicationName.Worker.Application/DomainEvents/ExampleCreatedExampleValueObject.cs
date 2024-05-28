@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Aggregates;
 
 namespace ApplicationName.Worker.Application.DomainEvents;
 

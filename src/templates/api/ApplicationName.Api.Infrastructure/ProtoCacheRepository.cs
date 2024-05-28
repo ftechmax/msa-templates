@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Api.Application.Repositories;
 using ArgDefender;
 using Microsoft.Extensions.Caching.Distributed;

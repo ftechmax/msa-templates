@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Contracts.Commands;
