@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Aggregates;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;

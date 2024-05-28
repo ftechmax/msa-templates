@@ -1,4 +1,4 @@
-﻿using ApplicationName.Api.Application.Commands;
+using ApplicationName.Api.Application.Commands;
 using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;

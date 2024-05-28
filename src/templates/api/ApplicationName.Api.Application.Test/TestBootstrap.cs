@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Test.Aggregates;
+using ApplicationName.Shared.Test.Aggregates;
 using FakeItEasy;
 
 namespace ApplicationName.Api.Application.Test;

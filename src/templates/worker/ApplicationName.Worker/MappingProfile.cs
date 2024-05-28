@@ -1,4 +1,4 @@
-﻿using ApplicationName.Worker.Application.DomainEvents;
+using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Commands;
 using ApplicationName.Worker.Events;
 using AutoMapper;

@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
 using ArgDefender;
 using MongoDB.Bson.Serialization.Attributes;

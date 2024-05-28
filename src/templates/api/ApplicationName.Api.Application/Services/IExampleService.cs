@@ -1,4 +1,4 @@
-﻿using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Api.Contracts.Dtos;
 
 namespace ApplicationName.Api.Application.Services;
 

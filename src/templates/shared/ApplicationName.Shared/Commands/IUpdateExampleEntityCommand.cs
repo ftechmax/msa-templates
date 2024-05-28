@@ -1,4 +1,4 @@
-﻿namespace ApplicationName.Shared.Commands;
+namespace ApplicationName.Shared.Commands;
 
 public interface IUpdateExampleEntityCommand
 {

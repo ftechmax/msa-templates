@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Aggregates;
+using ApplicationName.Shared.Aggregates;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ApplicationName.Worker.Application.Documents;

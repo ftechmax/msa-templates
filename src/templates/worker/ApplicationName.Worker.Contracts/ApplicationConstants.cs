@@ -1,4 +1,4 @@
-﻿namespace ApplicationName.Worker.Contracts;
+namespace ApplicationName.Worker.Contracts;
 
 public static class ApplicationConstants
 {
