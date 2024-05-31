@@ -10,7 +10,7 @@ COPY . /app
 RUN npm ci
 RUN npm run build --configuration="production" --aot
 
-FROM nginx:1.25-alpine
+FROM nginx:1.26.1-alpine
 RUN chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d && \
