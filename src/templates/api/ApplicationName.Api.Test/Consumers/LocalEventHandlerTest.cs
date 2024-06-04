@@ -34,7 +34,7 @@ namespace ApplicationName.Api.Test.Consumers
             public async Task Consume_ExampleCreatedEvent()
             {
                 // Arrange
-                var @event = A.Dummy<ExampleCreatedEvent>();
+                var @event = _fixture.Create<ExampleCreatedEvent>();
 
                 var context = _fixture.Create<ConsumeContext<ExampleCreatedEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);
@@ -50,7 +50,7 @@ namespace ApplicationName.Api.Test.Consumers
             public async Task Consume_ExampleUpdatedEvent()
             {
                 // Arrange
-                var @event = A.Dummy<ExampleUpdatedEvent>();
+                var @event = _fixture.Create<ExampleUpdatedEvent>();
 
                 var context = _fixture.Create<ConsumeContext<ExampleUpdatedEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);
@@ -67,7 +67,7 @@ namespace ApplicationName.Api.Test.Consumers
             public async Task Consume_ExampleRemoteCodeSetEvent()
             {
                 // Arrange
-                var @event = A.Dummy<ExampleRemoteCodeSetEvent>();
+                var @event = _fixture.Create<ExampleRemoteCodeSetEvent>();
 
                 var context = _fixture.Create<ConsumeContext<ExampleRemoteCodeSetEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);

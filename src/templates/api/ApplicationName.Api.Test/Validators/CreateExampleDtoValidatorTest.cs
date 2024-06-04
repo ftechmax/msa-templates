@@ -39,13 +39,7 @@ public class CreateExampleDtoValidatorTest
     public void Validate_With_Invalid_CorrelationId()
     {
         // Arrange
-        var dto = new CreateExampleDto
-        {
-            CorrelationId = Guid.Empty,
-            Name = _fixture.Create<string>(),
-            Description = _fixture.Create<string>(),
-            ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
-        };
+        var dto = _fixture.Create<CreateExampleDto>() with { CorrelationId = Guid.Empty };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -65,13 +59,7 @@ public class CreateExampleDtoValidatorTest
     public void Validate_With_Invalid_Name(string testCase)
     {
         // Arrange
-        var dto = new CreateExampleDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Name = testCase,
-            Description = _fixture.Create<string>(),
-            ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
-        };
+        var dto = _fixture.Create<CreateExampleDto>() with { Name = testCase };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -91,13 +79,7 @@ public class CreateExampleDtoValidatorTest
     public void Validate_With_Invalid_Description(string testCase)
     {
         // Arrange
-        var dto = new CreateExampleDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Name = _fixture.Create<string>(),
-            Description = testCase,
-            ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
-        };
+        var dto = _fixture.Create<CreateExampleDto>() with { Description = testCase };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -114,13 +96,7 @@ public class CreateExampleDtoValidatorTest
     public void Validate_With_Invalid_ExampleValueObject()
     {
         // Arrange
-        var dto = new CreateExampleDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Name = _fixture.Create<string>(),
-            Description = _fixture.Create<string>(),
-            ExampleValueObject = default
-        };
+        var dto = _fixture.Create<CreateExampleDto>() with { ExampleValueObject = default };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);

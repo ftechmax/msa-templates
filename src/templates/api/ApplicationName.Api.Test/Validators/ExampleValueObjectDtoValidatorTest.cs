@@ -42,11 +42,7 @@ public class ExampleValueObjectDtoValidatorTest
     public void Validate_With_Invalid_Code(string testCase)
     {
         // Arrange
-        var dto = new ExampleValueObjectDto
-        {
-            Code = testCase,
-            Value = _fixture.Create<double>(),
-        };
+        var dto = _fixture.Create<ExampleValueObjectDto>() with { Code = testCase };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -64,11 +60,7 @@ public class ExampleValueObjectDtoValidatorTest
     public void Validate_With_Invalid_Value(double testCase)
     {
         // Arrange
-        var dto = new ExampleValueObjectDto
-        {
-            Code = _fixture.Create<string>(),
-            Value = testCase
-        };
+        var dto = _fixture.Create<ExampleValueObjectDto>() with { Value = testCase };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
