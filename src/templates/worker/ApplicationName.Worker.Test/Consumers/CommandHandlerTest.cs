@@ -41,12 +41,12 @@ public class CommandHandlerTest
     public async Task Consume_CreateExampleCommand()
     {
         // Arrange
-        var command = A.Dummy<CreateExampleCommand>();
+        var command = _fixture.Create<CreateExampleCommand>();
         var context = _fixture.Create<ConsumeContext<CreateExampleCommand>>();
         A.CallTo(() => context.Message).Returns(command);
 
-        var documentSpec = A.Dummy<CreateExampleCommand>();
-        var document = new ExampleDocument(documentSpec);
+        var existingCommand = _fixture.Create<CreateExampleCommand>();
+        var document = new ExampleDocument(existingCommand);
         var domainEvent = new ExampleCreated(document);
 
         var capturedCommand = default(CreateExampleCommand);

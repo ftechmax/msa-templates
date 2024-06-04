@@ -29,10 +29,10 @@ public class ApplicationServiceTest
     }
 
     [Test]
-    public async Task HandleAsync_ICreateExampleCommand_With_Valid_Command()
+    public async Task HandleAsync_CreateExampleCommand_With_Valid_Command()
     {
         // Act
-        var command = A.Dummy<CreateExampleCommand>();
+        var command = _fixture.Create<CreateExampleCommand>();
 
         var capturedDocument = default(ExampleDocument);
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).Invokes((ExampleDocument arg1) =>
@@ -59,7 +59,7 @@ public class ApplicationServiceTest
     }
 
     [Test]
-    public async Task HandleAsync_ICreateExampleCommand_With_Default_Command()
+    public async Task HandleAsync_CreateExampleCommand_With_Default_Command()
     {
         // Act
         var command = default(CreateExampleCommand);

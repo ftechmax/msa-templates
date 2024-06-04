@@ -6,12 +6,6 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Events\**" />
-    <EmbeddedResource Remove="Events\**" />
-    <None Remove="Events\**" />
-  </ItemGroup>
-
   <Import Project="..\..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems" Label="Shared" />
 
 </Project>

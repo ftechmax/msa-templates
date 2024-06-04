@@ -44,7 +44,7 @@ public class ExternalEventHandlerTest
     public async Task Consume_ExternalEvent()
     {
         // Arrange
-        var @event = A.Dummy<ExternalEvent>();
+        var @event = _fixture.Create<ExternalEvent>();
         A.CallTo(() => _context.Message).ReturnsLazily(() => @event);
 
         var capturedCommand = default(SetExampleRemoteCodeCommand);
