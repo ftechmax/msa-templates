@@ -14,14 +14,9 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
     public string Description { get; init; }
 
-    public List<ExampleEntity> Examples { get; init; } = [];
-
     public ExampleValueObject ExampleValueObject { get; init; }
 
     public int? RemoteCode { get; init; }
-
-    [BsonIgnore]
-    IReadOnlyCollection<IExampleEntity> IExample.Examples => Examples;
 
     [BsonIgnore]
     IExampleValueObject IExample.ExampleValueObject => ExampleValueObject;

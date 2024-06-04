@@ -2,13 +2,13 @@ using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Shared.Commands;
 
-public interface IUpdateExampleCommand
+public record UpdateExampleCommand
 {
-    Guid CorrelationId { get; }
+    public Guid CorrelationId { get; init; }
 
-    Guid Id { get; }
+    public Guid Id { get; init; }
 
-    string Description { get; }
+    public string Description { get; init; }
 
-    IExampleValueObjectEventData ExampleValueObject { get; }
+    public ExampleValueObjectEventData ExampleValueObject { get; init; }
 }

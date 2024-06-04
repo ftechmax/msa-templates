@@ -10,12 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleEntityDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleValueObjectDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\AggregateDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\UpdateExampleCommandDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\CreateExampleCommandDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleCreatedEventDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleUpdatedEventDummyFactory.cs" />
   </ItemGroup>
 </Project>

@@ -2,13 +2,13 @@ using ApplicationName.Shared.Events;
 
 namespace ApplicationName.Shared.Commands;
 
-public interface ICreateExampleCommand
+public record CreateExampleCommand
 {
-    Guid CorrelationId { get; }
+    public Guid CorrelationId { get; init; }
 
-    string Name { get; }
+    public string Name { get; init; }
 
-    string Description { get; }
+    public string Description { get; init; }
 
-    IExampleValueObjectEventData ExampleValueObject { get; }
+    public ExampleValueObjectEventData ExampleValueObject { get; init; }
 }

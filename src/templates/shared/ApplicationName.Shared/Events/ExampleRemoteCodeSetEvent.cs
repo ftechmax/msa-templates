@@ -1,10 +1,10 @@
 namespace ApplicationName.Shared.Events;
 
-public interface IExampleRemoteCodeSetEvent
+public record ExampleRemoteCodeSetEvent
 {
-    Guid CorrelationId { get; }
+    public Guid CorrelationId { get; init; }
 
-    Guid Id { get; }
+    public Guid Id { get; init; }
 
-    int RemoteCode { get; }
+    public int RemoteCode { get; init; }
 }

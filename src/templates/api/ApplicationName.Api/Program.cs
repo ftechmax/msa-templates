@@ -58,7 +58,8 @@ public static class Program
         services.AddMassTransit(i =>
         {
             var uri = new Uri("queue:ApplicationName.Worker");
-            EndpointConvention.Map<ICreateExampleCommand>(uri);
+            EndpointConvention.Map<CreateExampleCommand>(uri);
+            EndpointConvention.Map<UpdateExampleCommand>(uri);
 
             i.AddConsumer<LocalEventHandler>();
 

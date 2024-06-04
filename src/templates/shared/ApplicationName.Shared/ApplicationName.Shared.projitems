@@ -11,10 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IAggregate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExampleValueObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExampleEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExample.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\CreateExampleCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Commands\UpdateExampleCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleValueObjectEventData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleCreatedEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleRemoteCodeSetEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleUpdatedEvent.cs" />

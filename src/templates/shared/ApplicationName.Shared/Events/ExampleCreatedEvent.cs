@@ -1,14 +1,14 @@
 namespace ApplicationName.Shared.Events;
 
-public interface IExampleCreatedEvent
+public record ExampleCreatedEvent
 {
-    Guid CorrelationId { get; }
+    public Guid CorrelationId { get; init; }
 
-    Guid Id { get; }
+    public Guid Id { get; init; }
 
-    string Name { get; }
+    public string Name { get; init; }
 
-    string Description { get; }
+    public string Description { get; init; }
 
-    IExampleValueObjectEventData ExampleValueObject { get; }
+    public ExampleValueObjectEventData ExampleValueObject { get; init; }
 }
