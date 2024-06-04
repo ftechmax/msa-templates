@@ -12,7 +12,7 @@ public sealed class ExampleValueObject : IExampleValueObject
     {
     }
 
-    public ExampleValueObject(IExampleValueObjectEventData eventData)
+    public ExampleValueObject(ExampleValueObjectEventData eventData)
         : this()
     {
         Guard.Argument(eventData).NotNull();

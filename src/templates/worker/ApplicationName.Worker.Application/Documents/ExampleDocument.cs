@@ -14,7 +14,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
     {
     }
 
-    public ExampleDocument(ICreateExampleCommand command)
+    public ExampleDocument(CreateExampleCommand command)
         : this()
     {
         Guard.Argument(command).NotNull();
@@ -29,7 +29,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         ExampleValueObject = new ExampleValueObject(command.ExampleValueObject);
     }
 
-    public ExampleUpdated Update(IUpdateExampleCommand command)
+    public ExampleUpdated Update(UpdateExampleCommand command)
     {
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Description).NotNull().NotWhiteSpace();
@@ -41,28 +41,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         return new ExampleUpdated(this);
     }
 
-    public ExampleEntityAdded AddExampleEntity(IAddExampleEntityCommand command)
-    {
-        Guard.Argument(command).NotNull();
-
-        var entity = new ExampleEntity(command);
-        Examples.Add(entity);
-
-        return new ExampleEntityAdded(Id, entity);
-    }
-
-    public ExampleEntityUpdated UpdateExampleEntity(IUpdateExampleEntityCommand command)
-    {
-        Guard.Argument(command).NotNull();
-        Guard.Argument(command.EntityId).NotDefault();
-
-        var entity = Examples.Single(i => i.Id == command.EntityId);
-        entity.Update(command);
-
-        return new ExampleEntityUpdated(Id, entity);
-    }
-
-    public ExampleRemoteCodeSet SetRemoteCode(ISetExampleRemoteCodeCommand command)
+    public ExampleRemoteCodeSet SetRemoteCode(SetExampleRemoteCodeCommand command)
     {
         Guard.Argument(command).NotNull();
         Guard.Argument(command.RemoteCode).NotDefault().NotNegative();
@@ -72,7 +51,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         return new ExampleRemoteCodeSet(Id, RemoteCode.Value);
     }
 
-    public static (ExampleDocument aggregate, ExampleCreated domainEvent) Create(ICreateExampleCommand command)
+    public static (ExampleDocument aggregate, ExampleCreated domainEvent) Create(CreateExampleCommand command)
     {
         var document = new ExampleDocument(command);
         return (document, new ExampleCreated(document));
@@ -82,14 +61,9 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
     public string Description { get; private set; }
 
-    public List<ExampleEntity> Examples { get; init; } = [];
-
     public ExampleValueObject ExampleValueObject { get; private set; }
 
     public int? RemoteCode { get; private set; }
-
-    [BsonIgnore]
-    IReadOnlyCollection<IExampleEntity> IExample.Examples => Examples;
 
     [BsonIgnore]
     IExampleValueObject IExample.ExampleValueObject => ExampleValueObject;

@@ -8,7 +8,7 @@ namespace ApplicationName.Worker.Application.Services;
 
 public class ApplicationService(IDocumentRepository documentRepository) : IApplicationService
 {
-    public async Task<ExampleCreated> HandleAsync(ICreateExampleCommand command)
+    public async Task<ExampleCreated> HandleAsync(CreateExampleCommand command)
     {
         Guard.Argument(command, nameof(command)).NotNull();
 
@@ -19,7 +19,7 @@ public class ApplicationService(IDocumentRepository documentRepository) : IAppli
         return domainEvent;
     }
 
-    public async Task<ExampleUpdated> HandleAsync(IUpdateExampleCommand command)
+    public async Task<ExampleUpdated> HandleAsync(UpdateExampleCommand command)
     {
         Guard.Argument(command, nameof(command)).NotNull();
         Guard.Argument(command.Id, nameof(command.Id)).NotDefault();
@@ -33,35 +33,7 @@ public class ApplicationService(IDocumentRepository documentRepository) : IAppli
         return domainEvent;
     }
 
-    public async Task<ExampleEntityAdded> HandleAsync(IAddExampleEntityCommand command)
-    {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.Id, nameof(command.Id)).NotDefault();
-
-        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
-
-        var domainEvent = document.AddExampleEntity(command);
-
-        await documentRepository.UpsertAsync(document);
-
-        return domainEvent;
-    }
-
-    public async Task<ExampleEntityUpdated> HandleAsync(IUpdateExampleEntityCommand command)
-    {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.Id, nameof(command.Id)).NotDefault();
-
-        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
-
-        var domainEvent = document.UpdateExampleEntity(command);
-
-        await documentRepository.UpsertAsync(document);
-
-        return domainEvent;
-    }
-
-    public async Task<ExampleRemoteCodeSet> HandleAsync(ISetExampleRemoteCodeCommand command)
+    public async Task<ExampleRemoteCodeSet> HandleAsync(SetExampleRemoteCodeCommand command)
     {
         Guard.Argument(command, nameof(command)).NotNull();
         Guard.Argument(command.Id, nameof(command.Id)).NotDefault();

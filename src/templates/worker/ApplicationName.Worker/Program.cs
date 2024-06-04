@@ -50,7 +50,7 @@ public static class Program
         services.AddMassTransit(i =>
         {
             var uri = new Uri($"queue:{ServiceName}");
-            EndpointConvention.Map<ISetExampleRemoteCodeCommand>(uri);
+            EndpointConvention.Map<SetExampleRemoteCodeCommand>(uri);
 
             i.AddConsumer<ExternalEventHandler>();
             i.AddConsumer<CommandHandler>();

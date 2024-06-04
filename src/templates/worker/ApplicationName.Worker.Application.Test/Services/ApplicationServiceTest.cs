@@ -32,7 +32,7 @@ public class ApplicationServiceTest
     public async Task HandleAsync_ICreateExampleCommand_With_Valid_Command()
     {
         // Act
-        var command = A.Dummy<ICreateExampleCommand>();
+        var command = A.Dummy<CreateExampleCommand>();
 
         var capturedDocument = default(ExampleDocument);
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).Invokes((ExampleDocument arg1) =>
@@ -50,7 +50,6 @@ public class ApplicationServiceTest
         capturedDocument.Name.Should().NotBeNullOrWhiteSpace().And.Be(command.Name);
         capturedDocument.Description.Should().NotBeNullOrWhiteSpace().And.Be(command.Description);
         capturedDocument.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(command.ExampleValueObject);
-        capturedDocument.Examples.Should().NotBeNull().And.BeEmpty();
         capturedDocument.RemoteCode.Should().BeNull();
 
         result.Should().NotBeNull().And.BeOfType<ExampleCreated>();
@@ -63,7 +62,7 @@ public class ApplicationServiceTest
     public async Task HandleAsync_ICreateExampleCommand_With_Default_Command()
     {
         // Act
-        var command = default(ICreateExampleCommand);
+        var command = default(CreateExampleCommand);
 
         // Arrange
         Func<Task> act = () => _subjectUnderTest.HandleAsync(command);
