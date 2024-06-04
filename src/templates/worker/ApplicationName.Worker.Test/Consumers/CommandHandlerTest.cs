@@ -38,27 +38,27 @@ public class CommandHandlerTest
     }
 
     [Test]
-    public async Task Consume_ICreateExampleCommand()
+    public async Task Consume_CreateExampleCommand()
     {
         // Arrange
-        var command = A.Dummy<ICreateExampleCommand>();
-        var context = _fixture.Create<ConsumeContext<ICreateExampleCommand>>();
+        var command = _fixture.Create<CreateExampleCommand>();
+        var context = _fixture.Create<ConsumeContext<CreateExampleCommand>>();
         A.CallTo(() => context.Message).Returns(command);
 
-        var documentSpec = A.Dummy<ICreateExampleCommand>();
-        var document = new ExampleDocument(documentSpec);
+        var existingCommand = _fixture.Create<CreateExampleCommand>();
+        var document = new ExampleDocument(existingCommand);
         var domainEvent = new ExampleCreated(document);
 
-        var capturedCommand = default(ICreateExampleCommand);
+        var capturedCommand = default(CreateExampleCommand);
         A.CallTo(() => _applicationService.HandleAsync(context.Message))
-            .Invokes((ICreateExampleCommand arg0) =>
+            .Invokes((CreateExampleCommand arg0) =>
             {
                 capturedCommand = arg0;
             })
             .ReturnsLazily(() => domainEvent);
 
-        var capturedEvent = default(IExampleCreatedEvent);
-        A.CallTo(() => context.Publish(A<IExampleCreatedEvent>._, A<CancellationToken>._)).Invokes((IExampleCreatedEvent arg0, CancellationToken _) =>
+        var capturedEvent = default(ExampleCreatedEvent);
+        A.CallTo(() => context.Publish(A<ExampleCreatedEvent>._, A<CancellationToken>._)).Invokes((ExampleCreatedEvent arg0, CancellationToken _) =>
         {
             capturedEvent = arg0;
         });
@@ -68,7 +68,7 @@ public class CommandHandlerTest
 
         // Assert
         A.CallTo(() => _applicationService.HandleAsync(context.Message)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => context.Publish(A<IExampleCreatedEvent>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => context.Publish(A<ExampleCreatedEvent>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         capturedEvent.Should().NotBeNull();
         capturedCommand.Should().NotBeNull().And.Be(command);
     }

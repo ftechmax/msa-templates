@@ -126,9 +126,9 @@ public class ExampleServiceTest
         // Arrange
         var request = _fixture.Create<CreateExampleDto>();
 
-        var capturedCommand = default(ICreateExampleCommand);
-        A.CallTo(() => _sendEndpoint.Send(A<ICreateExampleCommand>._, A<CancellationToken>._)).Invokes(
-            (ICreateExampleCommand arg0, CancellationToken _) =>
+        var capturedCommand = default(CreateExampleCommand);
+        A.CallTo(() => _sendEndpoint.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).Invokes(
+            (CreateExampleCommand arg0, CancellationToken _) =>
             {
                 capturedCommand = arg0;
             });
@@ -137,7 +137,7 @@ public class ExampleServiceTest
         await _subjectUnderTest.HandleAsync(request);
 
         // Assert
-        A.CallTo(() => _sendEndpoint.Send(A<ICreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _sendEndpoint.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
         capturedCommand.Should().NotBeNull();
         capturedCommand.Name.Should().NotBeNullOrWhiteSpace().And.Be(request.Name);
@@ -146,7 +146,7 @@ public class ExampleServiceTest
     private ExampleDocument GenerateDocument()
     {
         var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes);
-        var instance = (ExampleDocument)ci.Invoke(null);
+        var instance = (ExampleDocument)ci!.Invoke(null);
 
         var mapper = new MapperConfiguration(configure =>
         {
@@ -157,7 +157,7 @@ public class ExampleServiceTest
         mapper.Map(A.Dummy<IAggregate>(), instance);
 
         var propertyInfo = instance.GetType().GetProperty(nameof(ExampleDocument.Name));
-        propertyInfo.SetValue(instance, Convert.ChangeType(_fixture.Create<string>(), propertyInfo.PropertyType), null);
+        propertyInfo!.SetValue(instance, Convert.ChangeType(_fixture.Create<string>(), propertyInfo.PropertyType), null);
 
         return instance;
     }

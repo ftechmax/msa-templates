@@ -39,7 +39,6 @@ public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
             .SetOnInsert(i => i.Name, document.Name)
             .Set(i => i.Description, document.Description)
             .Set(i => i.ExampleValueObject, document.ExampleValueObject)
-            .Set(i => i.Examples, document.Examples)
             .Set(i => i.RemoteCode, document.RemoteCode);
 
         return collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });

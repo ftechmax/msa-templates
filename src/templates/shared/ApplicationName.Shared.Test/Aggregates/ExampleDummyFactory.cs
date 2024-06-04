@@ -18,7 +18,6 @@ internal class ExampleDummyFactory : DummyFactory<IExample>
         A.CallTo(() => result.Updated).Returns(result.Created);
         A.CallTo(() => result.Name).Returns(_fixture.Create<string>());
         A.CallTo(() => result.Description).Returns(_fixture.Create<string>());
-        A.CallTo(() => result.Examples).Returns(A.CollectionOfDummy<IExampleEntity>(3).AsReadOnly());
         A.CallTo(() => result.ExampleValueObject).Returns(A.Dummy<IExampleValueObject>());
 
         return result;

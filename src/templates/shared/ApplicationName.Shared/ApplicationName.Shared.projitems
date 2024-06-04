@@ -11,17 +11,12 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IAggregate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExampleValueObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExampleEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\IExample.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\IAddExampleEntityCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\ICreateExampleCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\IUpdateExampleCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\IUpdateExampleEntityCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleCreatedEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleEntityAddedEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleEntityUpdatedEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleRemoteCodeSetEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleUpdatedEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\IExampleValueObjectEventData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\CreateExampleCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\UpdateExampleCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleValueObjectEventData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleCreatedEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleRemoteCodeSetEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleUpdatedEvent.cs" />
   </ItemGroup>
 </Project>

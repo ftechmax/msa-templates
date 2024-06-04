@@ -1,6 +1,6 @@
+using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.DomainEvents;
-using ApplicationName.Worker.Commands;
-using ApplicationName.Worker.Events;
+using ApplicationName.Worker.Contracts.Commands;
 using AutoMapper;
 using Other.Worker.Contracts.Commands;
 
@@ -10,15 +10,13 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<IExternalEvent, SetExampleRemoteCodeCommand>()
+        CreateMap<ExternalEvent, SetExampleRemoteCodeCommand>()
             .ForMember(dst => dst.RemoteCode, src =>
                 src.MapFrom(i => i.Code));
 
         CreateMap<ExampleCreated, ExampleCreatedEvent>();
         CreateMap<ExampleUpdated, ExampleUpdatedEvent>();
         CreateMap<ExampleValueObjectEvent, ExampleValueObjectEventData>();
-        CreateMap<ExampleEntityAdded, ExampleEntityAddedEvent>();
-        CreateMap<ExampleEntityUpdated, ExampleEntityUpdatedEvent>();
         CreateMap<ExampleRemoteCodeSet, ExampleRemoteCodeSetEvent>();
     }
 }
