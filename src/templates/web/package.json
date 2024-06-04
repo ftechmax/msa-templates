@@ -19,11 +19,11 @@
     "@angular/platform-browser": "^17.3.6",
     "@angular/platform-browser-dynamic": "^17.3.6",
     "@angular/router": "^17.3.6",
-    "@jsverse/transloco": "^7.4.0",
-    "@jsverse/transloco-messageformat": "^7.0.0",
+    "@jsverse/transloco": "^7.4.2",
+    "@jsverse/transloco-messageformat": "^7.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.5.0",
-    "zone.js": "~0.14.5"
+    "zone.js": "~0.14.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.3.6",
