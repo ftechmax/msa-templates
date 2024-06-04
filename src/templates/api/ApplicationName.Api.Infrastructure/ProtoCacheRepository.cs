@@ -32,7 +32,7 @@ public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : I
         ProtoBuf.Serializer.Serialize(ms, obj);
         ms.Position = 0;
 
-        await distributedCache.SetAsync(key, ms.ToArray(), options);
+        await distributedCache.SetAsync(key, ms.ToArray(), options ?? new DistributedCacheEntryOptions());
     }
 
     public Task RemoveAsync(string key)

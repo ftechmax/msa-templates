@@ -105,7 +105,7 @@ public static class Program
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
-        var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var openTelemetryEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
@@ -125,7 +125,7 @@ public static class Program
                 .AddRedisInstrumentation()
                 .AddOtlpExporter(configure =>
                 {
-                    configure.Endpoint = otlpEndpoint;
+                    configure.Endpoint = openTelemetryEndpoint;
                 }))
             .WithMetrics(builder => builder
                 .SetResourceBuilder(appResourceBuilder)
@@ -133,7 +133,7 @@ public static class Program
                 .AddHttpClientInstrumentation()
                 .AddOtlpExporter(configure =>
                 {
-                    configure.Endpoint = otlpEndpoint;
+                    configure.Endpoint = openTelemetryEndpoint;
                 })
         );
     }

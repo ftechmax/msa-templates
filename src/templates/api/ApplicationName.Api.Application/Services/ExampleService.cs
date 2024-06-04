@@ -28,7 +28,7 @@ public sealed class ExampleService(
         var documents = await documentRepository.GetAllAsync<ExampleDocument>(_ => true);
         if (!documents.Any())
         {
-            return new List<ExampleCollectionDto>();
+            return [];
         }
 
         result = mapper.Map<IEnumerable<ExampleCollectionDto>>(documents);
@@ -69,7 +69,7 @@ public sealed class ExampleService(
 
         var command = mapper.Map<CreateExampleCommand>(dto);
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send<CreateExampleCommand>(command);
+        await sendEndpoint.Send(command);
     }
 
     public async Task HandleAsync(Guid id, UpdateExampleDto dto)
@@ -79,6 +79,6 @@ public sealed class ExampleService(
 
         var command = mapper.Map<UpdateExampleCommand>(dto) with { Id = id };
         var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send<UpdateExampleCommand>(command);
+        await sendEndpoint.Send(command);
     }
 }

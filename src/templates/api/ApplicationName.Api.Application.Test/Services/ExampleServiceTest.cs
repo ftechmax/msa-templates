@@ -146,7 +146,7 @@ public class ExampleServiceTest
     private ExampleDocument GenerateDocument()
     {
         var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes);
-        var instance = (ExampleDocument)ci.Invoke(null);
+        var instance = (ExampleDocument)ci!.Invoke(null);
 
         var mapper = new MapperConfiguration(configure =>
         {
@@ -157,7 +157,7 @@ public class ExampleServiceTest
         mapper.Map(A.Dummy<IAggregate>(), instance);
 
         var propertyInfo = instance.GetType().GetProperty(nameof(ExampleDocument.Name));
-        propertyInfo.SetValue(instance, Convert.ChangeType(_fixture.Create<string>(), propertyInfo.PropertyType), null);
+        propertyInfo!.SetValue(instance, Convert.ChangeType(_fixture.Create<string>(), propertyInfo.PropertyType), null);
 
         return instance;
     }
