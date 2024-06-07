@@ -26,7 +26,27 @@ public class ExampleControllerTest
     }
 
     [Test]
-    public async Task Get_With_Valid_Dto()
+    public async Task GetCollection()
+    {
+        // Arrange
+        var dtos = _fixture.CreateMany<ExampleCollectionDto>();
+
+        A.CallTo(() => _applicationService.GetCollectionAsync()).ReturnsLazily(() => dtos);
+
+        // Act
+        var result = await _subjectUnderTest.GetCollection();
+
+        // Assert
+        A.CallTo(() => _applicationService.GetCollectionAsync()).MustHaveHappenedOnceExactly();
+
+        result.Should()
+            .NotBeNullOrEmpty()
+            .And.HaveSameCount(dtos)
+            .And.Contain(dtos);
+    }
+
+    [Test]
+    public async Task Get()
     {
         // Arrange
         var id = _fixture.Create<Guid>();
@@ -46,7 +66,7 @@ public class ExampleControllerTest
     }
 
     [Test]
-    public async Task Post_With_Valid_Dto()
+    public async Task Post()
     {
         // Arrange
         var dto = _fixture.Create<CreateExampleDto>();
@@ -56,5 +76,19 @@ public class ExampleControllerTest
 
         // Assert
         A.CallTo(() => _applicationService.HandleAsync(dto)).MustHaveHappenedOnceExactly();
+    }
+
+    [Test]
+    public async Task Put()
+    {
+        // Arrange
+        var id = _fixture.Create<Guid>();
+        var dto = _fixture.Create<UpdateExampleDto>();
+
+        // Act
+        await _subjectUnderTest.Put(id, dto);
+
+        // Assert
+        A.CallTo(() => _applicationService.HandleAsync(id, dto)).MustHaveHappenedOnceExactly();
     }
 }
