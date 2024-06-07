@@ -14,7 +14,7 @@ public sealed class ExampleService(
     IDocumentRepository documentRepository,
     IProtoCacheRepository protoCacheRepository,
     IMapper mapper,
-    ISendEndpointProvider sendEndpointProvider)
+    IBus bus)
     : IExampleService
 {
     public async Task<IEnumerable<ExampleCollectionDto>> GetCollectionAsync()
@@ -68,8 +68,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<CreateExampleCommand>(dto);
-        var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send(command);
+        await bus.Send(command);
     }
 
     public async Task HandleAsync(Guid id, UpdateExampleDto dto)
@@ -78,7 +77,6 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<UpdateExampleCommand>(dto) with { Id = id };
-        var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send(command);
+        await bus.Send(command);
     }
 }

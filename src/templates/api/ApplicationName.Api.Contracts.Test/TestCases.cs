@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace ApplicationName.Worker.Contracts.Test;
+namespace ApplicationName.Api.Contracts.Test;
 
 [ExcludeFromCodeCoverage]
 public static class TestCases

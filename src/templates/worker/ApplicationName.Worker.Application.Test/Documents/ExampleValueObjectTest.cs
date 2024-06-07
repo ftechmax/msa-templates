@@ -61,7 +61,7 @@ internal class ExampleValueObjectTest
 
     [Test]
     [TestCaseSource(typeof(TestCases), nameof(TestCases.NegativeDoubleCases))]
-    public void Constructor_With_Invalid_Description(double testCase)
+    public void Constructor_With_Invalid_Value(double testCase)
     {
         // Arrange
         var command = _fixture.Create<ExampleValueObjectEventData>() with { Value = testCase };
