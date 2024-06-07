@@ -59,7 +59,7 @@ public class ApplicationServiceTest
         var command = default(CreateExampleCommand);
 
         // Arrange
-        Func<Task> act = () => _subjectUnderTest.HandleAsync(command);
+        var act = async () => await _subjectUnderTest.HandleAsync(command);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command)}*");
@@ -109,7 +109,7 @@ public class ApplicationServiceTest
         var command = default(UpdateExampleCommand);
 
         // Arrange
-        Func<Task> act = () => _subjectUnderTest.HandleAsync(command);
+        var act = () => _subjectUnderTest.HandleAsync(command);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command)}*");
@@ -173,7 +173,7 @@ public class ApplicationServiceTest
         var command = default(SetExampleRemoteCodeCommand);
 
         // Arrange
-        Func<Task> act = () => _subjectUnderTest.HandleAsync(command);
+        var act = () => _subjectUnderTest.HandleAsync(command);
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command)}*");

@@ -39,6 +39,19 @@ internal class ExampleDocumentTest
     }
 
     [Test]
+    public void Constructor_With_Invalid_Command()
+    {
+        // Arrange
+        var command = default(CreateExampleCommand);
+
+        // Act
+        var act = () => new ExampleDocument(command);
+
+        // Assert
+        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command)}*");
+    }
+
+    [Test]
     [TestCaseSource(typeof(TestCases), nameof(TestCases.StringCases))]
     public void Constructor_With_Invalid_Name(string testCase)
     {

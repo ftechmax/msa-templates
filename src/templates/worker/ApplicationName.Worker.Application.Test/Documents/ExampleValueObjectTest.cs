@@ -33,6 +33,19 @@ internal class ExampleValueObjectTest
     }
 
     [Test]
+    public void Constructor_With_Invalid_Command()
+    {
+        // Arrange
+        var eventData = default(ExampleValueObjectEventData);
+
+        // Act
+        var act = () => new ExampleValueObject(eventData);
+
+        // Assert
+        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(eventData)}*");
+    }
+
+    [Test]
     [TestCaseSource(typeof(TestCases), nameof(TestCases.StringCases))]
     public void Constructor_With_Invalid_Code(string testCase)
     {
