@@ -188,8 +188,7 @@ internal class ExampleDocumentTest
     }
 
     [Test]
-    [TestCase(-1)]
-    [TestCase(int.MinValue)]
+    [TestCaseSource(typeof(TestCases), nameof(TestCases.NegativeIntCases))]
     public void Handle_SetExampleRemoteCodeCommand_With_Invalid_Code(int testCase)
     {
         // Arrange
