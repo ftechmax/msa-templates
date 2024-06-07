@@ -26,7 +26,7 @@ public class ApplicationService(IDocumentRepository documentRepository) : IAppli
 
         var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
-        var domainEvent = document.Update(command);
+        var domainEvent = document.Handle(command);
 
         await documentRepository.UpsertAsync(document);
 
@@ -40,7 +40,7 @@ public class ApplicationService(IDocumentRepository documentRepository) : IAppli
 
         var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
-        var domainEvent = document.SetRemoteCode(command);
+        var domainEvent = document.Handle(command);
 
         await documentRepository.UpsertAsync(document);
 
