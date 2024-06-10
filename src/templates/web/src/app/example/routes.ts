@@ -5,8 +5,8 @@ import { ExampleUpdateComponent } from './update/example-update.component';
 import { ExampleDetailsComponent } from './details/example-details.component';
 
 export default [
-    {path: '', component: ExampleCollectionComponent},
-    {path: 'create', component: ExampleCreateComponent},
-    {path: ':id', component: ExampleDetailsComponent},
-    {path: 'update/:id', component: ExampleUpdateComponent},
+  { path: '', component: ExampleCollectionComponent },
+  { path: 'create', component: ExampleCreateComponent },
+  { path: ':id', component: ExampleDetailsComponent },
+  { path: ':id/update', component: ExampleUpdateComponent },
 ] satisfies Route[];

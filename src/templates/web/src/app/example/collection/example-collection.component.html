@@ -1,1 +1,6 @@
 <p>example-collection works!</p>
+<a routerLink="./create">Create</a>
+@for (item of model; track item) {
+<p>{{ item.name }}</p>
+<a routerLink="./{{ item.id }}">View</a>
+}

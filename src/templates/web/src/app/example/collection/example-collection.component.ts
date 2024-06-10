@@ -4,19 +4,26 @@ import { EventService } from '../../status.service';
 import { ExampleCollectionDto } from '../contracts';
 import { ExampleHttpClient } from '../httpclient';
 import { ExampleCreateComponent } from '../create/example-create.component';
+import { JsonPipe } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-example-collection',
   standalone: true,
-  imports: [],
+  imports: [RouterLink, JsonPipe],
+  providers: [ExampleHttpClient],
   templateUrl: './example-collection.component.html',
-  styleUrl: './example-collection.component.scss'
+  styleUrl: './example-collection.component.scss',
 })
 export class ExampleCollectionComponent implements OnInit, OnDestroy {
   model = [] as ExampleCollectionDto[];
   event$: Subscription | null = null;
 
-  constructor(private http: ExampleHttpClient, private eventService: EventService) {}
+  constructor(
+    private readonly router: Router,
+    private readonly http: ExampleHttpClient,
+    private readonly eventService: EventService
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -37,7 +44,7 @@ export class ExampleCollectionComponent implements OnInit, OnDestroy {
 
   onCreate() {
     // const dialogRef = this.dialog.open(ExampleCreateComponent);
-
     // dialogRef.afterClosed().subscribe(() => {});
+    this.router.navigate(['/example', 'create']);
   }
 }

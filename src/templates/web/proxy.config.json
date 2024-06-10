@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "http://applicationname.kube.local",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

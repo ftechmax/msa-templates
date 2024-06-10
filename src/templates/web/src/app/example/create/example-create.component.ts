@@ -5,8 +5,9 @@ import { ExampleHttpClient } from '../httpclient';
   selector: 'app-example-create',
   standalone: true,
   imports: [],
+  providers: [ExampleHttpClient],
   templateUrl: './example-create.component.html',
-  styleUrl: './example-create.component.scss'
+  styleUrl: './example-create.component.scss',
 })
 export class ExampleCreateComponent {
   constructor(private http: ExampleHttpClient) {}

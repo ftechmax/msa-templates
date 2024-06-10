@@ -1,7 +1,7 @@
 export type ExampleCollectionDto = {
   id: string;
   name: string;
-}[];
+};
 
 export type ExampleDetailsDto = {
   id: string;
