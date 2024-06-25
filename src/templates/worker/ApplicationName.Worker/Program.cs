@@ -90,6 +90,7 @@ public static class Program
                 }))
             .WithMetrics(cfg => cfg
                 .SetResourceBuilder(appResourceBuilder)
+                .AddProcessInstrumentation()
                 .AddRuntimeInstrumentation()
                 .AddOtlpExporter(configure =>
                 {
