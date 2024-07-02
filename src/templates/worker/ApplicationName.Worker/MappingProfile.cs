@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
@@ -6,6 +7,7 @@ using Other.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker;
 
+[ExcludeFromCodeCoverage]
 public class MappingProfile : Profile
 {
     public MappingProfile()

@@ -1,4 +1,5 @@
 using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Api.Contracts.Test;
 using ApplicationName.Api.Validators;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
@@ -36,9 +37,7 @@ public class ExampleValueObjectDtoValidatorTest
     }
 
     [Test]
-    [TestCase(default(string))]
-    [TestCase("")]
-    [TestCase(" ")]
+    [TestCaseSource(typeof(TestCases), nameof(TestCases.StringCases))]
     public void Validate_With_Invalid_Code(string testCase)
     {
         // Arrange
@@ -54,9 +53,7 @@ public class ExampleValueObjectDtoValidatorTest
     }
 
     [Test]
-    [TestCase(-1f)]
-    [TestCase(float.NegativeZero)]
-    [TestCase(float.NegativeInfinity)]
+    [TestCaseSource(typeof(TestCases), nameof(TestCases.NegativeDoubleCases))]
     public void Validate_With_Invalid_Value(double testCase)
     {
         // Arrange
