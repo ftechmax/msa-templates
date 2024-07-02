@@ -7,64 +7,38 @@ using Microsoft.AspNetCore.SignalR;
 namespace ApplicationName.Api.Consumers;
 
 public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository protoCacheRepository) :
-    IConsumer<IExampleCreatedEvent>,
-    IConsumer<IExampleUpdatedEvent>,
-    IConsumer<IExampleEntityAddedEvent>,
-    IConsumer<IExampleEntityUpdatedEvent>,
-    IConsumer<IExampleRemoteCodeSetEvent>
+    IConsumer<ExampleCreatedEvent>,
+    IConsumer<ExampleUpdatedEvent>,
+    IConsumer<ExampleRemoteCodeSetEvent>
 {
-    public async Task Consume(ConsumeContext<IExampleCreatedEvent> context)
+    public async Task Consume(ConsumeContext<ExampleCreatedEvent> context)
     {
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCollectionCacheKey);
 
-        await hub.Clients.All.SendAsync(nameof(IExampleCreatedEvent), new
+        await hub.Clients.All.SendAsync(nameof(ExampleCreatedEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id,
         });
     }
 
-    public async Task Consume(ConsumeContext<IExampleUpdatedEvent> context)
+    public async Task Consume(ConsumeContext<ExampleUpdatedEvent> context)
     {
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(context.Message.Id));
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCollectionCacheKey);
 
-        await hub.Clients.All.SendAsync(nameof(IExampleUpdatedEvent), new
+        await hub.Clients.All.SendAsync(nameof(ExampleUpdatedEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id,
         });
     }
 
-    public async Task Consume(ConsumeContext<IExampleEntityAddedEvent> context)
+    public async Task Consume(ConsumeContext<ExampleRemoteCodeSetEvent> context)
     {
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(context.Message.Id));
 
-        await hub.Clients.All.SendAsync(nameof(IExampleEntityAddedEvent), new
-        {
-            context.Message.CorrelationId,
-            context.Message.Id,
-            context.Message.EntityId
-        });
-    }
-
-    public async Task Consume(ConsumeContext<IExampleEntityUpdatedEvent> context)
-    {
-        await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(context.Message.Id));
-
-        await hub.Clients.All.SendAsync(nameof(IExampleEntityUpdatedEvent), new
-        {
-            context.Message.CorrelationId,
-            context.Message.Id,
-            context.Message.EntityId
-        });
-    }
-
-    public async Task Consume(ConsumeContext<IExampleRemoteCodeSetEvent> context)
-    {
-        await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(context.Message.Id));
-
-        await hub.Clients.All.SendAsync(nameof(IExampleRemoteCodeSetEvent), new
+        await hub.Clients.All.SendAsync(nameof(ExampleRemoteCodeSetEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id

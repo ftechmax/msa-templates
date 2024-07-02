@@ -15,7 +15,7 @@ public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
 
     public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
-        Guard.Argument(expr).NotNull();
+        Guard.Argument(expr, nameof(expr)).NotNull();
 
         var collection = GetCollection<T>();
 
@@ -26,10 +26,10 @@ public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
 
     public Task UpsertAsync(ExampleDocument document)
     {
-        Guard.Argument(document).NotNull();
-        Guard.Argument(document.Id).NotDefault();
-        Guard.Argument(document.Created).NotDefault();
-        Guard.Argument(document.Updated).NotDefault();
+        Guard.Argument(document, nameof(document)).NotNull();
+        Guard.Argument(document.Id, nameof(document.Id)).NotDefault();
+        Guard.Argument(document.Created, nameof(document.Created)).NotDefault();
+        Guard.Argument(document.Updated, nameof(document.Updated)).NotDefault();
 
         var collection = GetCollection<ExampleDocument>();
         var updateDefinition = Builders<ExampleDocument>.Update
@@ -39,7 +39,6 @@ public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
             .SetOnInsert(i => i.Name, document.Name)
             .Set(i => i.Description, document.Description)
             .Set(i => i.ExampleValueObject, document.ExampleValueObject)
-            .Set(i => i.Examples, document.Examples)
             .Set(i => i.RemoteCode, document.RemoteCode);
 
         return collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });

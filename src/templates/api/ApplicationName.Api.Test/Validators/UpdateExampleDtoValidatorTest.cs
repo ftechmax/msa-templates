@@ -1,4 +1,5 @@
 using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Api.Contracts.Test;
 using ApplicationName.Api.Validators;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
@@ -39,12 +40,7 @@ public class UpdateExampleDtoValidatorTest
     public void Validate_With_Invalid_CorrelationId()
     {
         // Arrange
-        var dto = new UpdateExampleDto
-        {
-            CorrelationId = Guid.Empty,
-            Description = _fixture.Create<string>(),
-            ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
-        };
+        var dto = _fixture.Create<UpdateExampleDto>() with { CorrelationId = Guid.Empty };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -57,18 +53,11 @@ public class UpdateExampleDtoValidatorTest
     }
 
     [Test]
-    [TestCase(default(string))]
-    [TestCase("")]
-    [TestCase(" ")]
+    [TestCaseSource(typeof(TestCases), nameof(TestCases.StringCases))]
     public void Validate_With_Invalid_Description(string testCase)
     {
         // Arrange
-        var dto = new UpdateExampleDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Description = testCase,
-            ExampleValueObject = _fixture.Create<ExampleValueObjectDto>()
-        };
+        var dto = _fixture.Create<UpdateExampleDto>() with { Description = testCase };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);
@@ -84,12 +73,7 @@ public class UpdateExampleDtoValidatorTest
     public void Validate_With_Invalid_ExampleValueObject()
     {
         // Arrange
-        var dto = new UpdateExampleDto
-        {
-            CorrelationId = _fixture.Create<Guid>(),
-            Description = _fixture.Create<string>(),
-            ExampleValueObject = default
-        };
+        var dto = _fixture.Create<UpdateExampleDto>() with { ExampleValueObject = default };
 
         // Act
         var result = _subjectUnderTest.TestValidate(dto);

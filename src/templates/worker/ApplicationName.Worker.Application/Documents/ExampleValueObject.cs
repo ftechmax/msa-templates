@@ -12,12 +12,12 @@ public sealed class ExampleValueObject : IExampleValueObject
     {
     }
 
-    public ExampleValueObject(IExampleValueObjectEventData eventData)
+    public ExampleValueObject(ExampleValueObjectEventData eventData)
         : this()
     {
-        Guard.Argument(eventData).NotNull();
-        Guard.Argument(eventData.Code).NotNull().NotWhiteSpace();
-        Guard.Argument(eventData.Value).NotNegative();
+        Guard.Argument(eventData, nameof(eventData)).NotNull();
+        Guard.Argument(eventData.Code, nameof(eventData.Code)).NotNull().NotWhiteSpace();
+        Guard.Argument(eventData.Value, nameof(eventData.Value)).NotNegative();
 
         Code = eventData.Code;
         Value = eventData.Value;

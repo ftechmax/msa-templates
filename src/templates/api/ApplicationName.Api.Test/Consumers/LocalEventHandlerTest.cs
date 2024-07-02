@@ -31,12 +31,12 @@ namespace ApplicationName.Api.Test.Consumers
             }
 
             [Test]
-            public async Task Consume_IExampleCreatedEvent()
+            public async Task Consume_ExampleCreatedEvent()
             {
                 // Arrange
-                var @event = A.Dummy<IExampleCreatedEvent>();
+                var @event = _fixture.Create<ExampleCreatedEvent>();
 
-                var context = _fixture.Create<ConsumeContext<IExampleCreatedEvent>>();
+                var context = _fixture.Create<ConsumeContext<ExampleCreatedEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);
 
                 // Act
@@ -47,12 +47,12 @@ namespace ApplicationName.Api.Test.Consumers
             }
 
             [Test]
-            public async Task Consume_IExampleUpdatedEvent()
+            public async Task Consume_ExampleUpdatedEvent()
             {
                 // Arrange
-                var @event = A.Dummy<IExampleUpdatedEvent>();
+                var @event = _fixture.Create<ExampleUpdatedEvent>();
 
-                var context = _fixture.Create<ConsumeContext<IExampleUpdatedEvent>>();
+                var context = _fixture.Create<ConsumeContext<ExampleUpdatedEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);
 
                 // Act
@@ -64,44 +64,12 @@ namespace ApplicationName.Api.Test.Consumers
             }
 
             [Test]
-            public async Task Consume_IExampleEntityAddedEvent()
+            public async Task Consume_ExampleRemoteCodeSetEvent()
             {
                 // Arrange
-                var @event = A.Dummy<IExampleEntityAddedEvent>();
+                var @event = _fixture.Create<ExampleRemoteCodeSetEvent>();
 
-                var context = _fixture.Create<ConsumeContext<IExampleEntityAddedEvent>>();
-                A.CallTo(() => context.Message).ReturnsLazily(() => @event);
-
-                // Act
-                await _subjectUnderTest.Consume(context);
-
-                // Assert
-                A.CallTo(() => _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(@event.Id))).MustHaveHappenedOnceExactly();
-            }
-
-            [Test]
-            public async Task Consume_IExampleEntityUpdatedEvent()
-            {
-                // Arrange
-                var @event = A.Dummy<IExampleEntityUpdatedEvent>();
-
-                var context = _fixture.Create<ConsumeContext<IExampleEntityUpdatedEvent>>();
-                A.CallTo(() => context.Message).ReturnsLazily(() => @event);
-
-                // Act
-                await _subjectUnderTest.Consume(context);
-
-                // Assert
-                A.CallTo(() => _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(@event.Id))).MustHaveHappenedOnceExactly();
-            }
-
-            [Test]
-            public async Task Consume_IExampleRemoteCodeSetEvent()
-            {
-                // Arrange
-                var @event = A.Dummy<IExampleRemoteCodeSetEvent>();
-
-                var context = _fixture.Create<ConsumeContext<IExampleRemoteCodeSetEvent>>();
+                var context = _fixture.Create<ConsumeContext<ExampleRemoteCodeSetEvent>>();
                 A.CallTo(() => context.Message).ReturnsLazily(() => @event);
 
                 // Act
