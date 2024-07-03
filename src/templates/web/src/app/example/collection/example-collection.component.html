@@ -25,7 +25,7 @@
 
   <mat-paginator
     #paginator
-    [length]="dataSource.data.length"
+    [length]="model.length || 0"
     [pageIndex]="0"
     [pageSize]="10"
     [pageSizeOptions]="[5, 10, 20]"

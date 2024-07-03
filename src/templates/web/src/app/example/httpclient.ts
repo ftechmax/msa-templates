@@ -10,6 +10,15 @@ export class ExampleHttpClient {
     return this.http.get<ExampleCollectionDto[]>(this.getUrl());
   }
 
+  getCollectionPaged(
+    sort: string,
+    order: string,
+    page: number,
+    pageSize: number
+  ) {
+    return this.http.get<ExampleCollectionDto[]>(this.getUrl());
+  }
+
   getDetails(id: string) {
     return this.http.get<ExampleDetailsDto>(this.getUrl(`${id}`));
   }

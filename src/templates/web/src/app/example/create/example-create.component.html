@@ -1,1 +1,35 @@
+<h2 mat-dialog-title>Create Example</h2>
+
 <p>example-create works!</p>
+
+<!-- <ng-container *transloco="let t"> -->
+<form [formGroup]="form" class="form" (submit)="submit()">
+  <mat-form-field class="form-field" appearance="outline">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" />
+    <mat-error *ngIf="form.controls['name'].touched && form.controls['name'].invalid"> </mat-error>
+    <mat-error *ngIf="form.controls['name'].errors?.['fluentValidationError']">
+      <ul>
+        @for (item of form.controls['name'].errors?.['fluentValidationError']; track item) {
+        <i>{{ item }}</i>
+        }
+      </ul>
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="form-field" appearance="outline">
+    <mat-label>Description</mat-label>
+    <input matInput formControlName="description" />
+    <mat-error *ngIf="form.controls['description'].touched && form.controls['description'].invalid"> </mat-error>
+    <mat-error *ngIf="form.controls['description'].errors?.['fluentValidationError']">
+      <ul>
+        @for (item of form.controls['description'].errors?.['fluentValidationError']; track item) {
+        <i>{{ item }}</i>
+        }
+      </ul>
+    </mat-error>
+  </mat-form-field>
+
+  <button mat-flat-button mat-dialog-close type="reset">Cancel</button>
+  <button mat-flat-button color="accent" type="submit" cdkFocusInitial [disabled]="submitting">Create</button>
+</form>
+<!-- </ng-container> -->
