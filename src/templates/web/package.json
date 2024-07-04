@@ -22,7 +22,7 @@
     "@angular/router": "^18.0.0",
     "@jsverse/transloco": "^7.4.2",
     "@jsverse/transloco-messageformat": "^7.0.1",
-    "@microsoft/signalr": "^8.0.0",
+    "@microsoft/signalr": "^7.0.14",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "uuid": "^10.0.0",
