@@ -4,7 +4,11 @@ public static class ApplicationConstants
 {
     public const string DatabaseName = "ApplicationName";
 
-    public const string ExampleCollectionCacheKey = "example-collection";
+    public const string ApplicationKey = "applicationname";
 
-    public static string ExampleDetailsCacheKey(Guid id) => $"example-details_{id:N}";
+    public const string ExampleCacheKey = "example";
+
+    public const string ExampleCollectionCacheKey = $"{ExampleCacheKey}:collection";
+
+    public static string ExampleDetailsCacheKey(Guid id) => $"{ExampleCacheKey}:details:{id:N}";
 }
