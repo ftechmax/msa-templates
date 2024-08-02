@@ -19,6 +19,9 @@ updates:
         update-types:
         - 'minor'
         - 'patch'
+    ignore:
+      - dependency-name: 'angular*'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'nuget'
     directories:
@@ -41,6 +44,9 @@ updates:
         update-types:
         - 'minor'
         - 'patch'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'docker'
     directories: 

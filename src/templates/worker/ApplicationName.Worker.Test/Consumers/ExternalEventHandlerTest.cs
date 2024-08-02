@@ -19,7 +19,7 @@ public class ExternalEventHandlerTest
 
     private ISendEndpoint _sendEndPoint;
 
-    private ConsumeContext<IExternalEvent> _context;
+    private ConsumeContext<ExternalEvent> _context;
 
     private ExternalEventHandler _subjectUnderTest;
 
@@ -31,25 +31,25 @@ public class ExternalEventHandlerTest
         _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>()).CreateMapper();
         _fixture.Register(() => _mapper);
 
-        EndpointConvention.Map<ISetExampleRemoteCodeCommand>(new Uri("queue:test"));
+        EndpointConvention.Map<SetExampleRemoteCodeCommand>(new Uri("queue:test"));
 
         _sendEndPoint = _fixture.Freeze<ISendEndpoint>();
-        _context = _fixture.Freeze<ConsumeContext<IExternalEvent>>();
+        _context = _fixture.Freeze<ConsumeContext<ExternalEvent>>();
         A.CallTo(() => _context.GetSendEndpoint(A<Uri>._)).Returns(_sendEndPoint);
 
         _subjectUnderTest = _fixture.Create<ExternalEventHandler>();
     }
 
     [Test]
-    public async Task Consume_IExternalEvent()
+    public async Task Consume_ExternalEvent()
     {
         // Arrange
-        var @event = A.Dummy<IExternalEvent>();
+        var @event = _fixture.Create<ExternalEvent>();
         A.CallTo(() => _context.Message).ReturnsLazily(() => @event);
 
-        var capturedCommand = default(ISetExampleRemoteCodeCommand);
-        A.CallTo(() => _sendEndPoint.Send(A<ISetExampleRemoteCodeCommand>._, A<CancellationToken>._)).Invokes(
-            (ISetExampleRemoteCodeCommand arg0, CancellationToken _) =>
+        var capturedCommand = default(SetExampleRemoteCodeCommand);
+        A.CallTo(() => _sendEndPoint.Send(A<SetExampleRemoteCodeCommand>._, A<CancellationToken>._)).Invokes(
+            (SetExampleRemoteCodeCommand arg0, CancellationToken _) =>
             {
                 capturedCommand = arg0;
             });
@@ -58,9 +58,9 @@ public class ExternalEventHandlerTest
         await _subjectUnderTest.Consume(_context);
 
         // Assert
-        A.CallTo(() => _sendEndPoint.Send(A<ISetExampleRemoteCodeCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _sendEndPoint.Send(A<SetExampleRemoteCodeCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         capturedCommand.Should()
             .NotBeNull()
-            .And.BeEquivalentTo(@event, opts => opts.WithMapping<ISetExampleRemoteCodeCommand>(i => i.Code, j => j.RemoteCode));
+            .And.BeEquivalentTo(@event, opts => opts.WithMapping<SetExampleRemoteCodeCommand>(i => i.Code, j => j.RemoteCode));
     }
 }

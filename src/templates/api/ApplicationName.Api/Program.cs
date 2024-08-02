@@ -3,6 +3,7 @@ using System.Net;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
+using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
@@ -58,7 +59,8 @@ public static class Program
         services.AddMassTransit(i =>
         {
             var uri = new Uri("queue:ApplicationName.Worker");
-            EndpointConvention.Map<ICreateExampleCommand>(uri);
+            EndpointConvention.Map<CreateExampleCommand>(uri);
+            EndpointConvention.Map<UpdateExampleCommand>(uri);
 
             i.AddConsumer<LocalEventHandler>();
 
@@ -83,7 +85,7 @@ public static class Program
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration["redis:connection-string"];
-            options.InstanceName = $"{configuration["redis:instance"]}_";
+            options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
         });
 
         // Api
@@ -103,7 +105,7 @@ public static class Program
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
-        var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var openTelemetryEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
@@ -123,15 +125,17 @@ public static class Program
                 .AddRedisInstrumentation()
                 .AddOtlpExporter(configure =>
                 {
-                    configure.Endpoint = otlpEndpoint;
+                    configure.Endpoint = openTelemetryEndpoint;
                 }))
             .WithMetrics(builder => builder
                 .SetResourceBuilder(appResourceBuilder)
                 .AddAspNetCoreInstrumentation()
+                .AddProcessInstrumentation()
+                .AddRuntimeInstrumentation()
                 .AddHttpClientInstrumentation()
                 .AddOtlpExporter(configure =>
                 {
-                    configure.Endpoint = otlpEndpoint;
+                    configure.Endpoint = openTelemetryEndpoint;
                 })
         );
     }

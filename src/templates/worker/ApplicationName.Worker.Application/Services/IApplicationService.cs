@@ -1,4 +1,4 @@
-﻿using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
 
@@ -6,13 +6,9 @@ namespace ApplicationName.Worker.Application.Services;
 
 public interface IApplicationService
 {
-    Task<ExampleCreated> HandleAsync(ICreateExampleCommand command);
+    Task<ExampleCreated> HandleAsync(CreateExampleCommand command);
 
-    Task<ExampleUpdated> HandleAsync(IUpdateExampleCommand command);
+    Task<ExampleUpdated> HandleAsync(UpdateExampleCommand command);
 
-    Task<ExampleEntityAdded> HandleAsync(IAddExampleEntityCommand command);
-
-    Task<ExampleEntityUpdated> HandleAsync(IUpdateExampleEntityCommand command);
-
-    Task<ExampleRemoteCodeSet> HandleAsync(ISetExampleRemoteCodeCommand command);
+    Task<ExampleRemoteCodeSet> HandleAsync(SetExampleRemoteCodeCommand command);
 }

@@ -1,4 +1,4 @@
-﻿using ApplicationName.Api.Application.Services;
+using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,17 +30,5 @@ public class ExampleController(IExampleService applicationService) : ControllerB
     public Task Put(Guid id, [FromBody] UpdateExampleDto dto)
     {
         return applicationService.HandleAsync(id, dto);
-    }
-
-    [HttpPost("{id}/entities")]
-    public Task Put(Guid id, [FromBody] AddExampleEntityDto dto)
-    {
-        return applicationService.HandleAsync(id, dto);
-    }
-
-    [HttpPut("{id}/entities/{entityId}")]
-    public Task Put(Guid id, Guid entityId, [FromBody] UpdateExampleEntityDto dto)
-    {
-        return applicationService.HandleAsync(id, entityId, dto);
     }
 }

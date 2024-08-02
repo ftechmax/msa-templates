@@ -1,4 +1,4 @@
-﻿using ProtoBuf;
+using ProtoBuf;
 
 namespace ApplicationName.Api.Contracts.Dtos;
 
@@ -15,9 +15,6 @@ public record ExampleDetailsDto
     public string Description { get; init; }
 
     [ProtoMember(4)]
-    public List<ExampleEntityDto> Examples { get; init; } = [];
-
-    [ProtoMember(5)]
     public ExampleValueObjectDto ExampleValueObject { get; init; }
 
     [ProtoMember(6)]

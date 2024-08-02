@@ -1,4 +1,4 @@
-﻿namespace ApplicationName.Shared.Aggregates;
+namespace ApplicationName.Shared.Aggregates;
 
 public interface IExampleValueObject
 {

@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ApplicationName.Worker.Application.Documents;
 
 namespace ApplicationName.Worker.Application;

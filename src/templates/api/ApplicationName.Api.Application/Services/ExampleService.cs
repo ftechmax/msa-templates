@@ -13,7 +13,7 @@ namespace ApplicationName.Api.Application.Services;
 public sealed class ExampleService(
     IProtoCacheRepository protoCacheRepository,
     IMapper mapper,
-    ISendEndpointProvider sendEndpointProvider)
+    IBus bus)
     : IExampleService
 {
     public async Task<IEnumerable<ExampleCollectionDto>> GetCollectionAsync()
@@ -67,8 +67,7 @@ public sealed class ExampleService(
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<CreateExampleCommand>(dto);
-        var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send<ICreateExampleCommand>(command);
+        await bus.Send(command);
     }
 
     public async Task HandleAsync(Guid id, UpdateExampleDto dto)
@@ -76,33 +75,7 @@ public sealed class ExampleService(
         Guard.Argument(id).NotDefault();
         Guard.Argument(dto).NotNull();
 
-        var command = mapper.Map<UpdateExampleCommand>(dto);
-        command.Id = id;
-        var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send<IUpdateExampleCommand>(command);
-    }
-
-    public async Task HandleAsync(Guid id, AddExampleEntityDto dto)
-    {
-        Guard.Argument(id).NotDefault();
-        Guard.Argument(dto).NotNull();
-
-        var command = mapper.Map<AddExampleEntityCommand>(dto);
-        command.Id = id;
-        var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send<IAddExampleEntityCommand>(command);
-    }
-
-    public async Task HandleAsync(Guid id, Guid entityId, UpdateExampleEntityDto dto)
-    {
-        Guard.Argument(id).NotDefault();
-        Guard.Argument(entityId).NotDefault();
-        Guard.Argument(dto).NotNull();
-
-        var command = mapper.Map<UpdateExampleEntityCommand>(dto);
-        command.Id = id;
-        command.EntityId = entityId;
-        var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(ApplicationConstants.MessageEndpoint);
-        await sendEndpoint.Send<IUpdateExampleEntityCommand>(command);
+        var command = mapper.Map<UpdateExampleCommand>(dto) with { Id = id };
+        await bus.Send(command);
     }
 }

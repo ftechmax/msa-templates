@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using ApplicationName.Shared.Projections;
 using ApplicationName.Worker.Application;
@@ -17,7 +17,7 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
 
     public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
-        Guard.Argument(expr).NotNull();
+        Guard.Argument(expr, nameof(expr)).NotNull();
 
         var collection = GetCollection<T>();
 
@@ -28,10 +28,10 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
 
     public async Task UpsertAsync(ExampleDocument document)
     {
-        Guard.Argument(document).NotNull();
-        Guard.Argument(document.Id).NotDefault();
-        Guard.Argument(document.Created).NotDefault();
-        Guard.Argument(document.Updated).NotDefault();
+        Guard.Argument(document, nameof(document)).NotNull();
+        Guard.Argument(document.Id, nameof(document.Id)).NotDefault();
+        Guard.Argument(document.Created, nameof(document.Created)).NotDefault();
+        Guard.Argument(document.Updated, nameof(document.Updated)).NotDefault();
 
         var collection = GetCollection<ExampleDocument>();
         var updateDefinition = Builders<ExampleDocument>.Update
@@ -41,7 +41,6 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
             .SetOnInsert(i => i.Name, document.Name)
             .Set(i => i.Description, document.Description)
             .Set(i => i.ExampleValueObject, document.ExampleValueObject)
-            .Set(i => i.Examples, document.Examples)
             .Set(i => i.RemoteCode, document.RemoteCode);
 
         await collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });

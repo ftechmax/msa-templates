@@ -1,3 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
+using ApplicationName.Shared.Events;
+using ApplicationName.Worker.Application.DomainEvents;
+using ApplicationName.Worker.Contracts.Commands;
 ﻿using ApplicationName.Shared.Projections;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
@@ -8,19 +12,18 @@ using Other.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker;
 
+[ExcludeFromCodeCoverage]
 public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<IExternalEvent, SetExampleRemoteCodeCommand>()
+        CreateMap<ExternalEvent, SetExampleRemoteCodeCommand>()
             .ForMember(dst => dst.RemoteCode, src =>
                 src.MapFrom(i => i.Code));
 
         CreateMap<ExampleCreated, ExampleCreatedEvent>();
         CreateMap<ExampleUpdated, ExampleUpdatedEvent>();
         CreateMap<ExampleValueObjectEvent, ExampleValueObjectEventData>();
-        CreateMap<ExampleEntityAdded, ExampleEntityAddedEvent>();
-        CreateMap<ExampleEntityUpdated, ExampleEntityUpdatedEvent>();
         CreateMap<ExampleRemoteCodeSet, ExampleRemoteCodeSetEvent>();
 
         // Projections

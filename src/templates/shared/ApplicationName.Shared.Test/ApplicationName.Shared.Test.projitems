@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -10,17 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleEntityDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\ExampleValueObjectDummyFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Aggregates\AggregateDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\UpdateExampleEntityCommandDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\AddExampleEntityCommandDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\UpdateExampleCommandDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Commands\CreateExampleCommandDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleEntityUpdatedEventDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleEntityAddedEventDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleCreatedEventDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleUpdatedEventDummyFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleValueObjectEventDataDummyFactory.cs" />
   </ItemGroup>
 </Project>
