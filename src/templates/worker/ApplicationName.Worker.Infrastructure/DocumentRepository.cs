@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using ApplicationName.Shared;
 using ApplicationName.Shared.Projections;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
@@ -46,7 +47,7 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
         await collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });
 
         var projection = mapper.Map<ExampleProjection>(document);
-        await protoCacheRepository.SetAsync($"{nameof(ExampleProjection)}:{document.Id:N}", projection);
+        await protoCacheRepository.SetAsync(ProjectionConstants.ExampleProjectionKey(document.Id), projection);
     }
 
     private IMongoCollection<T> GetCollection<T>() where T : DocumentBase

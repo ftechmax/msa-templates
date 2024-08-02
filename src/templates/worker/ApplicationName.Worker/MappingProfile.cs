@@ -1,12 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Shared.Events;
-using ApplicationName.Worker.Application.DomainEvents;
-using ApplicationName.Worker.Contracts.Commands;
-﻿using ApplicationName.Shared.Projections;
+using ApplicationName.Shared.Projections;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
-using ApplicationName.Worker.Commands;
-using ApplicationName.Worker.Events;
+using ApplicationName.Worker.Contracts.Commands;
 using AutoMapper;
 using Other.Worker.Contracts.Commands;
 
@@ -29,7 +26,6 @@ public class MappingProfile : Profile
         // Projections
         CreateMap<DocumentBase, ProjectionBase>();
         CreateMap<ExampleDocument, ExampleProjection>();
-        CreateMap<ExampleEntity, ExampleEntityProjection>();
         CreateMap<ExampleValueObject, ExampleValueObjectProjection>();
     }
 }

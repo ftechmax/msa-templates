@@ -58,7 +58,7 @@ public static class Program
         // MassTransit + RabbitMQ
         services.AddMassTransit(i =>
         {
-            var uri = new Uri("queue:ApplicationName.Worker");
+            var uri = new Uri(ApplicationConstants.MessageEndpoint);
             EndpointConvention.Map<CreateExampleCommand>(uri);
             EndpointConvention.Map<UpdateExampleCommand>(uri);
 

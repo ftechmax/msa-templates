@@ -1,6 +1,7 @@
 ﻿using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Shared;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Projections;
 using ArgDefender;
@@ -19,7 +20,7 @@ public sealed class ExampleService(IProtoCacheRepository protoCacheRepository, I
             return result;
         }
 
-        var projections = await protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace);
+        var projections = await protoCacheRepository.GetAllAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace);
         if (!projections.Any())
         {
             return [];
@@ -44,7 +45,7 @@ public sealed class ExampleService(IProtoCacheRepository protoCacheRepository, I
             return result;
         }
 
-        var projection = await protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey(id));
+        var projection = await protoCacheRepository.GetAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionKey(id));
         if (projection == default)
         {
             return default;

@@ -2,6 +2,7 @@
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
+using ApplicationName.Shared;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Projections;
 using AutoFixture;
@@ -63,7 +64,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace)).MustNotHaveHappened();
 
         result.Should()
             .NotBeNull()
@@ -79,7 +80,7 @@ public class ExampleServiceTest
 
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey))
             .ReturnsLazily(() => default(IEnumerable<ExampleCollectionDto>));
-        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace))
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace))
             .ReturnsLazily(() => projections);
 
         var capturedDtos = default(IEnumerable<ExampleCollectionDto>);
@@ -96,7 +97,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).MustHaveHappenedOnceExactly();
 
         capturedDtos.Should()
@@ -115,7 +116,7 @@ public class ExampleServiceTest
     {
         // Arrange
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).ReturnsLazily(() => default(IEnumerable<ExampleCollectionDto>));
-        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).Returns([]);
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace)).Returns([]);
 
         // Act
         var result = await _subjectUnderTest.GetCollectionAsync();
@@ -123,7 +124,7 @@ public class ExampleServiceTest
         // Assert
         A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).MustNotHaveHappened();
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(A<string>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace)).MustHaveHappenedOnceExactly();
 
         result.Should().NotBeNull().And.BeEmpty();
     }
@@ -143,7 +144,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ProjectionConstants.ExampleProjectionNamespace)).MustNotHaveHappened();
 
         result.Should()
             .NotBeNull()
@@ -157,7 +158,7 @@ public class ExampleServiceTest
         var id = _fixture.Create<Guid>();
         var projection = _fixture.Create<ExampleProjection>();
         var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
-        var projectionCacheKey = ApplicationConstants.ExampleProjectionCacheKey(id);
+        var projectionCacheKey = ProjectionConstants.ExampleProjectionKey(id);
 
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionCacheKey)).ReturnsLazily(() => projection);
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
@@ -182,7 +183,7 @@ public class ExampleServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
-        var projectionCacheKey = ApplicationConstants.ExampleProjectionCacheKey(id);
+        var projectionCacheKey = ProjectionConstants.ExampleProjectionKey(id);
 
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionCacheKey)).ReturnsLazily(() => default(ExampleProjection));
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
