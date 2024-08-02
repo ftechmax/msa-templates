@@ -20,7 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleUpdatedEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Projections\ProjectionBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Projections\ExampleProjection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Projections\ExampleEntityProjection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Projections\ExampleValueObjectProjection.cs" />
   </ItemGroup>
 </Project>

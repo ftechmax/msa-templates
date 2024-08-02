@@ -63,7 +63,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustNotHaveHappened();
 
         result.Should()
             .NotBeNull()
@@ -72,39 +72,36 @@ public class ExampleServiceTest
     }
 
     [Test]
-    public async Task GetCollectionAsync_From_Repository()
+    public async Task GetCollectionAsync_From_Projection()
     {
         // Arrange
-        var document1 = GenerateDocument(A.Dummy<IExample>());
-        var document2 = GenerateDocument(A.Dummy<IExample>());
-        var document3 = GenerateDocument(A.Dummy<IExample>());
-        var documents = new[] { document1, document2, document3 };
+        var projections = _fixture.CreateMany<ExampleProjection>();
 
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey))
             .ReturnsLazily(() => default(IEnumerable<ExampleCollectionDto>));
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._))
-            .ReturnsLazily(() => documents);
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace))
+            .ReturnsLazily(() => projections);
 
         var capturedDtos = default(IEnumerable<ExampleCollectionDto>);
-        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).Invokes(
-            (string _, IEnumerable<ExampleCollectionDto> arg1, DistributedCacheEntryOptions _) =>
+        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).Invokes(
+            (string _, IEnumerable<ExampleCollectionDto> arg1, TimeSpan? _) =>
             {
                 capturedDtos = arg1;
             });
 
-        var expectedDtos = _mapper.Map<IEnumerable<ExampleCollectionDto>>(documents);
+        var expectedDtos = _mapper.Map<IEnumerable<ExampleCollectionDto>>(projections);
 
         // Act
         var result = await _subjectUnderTest.GetCollectionAsync();
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).MustHaveHappenedOnceExactly();
 
         capturedDtos.Should()
             .NotBeNullOrEmpty()
-            .And.HaveSameCount(documents)
+            .And.HaveSameCount(projections)
             .And.BeEquivalentTo(expectedDtos);
 
         result.Should()
@@ -114,19 +111,19 @@ public class ExampleServiceTest
     }
 
     [Test]
-    public async Task GetCollectionAsync_From_Repository_Without_Document()
+    public async Task GetCollectionAsync_From_Repository_Without_Projections()
     {
         // Arrange
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).ReturnsLazily(() => default(IEnumerable<ExampleCollectionDto>));
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).Returns([]);
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).Returns([]);
 
         // Act
         var result = await _subjectUnderTest.GetCollectionAsync();
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).MustNotHaveHappened();
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(A<string>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustHaveHappenedOnceExactly();
 
         result.Should().NotBeNull().And.BeEmpty();
     }
@@ -146,7 +143,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}")).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace)).MustNotHaveHappened();
 
         result.Should()
             .NotBeNull()
@@ -160,17 +157,18 @@ public class ExampleServiceTest
         var id = _fixture.Create<Guid>();
         var projection = _fixture.Create<ExampleProjection>();
         var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
+        var projectionCacheKey = ApplicationConstants.ExampleProjectionCacheKey(id);
 
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}")).ReturnsLazily(() => projection);
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionCacheKey)).ReturnsLazily(() => projection);
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
 
         // Act
-        var result = await _subjectUnderTest.GetAsync(document.Id);
+        var result = await _subjectUnderTest.GetAsync(id);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<TimeSpan>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(cacheKey, A<ExampleDetailsDto>._, A<TimeSpan?>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionCacheKey)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}")).MustHaveHappenedOnceExactly();
 
         result.Should()
             .NotBeNull()
@@ -183,17 +181,19 @@ public class ExampleServiceTest
     {
         // Arrange
         var id = _fixture.Create<Guid>();
+        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
+        var projectionCacheKey = ApplicationConstants.ExampleProjectionCacheKey(id);
 
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}")).ReturnsLazily(() => default(ExampleProjection));
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).Returns(default(ExampleDetailsDto));
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionCacheKey)).ReturnsLazily(() => default(ExampleProjection));
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
 
         // Act
         var result = await _subjectUnderTest.GetAsync(id);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<TimeSpan>._)).MustNotHaveHappened();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}")).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(cacheKey, A<ExampleDetailsDto>._, A<TimeSpan?>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionCacheKey)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
 
         result.Should().BeNull();
     }
@@ -217,7 +217,34 @@ public class ExampleServiceTest
         // Assert
         A.CallTo(() => _sendEndpoint.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
-        capturedCommand.Should().NotBeNull();
-        capturedCommand.Name.Should().NotBeNullOrWhiteSpace().And.Be(dto.Name);
+        capturedCommand.Should()
+            .NotBeNull()
+            .And.BeEquivalentTo(dto);
+    }
+
+    [Test]
+    public async Task HandleAsync_UpdateExampleDto()
+    {
+        // Arrange
+        var id = _fixture.Create<Guid>();
+        var dto = _fixture.Create<UpdateExampleDto>();
+
+        var capturedCommand = default(UpdateExampleCommand);
+        A.CallTo(() => _sendEndpoint.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).Invokes(
+            (UpdateExampleCommand arg0, CancellationToken _) =>
+            {
+                capturedCommand = arg0;
+            });
+
+        // Act
+        await _subjectUnderTest.HandleAsync(id, dto);
+
+        // Assert
+        A.CallTo(() => _sendEndpoint.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+
+        capturedCommand.Should()
+            .NotBeNull()
+            .And.BeEquivalentTo(dto);
+        capturedCommand.Id.Should().NotBeEmpty().And.Be(id);
     }
 }

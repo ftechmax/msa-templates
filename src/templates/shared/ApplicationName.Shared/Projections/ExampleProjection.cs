@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using ApplicationName.Shared.Aggregates;
+﻿using ApplicationName.Shared.Aggregates;
 using ProtoBuf;
 
 namespace ApplicationName.Shared.Projections;
@@ -14,15 +13,10 @@ public record ExampleProjection : ProjectionBase, IExample
     public string Description { get; init; }
 
     [ProtoMember(3)]
-    public Collection<ExampleEntityProjection> Examples { get; init; } = [];
-
-    [ProtoMember(4)]
     public ExampleValueObjectProjection ExampleValueObject { get; init; }
 
-    [ProtoMember(5)]
+    [ProtoMember(4)]
     public int? RemoteCode { get; init; }
-
-    IReadOnlyCollection<IExampleEntity> IExample.Examples => Examples;
 
     IExampleValueObject IExample.ExampleValueObject => ExampleValueObject;
 }

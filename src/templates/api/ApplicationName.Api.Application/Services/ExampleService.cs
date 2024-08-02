@@ -1,5 +1,4 @@
-﻿using ApplicationName.Api.Application.Commands;
-using ApplicationName.Api.Application.Repositories;
+﻿using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Commands;
@@ -10,11 +9,7 @@ using MassTransit;
 
 namespace ApplicationName.Api.Application.Services;
 
-public sealed class ExampleService(
-    IProtoCacheRepository protoCacheRepository,
-    IMapper mapper,
-    IBus bus)
-    : IExampleService
+public sealed class ExampleService(IProtoCacheRepository protoCacheRepository, IMapper mapper, IBus bus) : IExampleService
 {
     public async Task<IEnumerable<ExampleCollectionDto>> GetCollectionAsync()
     {
@@ -24,7 +19,7 @@ public sealed class ExampleService(
             return result;
         }
 
-        var projections = await protoCacheRepository.GetAllAsync<ExampleProjection>(nameof(ExampleProjection));
+        var projections = await protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheNamespace);
         if (!projections.Any())
         {
             return [];
@@ -49,7 +44,7 @@ public sealed class ExampleService(
             return result;
         }
 
-        var projection = await protoCacheRepository.GetAsync<ExampleProjection>($"{nameof(ExampleProjection)}:{id:N}");
+        var projection = await protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey(id));
         if (projection == default)
         {
             return default;
