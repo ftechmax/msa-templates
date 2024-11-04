@@ -6,7 +6,7 @@
     "logLevel": "debug"
   },
   "/api-hub": {
-    "target": "ws://applicationname.kube.local",
+    "target": "http://applicationname.kube.local",
     "ws": true,
     "secure": false,
     "changeOrigin": true,

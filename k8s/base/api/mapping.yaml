@@ -19,3 +19,27 @@ spec:
       - DELETE
     headers:
       - 'content-type'
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: applicationname-api-hub
+spec:
+  prefix: /api-hub
+  rewrite: /api-hub
+  service: applicationname-api:80
+  host: '^applicationname\..+$'
+  host_regex: true
+  allow_upgrade:
+    - websocket
+  cors:
+    origins: ['*']
+    methods:
+      - POST
+      - GET
+      - OPTIONS
+    credentials: true
+    headers:
+      - 'x-requested-with'
+      - 'x-signalr-user-agent'
+    max_age: '86400'
