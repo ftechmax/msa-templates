@@ -2,28 +2,30 @@ version: 2
 updates:
   - package-ecosystem: 'npm'
     directory: '/src/templates/web'
+    target-branch: 'develop'
     schedule:
       interval: 'monthly'
     groups:
       angular:
         applies-to: version-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
       angular-security:
         applies-to: security-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
     ignore:
-      - dependency-name: 'angular*'
+      - dependency-name: '*'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'nuget'
+    target-branch: 'develop'
     directories:
       - '/src/templates/api'
       - '/src/templates/worker'
@@ -33,23 +35,24 @@ updates:
       nuget:
         applies-to: version-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
       nuget-security:
         applies-to: security-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'docker'
-    directories: 
+    target-branch: 'develop'
+    directories:
       - '/src/templates/web'
       - '/src/templates/api/ApplicationName.Api'
       - '/src/templates/worker/ApplicationName.Worker'

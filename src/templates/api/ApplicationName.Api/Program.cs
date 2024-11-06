@@ -3,6 +3,7 @@ using System.Net;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
+using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
@@ -84,7 +85,7 @@ public static class Program
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration["redis:connection-string"];
-            options.InstanceName = $"{configuration["redis:instance"]}_";
+            options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
         });
 
         // Api
