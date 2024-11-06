@@ -2,6 +2,7 @@ version: 2
 updates:
   - package-ecosystem: 'npm'
     directory: '/src/templates/web'
+    target-branch: 'develop'
     schedule:
       interval: 'monthly'
     groups:
@@ -24,6 +25,7 @@ updates:
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'nuget'
+    target-branch: 'develop'
     directories:
       - '/src/templates/api'
       - '/src/templates/worker'
@@ -49,6 +51,7 @@ updates:
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'docker'
+    target-branch: 'develop'
     directories:
       - '/src/templates/web'
       - '/src/templates/api/ApplicationName.Api'
