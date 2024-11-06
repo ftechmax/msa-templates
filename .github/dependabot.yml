@@ -8,19 +8,19 @@ updates:
       angular:
         applies-to: version-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
       angular-security:
         applies-to: security-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
     ignore:
-      - dependency-name: 'angular*'
+      - dependency-name: '*'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'nuget'
@@ -33,23 +33,23 @@ updates:
       nuget:
         applies-to: version-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
       nuget-security:
         applies-to: security-updates
         patterns:
-        - '*' 
+          - '*'
         update-types:
-        - 'minor'
-        - 'patch'
+          - 'minor'
+          - 'patch'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'docker'
-    directories: 
+    directories:
       - '/src/templates/web'
       - '/src/templates/api/ApplicationName.Api'
       - '/src/templates/worker/ApplicationName.Worker'
