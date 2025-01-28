@@ -11,10 +11,10 @@ using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using AutoMapper;
 using FakeItEasy;
-using Shouldly;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Api.Application.Test.Services;
 
@@ -72,10 +72,11 @@ public class ExampleServiceTest
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustNotHaveHappened();
 
-        result.Should()
-            .NotBeNull()
-            .And.HaveSameCount(dtos)
-            .And.Contain(dtos);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldNotBeEmpty(),
+            i => i.Count().ShouldBe(dtos.Count()),
+            i => i.ShouldBeSameAs(dtos));
     }
 
     [Test]
@@ -109,15 +110,17 @@ public class ExampleServiceTest
         A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
 
-        capturedDtos.Should()
-            .NotBeNullOrEmpty()
-            .And.HaveSameCount(documents)
-            .And.BeEquivalentTo(expectedDtos);
+        capturedDtos.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldNotBeEmpty(),
+            i => i.Count().ShouldBe(documents.Length),
+            i => i.ShouldBe(expectedDtos));
 
-        result.Should()
-            .NotBeNullOrEmpty()
-            .And.HaveSameCount(capturedDtos)
-            .And.Contain(capturedDtos);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldNotBeEmpty(),
+            i => i.Count().ShouldBe(documents.Length),
+            i => i.ShouldBe(expectedDtos));
     }
 
     [Test]
@@ -135,7 +138,9 @@ public class ExampleServiceTest
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(A<string>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
 
-        result.Should().NotBeNull().And.BeEmpty();
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeEmpty());
     }
 
     [Test]
@@ -155,9 +160,9 @@ public class ExampleServiceTest
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustNotHaveHappened();
 
-        result.Should()
-            .NotBeNull()
-            .And.BeEquivalentTo(dto);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeSameAs(dto));
     }
 
     [Test]
@@ -178,10 +183,17 @@ public class ExampleServiceTest
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
 
-        result.Should()
-            .NotBeNull()
-            .And.BeOfType<ExampleDetailsDto>()
-            .And.BeEquivalentTo(document, i => i.ExcludingMissingMembers());
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleDetailsDto>(),
+            i => i.Id.ShouldBe(document.Id),
+            i => i.Name.ShouldBe(document.Name),
+            i => i.Description.ShouldBe(document.Description),
+            i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNull(),
+                j => j.Code.ShouldBe(document.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(document.ExampleValueObject.Value)),
+            i => i.RemoteCode.ShouldBe(document.RemoteCode));
     }
 
     [Test]
@@ -201,7 +213,7 @@ public class ExampleServiceTest
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Test]
@@ -223,8 +235,10 @@ public class ExampleServiceTest
         // Assert
         A.CallTo(() => _sendEndpoint.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
-        capturedCommand.Should().NotBeNull();
-        capturedCommand.Name.Should().NotBeNullOrWhiteSpace().And.Be(dto.Name);
+        capturedCommand.ShouldNotBeNull();
+        capturedCommand.Name.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNullOrWhiteSpace(),
+            i => i.ShouldBe(dto.Name));
     }
 
     [Test]
@@ -247,11 +261,20 @@ public class ExampleServiceTest
         // Assert
         A.CallTo(() => _sendEndpoint.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
-        capturedCommand.Should().NotBeNull();
-        capturedCommand.CorrelationId.Should().NotBeEmpty().And.Be(dto.CorrelationId);
-        capturedCommand.Id.Should().NotBeEmpty().And.Be(id);
-        capturedCommand.Description.Should().NotBeNullOrWhiteSpace().And.Be(dto.Description);
-        capturedCommand.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(dto.ExampleValueObject);
+        capturedCommand.ShouldNotBeNull();
+        capturedCommand.CorrelationId.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBe(Guid.Empty),
+            i => i.ShouldBe(dto.CorrelationId));
+        capturedCommand.Id.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBe(Guid.Empty),
+            i => i.ShouldBe(id));
+        capturedCommand.Description.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNullOrWhiteSpace(),
+            i => i.ShouldBe(dto.Description));
+        capturedCommand.ExampleValueObject.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.Code.ShouldBe(dto.ExampleValueObject.Code),
+            i => i.Value.ShouldBe(dto.ExampleValueObject.Value));
     }
 
     public static ExampleDocument GenerateDocument(IExample source)

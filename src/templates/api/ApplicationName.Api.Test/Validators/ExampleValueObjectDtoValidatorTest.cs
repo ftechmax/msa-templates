@@ -3,9 +3,9 @@ using ApplicationName.Api.Contracts.Test;
 using ApplicationName.Api.Validators;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using Shouldly;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Api.Test.Validators;
 
@@ -33,7 +33,7 @@ public class ExampleValueObjectDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class ExampleValueObjectDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        result.IsValid.ShouldBeFalse();
         result.ShouldHaveValidationErrorFor(i => i.Code);
         result.ShouldNotHaveValidationErrorFor(i => i.Value);
     }
@@ -63,7 +63,7 @@ public class ExampleValueObjectDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        result.IsValid.ShouldBeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.Code);
         result.ShouldHaveValidationErrorFor(i => i.Value);
     }

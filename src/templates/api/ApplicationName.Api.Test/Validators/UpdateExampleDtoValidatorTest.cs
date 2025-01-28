@@ -3,9 +3,9 @@ using ApplicationName.Api.Contracts.Test;
 using ApplicationName.Api.Validators;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using Shouldly;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Api.Test.Validators;
 
@@ -33,7 +33,7 @@ public class UpdateExampleDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeTrue();
+        result.IsValid.ShouldBeTrue();
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class UpdateExampleDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        result.IsValid.ShouldBeFalse();
         result.ShouldHaveValidationErrorFor(i => i.CorrelationId);
         result.ShouldNotHaveValidationErrorFor(i => i.Description);
         result.ShouldNotHaveValidationErrorFor(i => i.ExampleValueObject);
@@ -63,7 +63,7 @@ public class UpdateExampleDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        result.IsValid.ShouldBeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
         result.ShouldHaveValidationErrorFor(i => i.Description);
         result.ShouldNotHaveValidationErrorFor(i => i.ExampleValueObject);
@@ -79,7 +79,7 @@ public class UpdateExampleDtoValidatorTest
         var result = _subjectUnderTest.TestValidate(dto);
 
         // Assert
-        result.IsValid.Should().BeFalse();
+        result.IsValid.ShouldBeFalse();
         result.ShouldNotHaveValidationErrorFor(i => i.CorrelationId);
         result.ShouldNotHaveValidationErrorFor(i => i.Description);
         result.ShouldHaveValidationErrorFor(i => i.ExampleValueObject);

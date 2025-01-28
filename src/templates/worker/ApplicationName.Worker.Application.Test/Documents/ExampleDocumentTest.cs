@@ -5,8 +5,8 @@ using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Contracts.Test;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using Shouldly;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Worker.Application.Test.Documents;
 
@@ -30,12 +30,22 @@ internal class ExampleDocumentTest
         var result = new ExampleDocument(command);
 
         // Assert
-        result.Id.Should().NotBeEmpty();
-        result.Created.Should().NotBe(DateTime.MinValue).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        result.Updated.Should().NotBe(DateTime.MinValue).And.Be(result.Created);
-        result.Name.Should().NotBeNullOrWhiteSpace().And.Be(command.Name);
-        result.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(command.ExampleValueObject);
-        result.RemoteCode.Should().BeNull();
+        result.ShouldSatisfyAllConditions(
+            i => i.Id.ShouldNotBe(Guid.Empty),
+            i => i.Created.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(DateTime.MinValue),
+                j => j.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1))),
+            i => i.Updated.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(DateTime.MinValue),
+                j => j.ShouldBe(result.Created)),
+            i => i.Name.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNullOrWhiteSpace(),
+                j => j.ShouldBe(command.Name)),
+            i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNull(),
+                j => j.Code.ShouldBe(command.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(command.ExampleValueObject.Value)),
+            i => i.RemoteCode.ShouldBeNull());
     }
 
     [Test]
@@ -48,7 +58,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command)}");
     }
 
     [Test]
@@ -62,7 +72,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.Name)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Name)}");
     }
 
     [Test]
@@ -76,7 +86,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.Description)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Description)}");
     }
 
     [Test]
@@ -89,7 +99,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.ExampleValueObject)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.ExampleValueObject)}");
     }
 
     [Test]
@@ -105,13 +115,20 @@ internal class ExampleDocumentTest
         var result = document.Handle(command);
 
         // Assert
-        result.Should().NotBeNull().And.BeOfType<ExampleUpdated>();
-        result.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        result.Id.Should().NotBeEmpty().And.Be(document.Id);
-        result.Description.Should().NotBeNullOrWhiteSpace().And.Be(command.Description);
-        result.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(command.ExampleValueObject);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleUpdated>(),
+            i => i.Timestamp.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1)),
+            i => i.Id.ShouldNotBe(Guid.Empty),
+            i => i.Id.ShouldBe(document.Id),
+            i => i.Description.ShouldNotBeNullOrWhiteSpace(),
+            i => i.Description.ShouldBe(command.Description),
+            i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNull(),
+                j => j.Code.ShouldBe(command.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(command.ExampleValueObject.Value)));
 
-        document.Updated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        document.Updated.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
     [Test]
@@ -127,7 +144,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command)}");
     }
 
     [Test]
@@ -144,7 +161,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.Description)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Description)}");
     }
 
     [Test]
@@ -160,7 +177,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.ExampleValueObject)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.ExampleValueObject)}");
     }
 
     [Test]
@@ -176,12 +193,15 @@ internal class ExampleDocumentTest
         var result = document.Handle(command);
 
         // Assert
-        result.Should().NotBeNull().And.BeOfType<ExampleRemoteCodeSet>();
-        result.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        result.Id.Should().NotBeEmpty().And.Be(document.Id);
-        result.RemoteCode.Should().Be(command.RemoteCode);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleRemoteCodeSet>(),
+            i => i.Timestamp.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1)),
+            i => i.Id.ShouldNotBe(Guid.Empty),
+            i => i.Id.ShouldBe(document.Id),
+            i => i.RemoteCode.ShouldBe(command.RemoteCode));
 
-        document.Updated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        document.Updated.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1));
     }
 
     [Test]
@@ -197,7 +217,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command)}");
     }
 
     [Test]
@@ -214,7 +234,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.RemoteCode)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.RemoteCode)}");
     }
 
     [Test]
@@ -227,19 +247,37 @@ internal class ExampleDocumentTest
         var (document, domainEvent) = ExampleDocument.Create(command);
 
         // Assert
-        document.Should().NotBeNull().And.BeOfType<ExampleDocument>();
-        document.Id.Should().NotBeEmpty();
-        document.Created.Should().NotBe(DateTime.MinValue).And.BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        document.Updated.Should().NotBe(DateTime.MinValue).And.Be(document.Created);
-        document.Name.Should().NotBeNullOrWhiteSpace().And.Be(command.Name);
-        document.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(command.ExampleValueObject);
-        document.RemoteCode.Should().BeNull();
+        document.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleDocument>(),
+            i => i.Id.ShouldNotBe(Guid.Empty),
+            i => i.Created.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(DateTime.MinValue),
+                j => j.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1))),
+            i => i.Updated.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(DateTime.MinValue),
+                j => j.ShouldBe(i.Created)),
+            i => i.Name.ShouldNotBeNullOrWhiteSpace(),
+            i => i.Name.ShouldBe(command.Name),
+            i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNull(),
+                j => j.Code.ShouldBe(command.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(command.ExampleValueObject.Value)),
+            i => i.RemoteCode.ShouldBeNull());
 
-        domainEvent.Should().NotBeNull().And.BeOfType<ExampleCreated>();
-        domainEvent.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        domainEvent.Id.Should().NotBeEmpty().And.Be(document.Id);
-        domainEvent.Name.Should().NotBeNullOrWhiteSpace().And.Be(document.Name);
-        domainEvent.Description.Should().NotBeNullOrWhiteSpace().And.Be(document.Description);
-        domainEvent.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(document.ExampleValueObject);
+        domainEvent.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleCreated>(),
+            i => i.Timestamp.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1)),
+            i => i.Id.ShouldNotBe(Guid.Empty),
+            i => i.Id.ShouldBe(document.Id),
+            i => i.Name.ShouldNotBeNullOrWhiteSpace(),
+            i => i.Name.ShouldBe(document.Name),
+            i => i.Description.ShouldNotBeNullOrWhiteSpace(),
+            i => i.Description.ShouldBe(document.Description),
+            i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNull(),
+                j => j.Code.ShouldBe(document.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(document.ExampleValueObject.Value)));
     }
 }

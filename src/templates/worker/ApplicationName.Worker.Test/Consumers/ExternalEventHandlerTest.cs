@@ -4,10 +4,10 @@ using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using AutoMapper;
 using FakeItEasy;
-using Shouldly;
 using MassTransit;
 using NUnit.Framework;
 using Other.Worker.Contracts.Commands;
+using Shouldly;
 
 namespace ApplicationName.Worker.Test.Consumers;
 
@@ -59,8 +59,11 @@ public class ExternalEventHandlerTest
 
         // Assert
         A.CallTo(() => _sendEndPoint.Send(A<SetExampleRemoteCodeCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-        capturedCommand.Should()
-            .NotBeNull()
-            .And.BeEquivalentTo(@event, opts => opts.WithMapping<SetExampleRemoteCodeCommand>(i => i.Code, j => j.RemoteCode));
+
+        capturedCommand.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.CorrelationId.ShouldBe(@event.CorrelationId),
+            i => i.Id.ShouldBe(@event.Id),
+            i => i.RemoteCode.ShouldBe(@event.Code));
     }
 }
