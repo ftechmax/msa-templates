@@ -9,7 +9,7 @@ using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using AutoMapper;
 using FakeItEasy;
-using FluentAssertions;
+using Shouldly;
 using MassTransit;
 using NUnit.Framework;
 

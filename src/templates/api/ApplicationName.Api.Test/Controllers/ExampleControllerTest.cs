@@ -4,7 +4,7 @@ using ApplicationName.Api.Controllers;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
-using FluentAssertions;
+using Shouldly;
 using NUnit.Framework;
 
 namespace ApplicationName.Api.Test.Controllers;

@@ -7,7 +7,7 @@ using ApplicationName.Worker.Contracts.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
-using FluentAssertions;
+using Shouldly;
 using NUnit.Framework;
 
 namespace ApplicationName.Worker.Application.Test.Services;

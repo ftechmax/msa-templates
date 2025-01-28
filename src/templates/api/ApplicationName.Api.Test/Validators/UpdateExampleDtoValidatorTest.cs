@@ -3,7 +3,7 @@ using ApplicationName.Api.Contracts.Test;
 using ApplicationName.Api.Validators;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using FluentAssertions;
+using Shouldly;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 

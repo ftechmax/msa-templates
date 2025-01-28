@@ -3,7 +3,7 @@ using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts.Test;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using FluentAssertions;
+using Shouldly;
 using NUnit.Framework;
 
 namespace ApplicationName.Worker.Application.Test.Documents;
