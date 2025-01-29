@@ -4,8 +4,8 @@ using ApplicationName.Api.Controllers;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
-using FluentAssertions;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Api.Test.Controllers;
 
@@ -39,10 +39,11 @@ public class ExampleControllerTest
         // Assert
         A.CallTo(() => _applicationService.GetCollectionAsync()).MustHaveHappenedOnceExactly();
 
-        result.Should()
-            .NotBeNullOrEmpty()
-            .And.HaveSameCount(dtos)
-            .And.Contain(dtos);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldNotBeEmpty(),
+            i => i.Count().ShouldBe(dtos.Count()),
+            i => i.ShouldBeSameAs(dtos));
     }
 
     [Test]
@@ -60,9 +61,9 @@ public class ExampleControllerTest
         // Assert
         A.CallTo(() => _applicationService.GetAsync(id)).MustHaveHappenedOnceExactly();
 
-        result.Should()
-            .NotBeNull()
-            .And.Be(returnDto);
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeSameAs(returnDto));
     }
 
     [Test]

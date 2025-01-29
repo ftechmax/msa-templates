@@ -7,8 +7,8 @@ using ApplicationName.Worker.Contracts.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
-using FluentAssertions;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Worker.Application.Test.Services;
 
@@ -48,8 +48,18 @@ public class ApplicationServiceTest
         // Assert
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustHaveHappenedOnceExactly();
 
-        capturedDocument.Should().NotBeNull();
-        result.Should().NotBeNull().And.BeOfType<ExampleCreated>().And.BeEquivalentTo(capturedDocument, opts => opts.ExcludingMissingMembers());
+        capturedDocument.ShouldNotBeNull();
+
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleCreated>(),
+            i => i.ShouldSatisfyAllConditions(
+                j => j.Id.ShouldBe(capturedDocument.Id),
+                j => j.Name.ShouldBe(capturedDocument.Name),
+                j => j.Description.ShouldBe(capturedDocument.Description),
+                j => j.ExampleValueObject.ShouldSatisfyAllConditions(
+                    k => k.Code.ShouldBe(capturedDocument.ExampleValueObject.Code),
+                    k => k.Value.ShouldBe(capturedDocument.ExampleValueObject.Value))));
     }
 
     [Test]
@@ -62,7 +72,8 @@ public class ApplicationServiceTest
         var act = async () => await _subjectUnderTest.HandleAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command)}*");
+        var exception = await act.ShouldThrowAsync<ArgumentException>();
+        exception.Message.ShouldStartWith($"{nameof(command)}");
     }
 
     [Test]
@@ -96,10 +107,15 @@ public class ApplicationServiceTest
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustHaveHappenedOnceExactly();
 
-        result.Should()
-            .NotBeNull()
-            .And.BeOfType<ExampleUpdated>()
-            .And.BeEquivalentTo(capturedDocument, opts => opts.ExcludingMissingMembers());
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleUpdated>(),
+            i => i.ShouldSatisfyAllConditions(
+                j => j.Id.ShouldBe(capturedDocument.Id),
+                j => j.Description.ShouldBe(capturedDocument.Description),
+                j => j.ExampleValueObject.ShouldSatisfyAllConditions(
+                    k => k.Code.ShouldBe(capturedDocument.ExampleValueObject.Code),
+                    k => k.Value.ShouldBe(capturedDocument.ExampleValueObject.Value))));
     }
 
     [Test]
@@ -112,7 +128,8 @@ public class ApplicationServiceTest
         var act = () => _subjectUnderTest.HandleAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command)}*");
+        var exception = await act.ShouldThrowAsync<ArgumentException>();
+        exception.Message.ShouldStartWith($"{nameof(command)}");
     }
 
     [Test]
@@ -125,7 +142,9 @@ public class ApplicationServiceTest
         var act = () => _subjectUnderTest.HandleAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command.Id)}*");
+        var exception = await act.ShouldThrowAsync<ArgumentException>();
+        exception.Message.ShouldStartWith($"{nameof(command.Id)}");
+
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
     }
 
@@ -160,10 +179,13 @@ public class ApplicationServiceTest
         A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustHaveHappenedOnceExactly();
 
-        result.Should()
-            .NotBeNull()
-            .And.BeOfType<ExampleRemoteCodeSet>()
-            .And.BeEquivalentTo(capturedDocument, opts => opts.ExcludingMissingMembers());
+        result.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBeOfType<ExampleRemoteCodeSet>(),
+            i => i.ShouldSatisfyAllConditions(
+                j => j.Id.ShouldBe(capturedDocument.Id),
+                j => j.Timestamp.ShouldBe(DateTime.UtcNow, TimeSpan.FromSeconds(1)),
+                j => j.RemoteCode.ShouldBe(capturedDocument.RemoteCode.Value)));
     }
 
     [Test]
@@ -176,7 +198,8 @@ public class ApplicationServiceTest
         var act = () => _subjectUnderTest.HandleAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command)}*");
+        var exception = await act.ShouldThrowAsync<ArgumentException>();
+        exception.Message.ShouldStartWith($"{nameof(command)}");
     }
 
     [Test]
@@ -189,7 +212,9 @@ public class ApplicationServiceTest
         var act = () => _subjectUnderTest.HandleAsync(command);
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage($"{nameof(command.Id)}*");
+        var exception = await act.ShouldThrowAsync<ArgumentException>();
+        exception.Message.ShouldStartWith($"{nameof(command.Id)}");
+
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
     }
 }

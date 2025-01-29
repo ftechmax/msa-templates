@@ -3,8 +3,8 @@ using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts.Test;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using FluentAssertions;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Worker.Application.Test.Documents;
 
@@ -28,8 +28,9 @@ internal class ExampleValueObjectTest
         var result = new ExampleValueObject(eventData);
 
         // Assert
-        result.Code.Should().NotBeNullOrWhiteSpace().And.Be(eventData.Code);
-        result.Value.Should().BePositive().And.Be(eventData.Value);
+        result.ShouldSatisfyAllConditions(
+            i => i.Code.ShouldBe(eventData.Code),
+            i => i.Value.ShouldBe(eventData.Value));
     }
 
     [Test]
@@ -42,7 +43,7 @@ internal class ExampleValueObjectTest
         var act = () => new ExampleValueObject(eventData);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(eventData)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(eventData)}");
     }
 
     [Test]
@@ -56,7 +57,7 @@ internal class ExampleValueObjectTest
         var act = () => new ExampleValueObject(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.Code)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Code)}");
     }
 
     [Test]
@@ -70,6 +71,6 @@ internal class ExampleValueObjectTest
         var act = () => new ExampleValueObject(command);
 
         // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"{nameof(command.Value)}*");
+        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Value)}");
     }
 }

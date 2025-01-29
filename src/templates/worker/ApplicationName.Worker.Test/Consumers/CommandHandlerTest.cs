@@ -9,9 +9,9 @@ using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using AutoMapper;
 using FakeItEasy;
-using FluentAssertions;
 using MassTransit;
 using NUnit.Framework;
+using Shouldly;
 
 namespace ApplicationName.Worker.Test.Consumers;
 
@@ -72,14 +72,28 @@ public class CommandHandlerTest
         A.CallTo(() => _applicationService.HandleAsync(context.Message)).MustHaveHappenedOnceExactly();
         A.CallTo(() => context.Publish(A<ExampleCreatedEvent>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
-        capturedCommand.Should().NotBeNull().And.Be(command);
+        capturedCommand.ShouldSatisfyAllConditions(
+                i => i.ShouldNotBeNull(),
+                i => i.ShouldBe(command));
 
-        capturedEvent.Should().NotBeNull();
-        capturedEvent.CorrelationId.Should().NotBeEmpty().And.Be(command.CorrelationId);
-        capturedEvent.Id.Should().NotBeEmpty().And.Be(domainEvent.Id);
-        capturedEvent.Name.Should().NotBeNullOrWhiteSpace().And.Be(domainEvent.Name);
-        capturedEvent.Description.Should().NotBeNullOrWhiteSpace().And.Be(domainEvent.Description);
-        capturedEvent.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(domainEvent.ExampleValueObject);
+        capturedEvent.ShouldSatisfyAllConditions(
+                i => i.ShouldNotBeNull(),
+                i => i.CorrelationId.ShouldSatisfyAllConditions(
+                    j => j.ShouldNotBe(Guid.Empty),
+                    j => j.ShouldBe(command.CorrelationId)),
+                i => i.Id.ShouldSatisfyAllConditions(
+                    j => j.ShouldNotBe(Guid.Empty),
+                    j => j.ShouldBe(domainEvent.Id)),
+                i => i.Name.ShouldSatisfyAllConditions(
+                    j => j.ShouldNotBeNullOrWhiteSpace(),
+                    j => j.ShouldBe(domainEvent.Name)),
+                i => i.Description.ShouldSatisfyAllConditions(
+                    j => j.ShouldNotBeNullOrWhiteSpace(),
+                    j => j.ShouldBe(domainEvent.Description)),
+                i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                    j => j.ShouldNotBeNull(),
+                    j => j.Code.ShouldBe(domainEvent.ExampleValueObject.Code),
+                    j => j.Value.ShouldBe(domainEvent.ExampleValueObject.Value)));
     }
 
     [Test]
@@ -134,13 +148,25 @@ public class CommandHandlerTest
         A.CallTo(() => _applicationService.HandleAsync(context.Message)).MustHaveHappenedOnceExactly();
         A.CallTo(() => context.Publish(A<ExampleUpdatedEvent>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
-        capturedCommand.Should().NotBeNull().And.Be(command);
+        capturedCommand.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBe(command));
 
-        capturedEvent.Should().NotBeNull();
-        capturedEvent.CorrelationId.Should().NotBeEmpty().And.Be(command.CorrelationId);
-        capturedEvent.Id.Should().NotBeEmpty().And.Be(domainEvent.Id);
-        capturedEvent.Description.Should().NotBeNullOrWhiteSpace().And.Be(domainEvent.Description);
-        capturedEvent.ExampleValueObject.Should().NotBeNull().And.BeEquivalentTo(domainEvent.ExampleValueObject);
+        capturedEvent.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.CorrelationId.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(Guid.Empty),
+                j => j.ShouldBe(command.CorrelationId)),
+            i => i.Id.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(Guid.Empty),
+                j => j.ShouldBe(domainEvent.Id)),
+            i => i.Description.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNullOrWhiteSpace(),
+                j => j.ShouldBe(domainEvent.Description)),
+            i => i.ExampleValueObject.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBeNull(),
+                j => j.Code.ShouldBe(domainEvent.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(domainEvent.ExampleValueObject.Value)));
     }
 
     [Test]
@@ -195,12 +221,21 @@ public class CommandHandlerTest
         A.CallTo(() => _applicationService.HandleAsync(context.Message)).MustHaveHappenedOnceExactly();
         A.CallTo(() => context.Publish(A<ExampleRemoteCodeSetEvent>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
-        capturedCommand.Should().NotBeNull().And.Be(command);
+        capturedCommand.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.ShouldBe(command));
 
-        capturedEvent.Should().NotBeNull();
-        capturedEvent.CorrelationId.Should().NotBeEmpty().And.Be(command.CorrelationId);
-        capturedEvent.Id.Should().NotBeEmpty().And.Be(domainEvent.Id);
-        capturedEvent.RemoteCode.Should().Be(domainEvent.RemoteCode);
+        capturedEvent.ShouldSatisfyAllConditions(
+            i => i.ShouldNotBeNull(),
+            i => i.CorrelationId.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(Guid.Empty),
+                j => j.ShouldBe(command.CorrelationId)),
+            i => i.Id.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(Guid.Empty),
+                j => j.ShouldBe(domainEvent.Id)),
+            i => i.RemoteCode.ShouldSatisfyAllConditions(
+                j => j.ShouldNotBe(default),
+                j => j.ShouldBe(domainEvent.RemoteCode)));
     }
 
     [Test]
