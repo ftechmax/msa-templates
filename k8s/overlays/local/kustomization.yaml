@@ -16,11 +16,11 @@ patches:
         path: /spec/template/spec/containers/0/resources
 images:
   - name: applicationname-worker
-    newName: 192.168.100.2:32000/applicationname-worker
+    newName: registry:5000/applicationname-worker
     newTag: latest
   - name: applicationname-api
-    newName: 192.168.100.2:32000/applicationname-api
+    newName: registry:5000/applicationname-api
     newTag: latest
   - name: applicationname-web
-    newName: 192.168.100.2:32000/applicationname-web
+    newName: registry:5000/applicationname-web
     newTag: latest
