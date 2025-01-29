@@ -12,6 +12,9 @@ using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.Logging;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using OpenTelemetry.Logs;
@@ -45,6 +48,7 @@ public static class Program
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         // MongoDB
+        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
         var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
