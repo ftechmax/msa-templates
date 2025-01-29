@@ -4,11 +4,10 @@ import { LayoutComponent } from './layout/layout.component';
 import { SignalRService } from './signalr.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  imports: [RouterOutlet, LayoutComponent],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
+    imports: [RouterOutlet, LayoutComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'web';

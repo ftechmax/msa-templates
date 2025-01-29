@@ -20,19 +20,18 @@ import { FaultSnackBarComponent } from '../../core/fault-snackbar/fault-snack-ba
 import { DomainFault } from '../../core/contracts';
 
 @Component({
-  selector: 'app-example-create',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule,
-  ],
-  providers: [ExampleHttpClient],
-  templateUrl: './example-create.component.html',
-  styleUrl: './example-create.component.scss',
+    selector: 'app-example-create',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+    ],
+    providers: [ExampleHttpClient],
+    templateUrl: './example-create.component.html',
+    styleUrl: './example-create.component.scss'
 })
 export class ExampleCreateComponent implements OnInit, OnDestroy {
   correlationId: string = uuidv4();

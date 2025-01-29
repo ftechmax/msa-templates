@@ -10,16 +10,15 @@ import {
 import { DomainFault } from '../contracts';
 
 @Component({
-  selector: 'app-fault-snackbar',
-  standalone: true,
-  imports: [
-    MatButtonModule,
-    MatSnackBarLabel,
-    MatSnackBarActions,
-    MatSnackBarAction,
-  ],
-  templateUrl: './fault-snack-bar.component.html',
-  styleUrl: './fault-snack-bar.component.scss',
+    selector: 'app-fault-snackbar',
+    imports: [
+        MatButtonModule,
+        MatSnackBarLabel,
+        MatSnackBarActions,
+        MatSnackBarAction,
+    ],
+    templateUrl: './fault-snack-bar.component.html',
+    styleUrl: './fault-snack-bar.component.scss'
 })
 export class FaultSnackBarComponent {
   snackBarRef = inject(MatSnackBarRef);
