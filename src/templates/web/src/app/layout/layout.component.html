@@ -30,6 +30,12 @@
       }
       <span>web</span>
     </mat-toolbar>
-    <ng-content />
+    <main class="container-fluid px-4">
+      <div class="row">
+        <div class="col">
+          <ng-content />
+        </div>
+      </div>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>
