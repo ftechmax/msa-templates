@@ -9,8 +9,11 @@ public record ExampleCollectionDto
     public Guid Id { get; init; }
 
     [ProtoMember(2)]
-    public string Name { get; init; }
+    public DateTime Created { get; init; }
 
     [ProtoMember(3)]
+    public string Name { get; init; }
+
+    [ProtoMember(4)]
     public string Description { get; init; }
 }

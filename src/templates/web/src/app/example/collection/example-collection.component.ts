@@ -2,12 +2,14 @@ import {
   AfterViewInit,
   Component,
   OnDestroy,
-  OnInit,
+  signal,
   ViewChild,
 } from '@angular/core';
 import {
+  Subject,
   Subscription,
   catchError,
+  debounceTime,
   map,
   merge,
   of,
@@ -17,98 +19,101 @@ import {
 import { EventService } from '../../status.service';
 import { ExampleCollectionDto } from '../contracts';
 import { ExampleHttpClient } from '../httpclient';
-import { JsonPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTable, MatTableModule } from '@angular/material/table';
-//import { ExampleDataSource } from './example.datasource';
+import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { DatePipe, NgIf } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-example-collection',
   providers: [ExampleHttpClient],
   templateUrl: './example-collection.component.html',
   styleUrl: './example-collection.component.scss',
-  imports: [RouterLink, MatTableModule, MatPaginatorModule, MatSortModule],
+  imports: [
+    NgIf,
+    DatePipe,
+    RouterLink,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatProgressSpinner,
+    MatIcon,
+  ],
 })
-export class ExampleCollectionComponent
-  implements OnInit, OnDestroy, AfterViewInit
-{
+export class ExampleCollectionComponent implements AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatTable) table!: MatTable<ExampleCollectionDto>;
+
+  displayedColumns = ['name', 'created', 'actions'];
   model = [] as ExampleCollectionDto[];
   event$: Subscription | null = null;
-  displayedColumns = ['id', 'name'];
-  //dataSource = new ExampleDataSource(this.http);
+  data$: Subscription | undefined;
+  spinner = signal(false);
+
+  private isLoading = new Subject<boolean>();
+  private debouncedLoading$: Subscription;
 
   constructor(
     private readonly router: Router,
     private readonly http: ExampleHttpClient,
     private readonly eventService: EventService
-  ) {}
-
-  ngOnInit(): void {
-    this.load();
-    this.event$ = this.eventService.ExampleCreatedEvent.pipe().subscribe(() => {
-      this.load();
-    });
+  ) {
+    this.debouncedLoading$ = this.isLoading
+      .pipe(debounceTime(200))
+      .subscribe((loading) => {
+        if (loading) {
+          this.spinner.set(true);
+        } else {
+          this.spinner.set(false);
+        }
+      });
   }
 
-  ngOnDestroy(): void {
-    this.event$?.unsubscribe();
-  }
-
-  // ngAfterViewInit(): void {
-  //   this.dataSource.sort = this.sort;
-  //   this.dataSource.paginator = this.paginator;
-  //   this.table.dataSource = this.dataSource;
-  // }
-
-  ngAfterViewInit() {
-    // If the user changes the sort order, reset back to the first page.
+  ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-    merge(this.sort.sortChange, this.paginator.page)
+    this.data$ = merge(
+      this.sort.sortChange,
+      this.paginator.page,
+      this.eventService.ExampleCreatedEvent
+    )
       .pipe(
-        startWith({}),
+        startWith([]),
         switchMap(() => {
-          //this.isLoadingResults = true;
-          return this.http!.getCollectionPaged(
-            this.sort.active,
-            this.sort.direction,
-            this.paginator.pageIndex,
-            this.paginator.pageSize
-          ).pipe(catchError(() => of(null)));
+          this.isLoading.next(true);
+          return this.http
+            .getCollectionPaged(
+              this.sort.active,
+              this.sort.direction,
+              this.paginator.pageIndex,
+              this.paginator.pageSize
+            )
+            .pipe(catchError(() => of(null)));
         }),
         map((data) => {
-          // Flip flag to show that loading has finished.
-          // this.isLoadingResults = false;
-          // this.isRateLimitReached = data === null;
+          this.isLoading.next(false);
 
           if (data === null) {
             return [];
           }
 
-          // Only refresh the result length if there is new data. In case of rate
-          // limit errors, we do not want to reset the paginator to zero, as that
-          // would prevent users from re-triggering requests.
-          //this.resultsLength = data?.length || 0;
           return data;
         })
       )
       .subscribe((data) => (this.model = data));
   }
 
-  private load() {
-    this.http.getCollection().subscribe((response) => {
-      this.model = response;
-    });
+  ngOnDestroy(): void {
+    this.event$?.unsubscribe();
+    this.data$?.unsubscribe();
+    this.isLoading?.complete();
+    this.debouncedLoading$?.unsubscribe();
   }
 
   onCreate() {
-    // const dialogRef = this.dialog.open(ExampleCreateComponent);
-    // dialogRef.afterClosed().subscribe(() => {});
     this.router.navigate(['/example', 'create']);
   }
 }

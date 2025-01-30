@@ -1,5 +1,6 @@
 export type ExampleCollectionDto = {
   id: string;
+  created: string;
   name: string;
 };
 
