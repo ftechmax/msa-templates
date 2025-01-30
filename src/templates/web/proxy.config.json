@@ -1,14 +1,14 @@
 {
   "/api": {
-    "target": "http://applicationname.kube.local",
-    "secure": false,
+    "target": "https://awesome-app.nfokkema.kube.voortman.net",
+    "secure": true,
     "changeOrigin": true,
     "logLevel": "debug"
   },
   "/api-hub": {
-    "target": "http://applicationname.kube.local",
+    "target": "https://awesome-app.nfokkema.kube.voortman.net",
     "ws": true,
-    "secure": false,
+    "secure": true,
     "changeOrigin": true,
     "logLevel": "debug"
   }

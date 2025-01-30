@@ -18,20 +18,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FaultSnackBarComponent } from '../../core/fault-snackbar/fault-snack-bar.component';
 import { DomainFault } from '../../core/contracts';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
-    selector: 'app-example-create',
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        MatButtonModule,
-    ],
-    providers: [ExampleHttpClient],
-    templateUrl: './example-create.component.html',
-    styleUrl: './example-create.component.scss'
+  selector: 'app-example-create',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    TranslocoDirective,
+  ],
+  providers: [ExampleHttpClient],
+  templateUrl: './example-create.component.html',
+  styleUrl: './example-create.component.scss',
 })
 export class ExampleCreateComponent implements OnInit, OnDestroy {
   correlationId: string = uuidv4();

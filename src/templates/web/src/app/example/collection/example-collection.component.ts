@@ -25,17 +25,11 @@ import { MatTable, MatTableModule } from '@angular/material/table';
 //import { ExampleDataSource } from './example.datasource';
 
 @Component({
-    selector: 'app-example-collection',
-    providers: [ExampleHttpClient],
-    templateUrl: './example-collection.component.html',
-    styleUrl: './example-collection.component.scss',
-    imports: [
-        RouterLink,
-        JsonPipe,
-        MatTableModule,
-        MatPaginatorModule,
-        MatSortModule,
-    ]
+  selector: 'app-example-collection',
+  providers: [ExampleHttpClient],
+  templateUrl: './example-collection.component.html',
+  styleUrl: './example-collection.component.scss',
+  imports: [RouterLink, MatTableModule, MatPaginatorModule, MatSortModule],
 })
 export class ExampleCollectionComponent
   implements OnInit, OnDestroy, AfterViewInit
