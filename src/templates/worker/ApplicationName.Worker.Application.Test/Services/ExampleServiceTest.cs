@@ -12,13 +12,13 @@ using Shouldly;
 
 namespace ApplicationName.Worker.Application.Test.Services;
 
-public class ApplicationServiceTest
+public class ExampleServiceTest
 {
     private IFixture _fixture;
 
     private IDocumentRepository _documentRepository;
 
-    private ApplicationService _subjectUnderTest;
+    private ExampleService _subjectUnderTest;
 
     [SetUp]
     public void SetUp()
@@ -27,7 +27,7 @@ public class ApplicationServiceTest
 
         _documentRepository = _fixture.Freeze<IDocumentRepository>();
 
-        _subjectUnderTest = _fixture.Create<ApplicationService>();
+        _subjectUnderTest = _fixture.Create<ExampleService>();
     }
 
     [Test]

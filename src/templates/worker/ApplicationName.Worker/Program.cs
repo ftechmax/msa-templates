@@ -77,7 +77,7 @@ public static class Program
 
         // Application
         services.AddScoped<IDocumentRepository, DocumentRepository>();
-        services.AddScoped<IApplicationService, ApplicationService>();
+        services.AddScoped<IExampleService, ExampleService>();
 
         // OpenTelemetry
         var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
