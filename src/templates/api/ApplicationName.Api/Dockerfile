@@ -8,7 +8,8 @@ ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 WORKDIR /src
-COPY . .
+COPY api/ api/
+COPY shared/ shared/
 WORKDIR "/src/api/ApplicationName.Api"
 RUN dotnet publish "ApplicationName.Api.csproj" -c Release -o /app/publish
 
