@@ -4,7 +4,7 @@ using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Commands;
 using ArgDefender;
-using AutoMapper;
+using MapsterMapper;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Reflection;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
@@ -9,6 +10,7 @@ using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Mapster;
 using MassTransit;
 using MassTransit.Logging;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
@@ -56,8 +58,9 @@ public static class Program
         // SignalR
         services.AddSignalR();
 
-        // AutoMapper
-        services.AddAutoMapper(i => i.AddProfile<MappingProfile>());
+        // Mapster
+        services.AddMapster();
+        TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         // MassTransit + RabbitMQ
         services.AddMassTransit(i =>

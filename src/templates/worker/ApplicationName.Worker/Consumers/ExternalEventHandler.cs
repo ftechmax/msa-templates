@@ -1,5 +1,5 @@
 using ApplicationName.Worker.Contracts.Commands;
-using AutoMapper;
+using MapsterMapper;
 using MassTransit;
 using Other.Worker.Contracts.Commands;
 
