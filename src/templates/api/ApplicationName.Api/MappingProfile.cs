@@ -3,23 +3,23 @@ using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
-using AutoMapper;
+using Mapster;
 
 namespace ApplicationName.Api;
 
 [ExcludeFromCodeCoverage]
-public class MappingProfile : Profile
+public class MappingProfile : IRegister
 {
-    public MappingProfile()
+    public void Register(TypeAdapterConfig config)
     {
         // API -> Application
-        CreateMap<CreateExampleDto, CreateExampleCommand>();
-        CreateMap<UpdateExampleDto, UpdateExampleCommand>();
-        CreateMap<ExampleValueObjectDto, ExampleValueObjectEventData>();
+        config.NewConfig<CreateExampleDto, CreateExampleCommand>();
+        config.NewConfig<UpdateExampleDto, UpdateExampleCommand>();
+        config.NewConfig<ExampleValueObjectDto, ExampleValueObjectEventData>();
 
         // Application -> API
-        CreateMap<ExampleDocument, ExampleCollectionDto>();
-        CreateMap<ExampleDocument, ExampleDetailsDto>();
-        CreateMap<ExampleValueObject, ExampleValueObjectDto>();
+        config.NewConfig<ExampleDocument, ExampleCollectionDto>();
+        config.NewConfig<ExampleDocument, ExampleDetailsDto>();
+        config.NewConfig<ExampleValueObject, ExampleValueObjectDto>();
     }
 }

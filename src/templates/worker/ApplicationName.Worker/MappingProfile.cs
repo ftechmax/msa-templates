@@ -2,23 +2,20 @@ using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
-using AutoMapper;
+using Mapster;
 using Other.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker;
 
 [ExcludeFromCodeCoverage]
-public class MappingProfile : Profile
+public class MappingProfile : IRegister
 {
-    public MappingProfile()
+    public void Register(TypeAdapterConfig config)
     {
-        CreateMap<ExternalEvent, SetExampleRemoteCodeCommand>()
-            .ForMember(dst => dst.RemoteCode, src =>
-                src.MapFrom(i => i.Code));
-
-        CreateMap<ExampleCreated, ExampleCreatedEvent>();
-        CreateMap<ExampleUpdated, ExampleUpdatedEvent>();
-        CreateMap<ExampleValueObjectEvent, ExampleValueObjectEventData>();
-        CreateMap<ExampleRemoteCodeSet, ExampleRemoteCodeSetEvent>();
+        config.NewConfig<ExternalEvent, SetExampleRemoteCodeCommand>().Map(dest => dest.RemoteCode, src => src.Code);
+        config.NewConfig<ExampleCreated, ExampleCreatedEvent>();
+        config.NewConfig<ExampleUpdated, ExampleUpdatedEvent>();
+        config.NewConfig<ExampleValueObjectEvent, ExampleValueObjectEventData>();
+        config.NewConfig<ExampleRemoteCodeSet, ExampleRemoteCodeSetEvent>();
     }
 }
