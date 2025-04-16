@@ -31,7 +31,7 @@ public class CommandHandlerTest
     {
         _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 
-        var mapperConfig = TypeAdapterConfig.GlobalSettings;
+        var mapperConfig = new TypeAdapterConfig();
         mapperConfig.Scan(typeof(MappingProfile).Assembly);
         _mapper = new Mapper(mapperConfig);
         _fixture.Register(() => _mapper);

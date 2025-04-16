@@ -51,7 +51,7 @@ public class ExampleServiceTest
         _sendEndpoint = _fixture.Freeze<ISendEndpoint>();
         A.CallTo(() => _bus.GetSendEndpoint(A<Uri>._)).Returns(_sendEndpoint);
 
-        var mapperConfig = TypeAdapterConfig.GlobalSettings;
+        var mapperConfig = new TypeAdapterConfig();
         mapperConfig.Scan(typeof(MappingProfile).Assembly);
         _mapper = new Mapper(mapperConfig);
         _fixture.Register(() => _mapper);
@@ -284,11 +284,12 @@ public class ExampleServiceTest
         var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes);
         var instance = (ExampleDocument)ci!.Invoke(null);
 
-        var config = TypeAdapterConfig.GlobalSettings;
+        var config = new TypeAdapterConfig();
         config.NewConfig<IAggregate, DocumentBase>();
         config.NewConfig<IExample, ExampleDocument>();
         config.NewConfig<IExampleValueObject, ExampleValueObject>()
-            .MapToConstructor(typeof(ExampleValueObject).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes)!);
+            // ReSharper disable once AssignNullToNotNullAttribute
+            .MapToConstructor(typeof(ExampleValueObject).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes));
         var mapper = new Mapper(config);
 
         mapper.Map(A.Dummy<IAggregate>(), instance);
