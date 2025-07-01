@@ -9,8 +9,8 @@
   <ItemGroup>
     <PackageReference Include="ArgDefender" Version="1.1.0" />
     <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
-    <PackageReference Include="MassTransit" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.4" />
+    <PackageReference Include="MassTransit" Version="8.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.6" />
     <PackageReference Include="protobuf-net" Version="3.2.52" />
   </ItemGroup>
 
