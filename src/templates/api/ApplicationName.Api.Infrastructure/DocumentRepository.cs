@@ -1,9 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 
 namespace ApplicationName.Api.Infrastructure;
 
@@ -12,7 +12,7 @@ public sealed class DocumentRepository(IMongoClient mongoClient) : IDocumentRepo
 {
     private readonly IMongoDatabase _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
 
-    public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
+    public async Task<T?> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
         var collection = GetCollection<T>();
 

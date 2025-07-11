@@ -6,8 +6,8 @@ namespace ApplicationName.Api.Contracts.Dtos;
 public record ExampleValueObjectDto
 {
     [ProtoMember(1)]
-    public string Code { get; init; }
+    public required string Code { get; init; }
 
     [ProtoMember(2)]
-    public double Value { get; init; }
+    public required double Value { get; init; }
 }

@@ -5,16 +5,16 @@ namespace ApplicationName.Api.Application.Documents;
 
 public sealed class ExampleDocument : DocumentBase, IExample
 {
-    [BsonConstructor]
-    private ExampleDocument()
-    {
-    }
+    //[BsonConstructor]
+    //private ExampleDocument()
+    //{
+    //}
 
-    public string Name { get; init; }
+    public required string Name { get; init; }
 
-    public string Description { get; init; }
+    public required string Description { get; init; }
 
-    public ExampleValueObject ExampleValueObject { get; init; }
+    public required ExampleValueObject ExampleValueObject { get; init; }
 
     public int? RemoteCode { get; init; }
 

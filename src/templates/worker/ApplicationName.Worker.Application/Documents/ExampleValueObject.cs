@@ -23,7 +23,7 @@ public sealed class ExampleValueObject : IExampleValueObject
         Value = eventData.Value;
     }
 
-    public string Code { get; init; }
+    public string Code { get; }
 
     public double Value { get; init; }
 }
