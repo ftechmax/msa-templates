@@ -9,10 +9,14 @@ namespace ApplicationName.Worker.Application.Documents;
 
 public sealed class ExampleDocument : DocumentBase, IExample
 {
+    // Suppress CS8618: Non-nullable property must contain a non-null value when exiting constructor.
+    // This constructor is used by the database driver for deserialization and properties are set via reflection.
+#pragma warning disable CS8618
     [BsonConstructor]
     private ExampleDocument()
     {
     }
+#pragma warning restore CS8618
 
     public ExampleDocument(CreateExampleCommand command)
         : this()
@@ -57,7 +61,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         return (document, new ExampleCreated(document));
     }
 
-    public string Name { get; init; }
+    public string Name { get; }
 
     public string Description { get; private set; }
 

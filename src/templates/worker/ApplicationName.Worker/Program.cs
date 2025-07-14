@@ -83,7 +83,7 @@ public static class Program
         services.AddScoped<IApplicationService, ApplicationService>();
 
         // OpenTelemetry
-        var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var otlpEndpoint = new Uri(configuration["opentelemetry:endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
@@ -119,7 +119,7 @@ public static class Program
                     .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+                    opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
     }
