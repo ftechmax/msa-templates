@@ -1,9 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using MongoDB.Driver;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 
 namespace ApplicationName.Api.Infrastructure;
 

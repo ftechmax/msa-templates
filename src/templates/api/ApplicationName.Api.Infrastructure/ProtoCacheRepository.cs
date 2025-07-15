@@ -1,7 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Api.Application.Repositories;
 using ArgDefender;
 using Microsoft.Extensions.Caching.Distributed;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ApplicationName.Api.Infrastructure;
 
