@@ -9,5 +9,5 @@ public record ExampleValueObjectDto
     public required string Code { get; init; }
 
     [ProtoMember(2)]
-    public required double Value { get; init; }
+    public double Value { get; init; }
 }
