@@ -281,7 +281,7 @@ public class ExampleServiceTest
 
     public static ExampleDocument GenerateDocument(IExample source)
     {
-        var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes);
+        var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes);
         var instance = (ExampleDocument)ci!.Invoke(null);
 
         var config = new TypeAdapterConfig();
@@ -289,7 +289,7 @@ public class ExampleServiceTest
         config.NewConfig<IExample, ExampleDocument>();
         config.NewConfig<IExampleValueObject, ExampleValueObject>()
             // ReSharper disable once AssignNullToNotNullAttribute
-            .MapToConstructor(typeof(ExampleValueObject).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes));
+            .MapToConstructor(typeof(ExampleValueObject).GetConstructor(BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes));
         var mapper = new Mapper(config);
 
         mapper.Map(A.Dummy<IAggregate>(), instance);

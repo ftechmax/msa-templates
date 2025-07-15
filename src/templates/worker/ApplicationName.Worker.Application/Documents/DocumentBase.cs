@@ -6,9 +6,9 @@ namespace ApplicationName.Worker.Application.Documents;
 public abstract class DocumentBase : IAggregate
 {
     [BsonId]
-    public Guid Id { get; protected init; }
+    public Guid Id { get; init; }
 
-    public DateTime Created { get; protected init; }
+    public DateTime Created { get; init; }
 
-    public DateTime Updated { get; protected init; }
+    public DateTime Updated { get; init; }
 }
