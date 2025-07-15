@@ -5,11 +5,6 @@ namespace ApplicationName.Api.Application.Documents;
 
 public sealed class ExampleDocument : DocumentBase, IExample
 {
-    //[BsonConstructor]
-    //private ExampleDocument()
-    //{
-    //}
-
     public required string Name { get; init; }
 
     public required string Description { get; init; }

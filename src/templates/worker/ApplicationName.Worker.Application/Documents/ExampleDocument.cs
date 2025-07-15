@@ -61,7 +61,7 @@ public sealed class ExampleDocument : DocumentBase, IExample
         return (document, new ExampleCreated(document));
     }
 
-    public string Name { get; }
+    public string Name { get; init; }
 
     public string Description { get; private set; }
 

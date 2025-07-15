@@ -27,7 +27,7 @@ public sealed class ExampleValueObject : IExampleValueObject
         Value = eventData.Value;
     }
 
-    public string Code { get; }
+    public string Code { get; init; }
 
-    public double Value { get; }
+    public double Value { get; init; }
 }
