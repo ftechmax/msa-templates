@@ -8,12 +8,12 @@ namespace ApplicationName.Api.Infrastructure;
 [ExcludeFromCodeCoverage]
 public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : IProtoCacheRepository
 {
-    public async Task<T> GetAsync<T>(string key)
+    public async Task<T?> GetAsync<T>(string key)
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
 
         var bytes = await distributedCache.GetAsync(key);
-        if (bytes == default)
+        if (bytes == null)
         {
             return default;
         }
@@ -22,7 +22,7 @@ public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : I
         return ProtoBuf.Serializer.Deserialize<T>(ms);
     }
 
-    public async Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions options = default) where T : class
+    public async Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions? options = null) where T : class
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
         Guard.Argument(obj).NotNull();

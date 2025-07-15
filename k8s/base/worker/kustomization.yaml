@@ -4,5 +4,3 @@ kind: Kustomization
 resources:
   - ./deployment.yaml
   - ./service.yaml
-  # optional: keda scaledobject
-  # - ./scaledobject.yaml

@@ -52,8 +52,3 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
         | Set-Content -Path $filePath
     }
 }
-
-# Patch KubernetesLocalProcessConfig.yaml
-$filePath = Join-Path -Path $ProjectFolder -ChildPath "src/api/$ServiceName.Api/KubernetesLocalProcessConfig.yaml"
-(Get-Content -Path $filePath) -creplace '{{REDIS-SERVICE}}', "$RedisServiceName.$RedisServiceNamespace" | Set-Content -Path $filePath
-Write-Host "Patching $filePath"

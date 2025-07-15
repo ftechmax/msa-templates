@@ -15,7 +15,7 @@ public class ExampleController(IExampleService applicationService) : ControllerB
     }
 
     [HttpGet("{id}")]
-    public Task<ExampleDetailsDto> Get(Guid id)
+    public Task<ExampleDetailsDto?> Get(Guid id)
     {
         return applicationService.GetAsync(id);
     }

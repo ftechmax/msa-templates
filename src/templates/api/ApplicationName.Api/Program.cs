@@ -47,7 +47,7 @@ public static class Program
         app.Run();
     }
 
-    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    private static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
     {
         // MongoDB
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
@@ -113,7 +113,7 @@ public static class Program
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
-        var openTelemetryEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var openTelemetryEndpoint = new Uri(configuration["opentelemetry:endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
@@ -164,7 +164,7 @@ public static class Program
         app.MapHub<ApiHub>("/api-hub");
     }
 
-    private static void ConfigureLogging(ILoggingBuilder builder, IConfiguration configuration)
+    private static void ConfigureLogging(ILoggingBuilder builder, ConfigurationManager configuration)
     {
         builder.AddOpenTelemetry(configure =>
         {
@@ -175,7 +175,7 @@ public static class Program
                 .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+                    opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
     }
