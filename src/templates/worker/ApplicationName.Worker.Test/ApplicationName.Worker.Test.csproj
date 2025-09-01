@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit" Version="8.5.2" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.2" />
+  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+  <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
     <ProjectReference Include="..\ApplicationName.Worker.Contracts.Test\ApplicationName.Worker.Contracts.Test.csproj" />
     <ProjectReference Include="..\ApplicationName.Worker\ApplicationName.Worker.csproj" />
   </ItemGroup>
