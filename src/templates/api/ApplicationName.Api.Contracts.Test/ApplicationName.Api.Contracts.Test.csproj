@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="3.4.3" />
     <ProjectReference Include="..\ApplicationName.Api.Contracts\ApplicationName.Api.Contracts.csproj" />
   </ItemGroup>
 
