@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.MongoDb" Version="8.5.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.3" />
+  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.9" />
     <ProjectReference Include="..\ApplicationName.Api.Application\ApplicationName.Api.Application.csproj" />
     <ProjectReference Include="..\ApplicationName.Api.Contracts.Test\ApplicationName.Api.Contracts.Test.csproj" />
     <ProjectReference Include="..\ApplicationName.Api\ApplicationName.Api.csproj" />
