@@ -9,8 +9,8 @@
   <ItemGroup>
     <PackageReference Include="ArgDefender" Version="1.1.0" />
     <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
-    <PackageReference Include="MassTransit" Version="8.5.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.6" />
+    <PackageReference Include="MassTransit" Version="8.5.5" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.10" />
     <PackageReference Include="protobuf-net" Version="3.2.52" />
   </ItemGroup>
 
@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="3.5.0" />
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
     <_Parameter1>$(AssemblyName).Test</_Parameter1>
     </AssemblyAttribute>
