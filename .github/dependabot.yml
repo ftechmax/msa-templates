@@ -12,14 +12,12 @@ updates:
           - '*'
         update-types:
           - 'minor'
-          - 'patch'
       angular-security:
         applies-to: security-updates
         patterns:
           - '*'
         update-types:
           - 'minor'
-          - 'patch'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
@@ -38,14 +36,12 @@ updates:
           - '*'
         update-types:
           - 'minor'
-          - 'patch'
       nuget-security:
         applies-to: security-updates
         patterns:
           - '*'
         update-types:
           - 'minor'
-          - 'patch'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
