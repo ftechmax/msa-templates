@@ -9,7 +9,6 @@ using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Mapster;
 using MassTransit;
 using MassTransit.Logging;
@@ -99,7 +98,6 @@ public static class Program
         services.AddHealthChecks();
         services.AddControllers();
 
-        services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<CreateExampleDtoValidator>();
 
         services.AddEndpointsApiExplorer();
