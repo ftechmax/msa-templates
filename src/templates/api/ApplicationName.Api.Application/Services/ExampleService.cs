@@ -4,7 +4,7 @@ using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Commands;
 using ArgDefender;
-using AutoMapper;
+using MapsterMapper;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 
@@ -20,7 +20,7 @@ public sealed class ExampleService(
     public async Task<IEnumerable<ExampleCollectionDto>> GetCollectionAsync()
     {
         var result = await protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey);
-        if (result != default)
+        if (result != null)
         {
             return result;
         }
@@ -38,22 +38,22 @@ public sealed class ExampleService(
         return result;
     }
 
-    public async Task<ExampleDetailsDto> GetAsync(Guid id)
+    public async Task<ExampleDetailsDto?> GetAsync(Guid id)
     {
         Guard.Argument(id).NotDefault();
 
         var key = ApplicationConstants.ExampleDetailsCacheKey(id);
 
         var result = await protoCacheRepository.GetAsync<ExampleDetailsDto>(key);
-        if (result != default)
+        if (result != null)
         {
             return result;
         }
 
         var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == id);
-        if (document == default)
+        if (document == null)
         {
-            return default;
+            return null;
         }
 
         result = mapper.Map<ExampleDetailsDto>(document);

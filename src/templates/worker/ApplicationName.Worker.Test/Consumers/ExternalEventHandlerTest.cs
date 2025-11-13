@@ -2,8 +2,9 @@ using ApplicationName.Worker.Consumers;
 using ApplicationName.Worker.Contracts.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using AutoMapper;
 using FakeItEasy;
+using Mapster;
+using MapsterMapper;
 using MassTransit;
 using NUnit.Framework;
 using Other.Worker.Contracts.Commands;
@@ -28,7 +29,9 @@ public class ExternalEventHandlerTest
     {
         _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 
-        _mapper = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>()).CreateMapper();
+        var mapperConfig = new TypeAdapterConfig();
+        mapperConfig.Scan(typeof(MappingProfile).Assembly);
+        _mapper = new Mapper(mapperConfig);
         _fixture.Register(() => _mapper);
 
         EndpointConvention.Map<SetExampleRemoteCodeCommand>(new Uri("queue:test"));

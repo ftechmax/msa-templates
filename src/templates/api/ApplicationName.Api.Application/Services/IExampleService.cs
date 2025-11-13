@@ -6,7 +6,7 @@ public interface IExampleService
 {
     Task<IEnumerable<ExampleCollectionDto>> GetCollectionAsync();
 
-    Task<ExampleDetailsDto> GetAsync(Guid id);
+    Task<ExampleDetailsDto?> GetAsync(Guid id);
 
     Task HandleAsync(CreateExampleDto dto);
 

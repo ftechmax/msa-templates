@@ -1,10 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Reflection;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
+using Mapster;
 using MassTransit;
 using MassTransit.Logging;
 using MongoDB.Bson;
@@ -47,8 +49,9 @@ public static class Program
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
 
-        // AutoMapper
-        services.AddAutoMapper(i => i.AddProfile<MappingProfile>());
+        // Mapster
+        services.AddMapster();
+        TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         // MassTransit
         services.AddMassTransit(i =>
@@ -80,7 +83,7 @@ public static class Program
         services.AddScoped<IExampleService, ExampleService>();
 
         // OpenTelemetry
-        var otlpEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var otlpEndpoint = new Uri(configuration["opentelemetry:endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
@@ -116,7 +119,7 @@ public static class Program
                     .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+                    opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
     }

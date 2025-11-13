@@ -12,7 +12,7 @@ public sealed class DocumentRepository(IMongoClient mongoClient) : IDocumentRepo
 {
     private readonly IMongoDatabase _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
 
-    public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
+    public async Task<T?> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
         var collection = GetCollection<T>();
 

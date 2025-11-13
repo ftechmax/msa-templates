@@ -6,7 +6,7 @@ namespace ApplicationName.Api.Contracts.Dtos;
 public record ExampleCollectionDto
 {
     [ProtoMember(1)]
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
     [ProtoMember(2)]
     public DateTime Created { get; init; }

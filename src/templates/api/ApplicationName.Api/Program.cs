@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Reflection;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
@@ -8,7 +9,7 @@ using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
 using FluentValidation;
-using FluentValidation.AspNetCore;
+using Mapster;
 using MassTransit;
 using MassTransit.Logging;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
@@ -45,7 +46,7 @@ public static class Program
         app.Run();
     }
 
-    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    private static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
     {
         // MongoDB
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
@@ -56,8 +57,9 @@ public static class Program
         // SignalR
         services.AddSignalR();
 
-        // AutoMapper
-        services.AddAutoMapper(i => i.AddProfile<MappingProfile>());
+        // Mapster
+        services.AddMapster();
+        TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
         // MassTransit + RabbitMQ
         services.AddMassTransit(i =>
@@ -96,7 +98,6 @@ public static class Program
         services.AddHealthChecks();
         services.AddControllers();
 
-        services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<CreateExampleDtoValidator>();
 
         services.AddEndpointsApiExplorer();
@@ -110,7 +111,7 @@ public static class Program
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
-        var openTelemetryEndpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+        var openTelemetryEndpoint = new Uri(configuration["opentelemetry:endpoint"]!);
         var appResourceBuilder = ResourceBuilder.CreateDefault()
             .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName());
 
@@ -173,7 +174,7 @@ public static class Program
         app.MapHub<ApiHub>("/api-hub");
     }
 
-    private static void ConfigureLogging(ILoggingBuilder builder, IConfiguration configuration)
+    private static void ConfigureLogging(ILoggingBuilder builder, ConfigurationManager configuration)
     {
         builder.AddOpenTelemetry(configure =>
         {
@@ -184,7 +185,7 @@ public static class Program
                 .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
                 .AddOtlpExporter(opts =>
                 {
-                    opts.Endpoint = new Uri(configuration["OpenTelemetry:Endpoint"]!);
+                    opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
     }

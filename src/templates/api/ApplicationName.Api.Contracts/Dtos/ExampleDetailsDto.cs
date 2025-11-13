@@ -6,16 +6,16 @@ namespace ApplicationName.Api.Contracts.Dtos;
 public record ExampleDetailsDto
 {
     [ProtoMember(1)]
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
     [ProtoMember(2)]
-    public string Name { get; init; }
+    public required string Name { get; init; }
 
     [ProtoMember(3)]
-    public string Description { get; init; }
+    public required string Description { get; init; }
 
     [ProtoMember(4)]
-    public ExampleValueObjectDto ExampleValueObject { get; init; }
+    public required ExampleValueObjectDto ExampleValueObject { get; init; }
 
     [ProtoMember(6)]
     public int? RemoteCode { get; init; }

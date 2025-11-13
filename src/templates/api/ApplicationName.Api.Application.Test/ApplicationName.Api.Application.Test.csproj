@@ -16,9 +16,9 @@
     </PackageReference>
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="NUnit" Version="4.3.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +26,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.MongoDb" Version="8.5.5" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.5" />
+  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.0" />
+  <PackageReference Include="OpenTelemetry" Version="1.14.0" />
+  <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+  <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+  <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <ProjectReference Include="..\ApplicationName.Api.Application\ApplicationName.Api.Application.csproj" />
     <ProjectReference Include="..\ApplicationName.Api.Contracts.Test\ApplicationName.Api.Contracts.Test.csproj" />
     <ProjectReference Include="..\ApplicationName.Api\ApplicationName.Api.csproj" />

@@ -9,8 +9,9 @@ using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
-using AutoMapper;
 using FakeItEasy;
+using Mapster;
+using MapsterMapper;
 using MassTransit;
 using Microsoft.Extensions.Caching.Distributed;
 using NUnit.Framework;
@@ -50,8 +51,9 @@ public class ExampleServiceTest
         _sendEndpoint = _fixture.Freeze<ISendEndpoint>();
         A.CallTo(() => _bus.GetSendEndpoint(A<Uri>._)).Returns(_sendEndpoint);
 
-        var mappingConfig = new MapperConfiguration(cfg => { cfg.AddProfile(new MappingProfile()); });
-        _mapper = mappingConfig.CreateMapper();
+        var mapperConfig = new TypeAdapterConfig();
+        mapperConfig.Scan(typeof(MappingProfile).Assembly);
+        _mapper = new Mapper(mapperConfig);
         _fixture.Register(() => _mapper);
 
         _subjectUnderTest = _fixture.Create<ExampleService>();
@@ -279,16 +281,16 @@ public class ExampleServiceTest
 
     public static ExampleDocument GenerateDocument(IExample source)
     {
-        var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, Type.EmptyTypes);
+        var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes);
         var instance = (ExampleDocument)ci!.Invoke(null);
 
-        var mapper = new MapperConfiguration(configure =>
-        {
-            configure.ShouldMapProperty = i => i.PropertyType.IsPublic || i.PropertyType.IsNotPublic;
-            configure.CreateMap<IAggregate, DocumentBase>();
-            configure.CreateMap<IExample, ExampleDocument>();
-            configure.CreateMap<IExampleValueObject, ExampleValueObject>();
-        }).CreateMapper();
+        var config = new TypeAdapterConfig();
+        config.NewConfig<IAggregate, DocumentBase>();
+        config.NewConfig<IExample, ExampleDocument>();
+        config.NewConfig<IExampleValueObject, ExampleValueObject>()
+            // ReSharper disable once AssignNullToNotNullAttribute
+            .MapToConstructor(typeof(ExampleValueObject).GetConstructor(BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes));
+        var mapper = new Mapper(config);
 
         mapper.Map(A.Dummy<IAggregate>(), instance);
 
