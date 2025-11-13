@@ -12,7 +12,6 @@ using FluentValidation;
 using Mapster;
 using MassTransit;
 using MassTransit.Logging;
-using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -102,7 +101,6 @@ public static class Program
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddFluentValidationRulesToSwagger();
         services.AddResponseCompression();
 
         // Application
