@@ -1,27 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/src/templates/web'
-    target-branch: 'develop'
-    schedule:
-      interval: 'monthly'
-    groups:
-      angular:
-        applies-to: version-updates
-        patterns:
-          - '*'
-        update-types:
-          - 'minor'
-      angular-security:
-        applies-to: security-updates
-        patterns:
-          - '*'
-        update-types:
-          - 'minor'
-    ignore:
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
-
   - package-ecosystem: 'nuget'
     target-branch: 'develop'
     directories:
