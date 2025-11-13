@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Bson" Version="3.4.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="protobuf-net" Version="3.2.52" />
+    <PackageReference Include="MongoDB.Bson" Version="3.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="protobuf-net" Version="3.2.56" />
   </ItemGroup>
 
   <Import Project="..\..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems" Label="Shared" />
