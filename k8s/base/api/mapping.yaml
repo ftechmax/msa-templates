@@ -37,6 +37,7 @@ spec:
     methods:
       - POST
       - GET
+      - OPTIONS
     credentials: true
     headers:
       - 'x-requested-with'

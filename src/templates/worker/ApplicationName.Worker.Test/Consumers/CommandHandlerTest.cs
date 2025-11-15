@@ -22,7 +22,7 @@ public class CommandHandlerTest
 
     private IMapper _mapper;
 
-    private IApplicationService _applicationService;
+    private IExampleService _applicationService;
 
     private CommandHandler _subjectUnderTest;
 
@@ -36,7 +36,7 @@ public class CommandHandlerTest
         _mapper = new Mapper(mapperConfig);
         _fixture.Register(() => _mapper);
 
-        _applicationService = _fixture.Freeze<IApplicationService>();
+        _applicationService = _fixture.Freeze<IExampleService>();
 
         _subjectUnderTest = _fixture.Create<CommandHandler>();
     }

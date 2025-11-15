@@ -11,11 +11,6 @@ server {
         try_files $uri $uri/ /index.html =404; # this rule will redirect all pages to index.html
     }
 
-    location ^~ /config.js {
-        add_header Content-Type text/javascript;
-        return 200 'var appConfig = {};';
-    }
-
     # redirect server error pages to the static page /50x.html
     #
     error_page   500 502 503 504  /50x.html;
