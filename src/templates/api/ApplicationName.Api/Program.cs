@@ -105,7 +105,6 @@ public static class Program
 
         // Application
         services.AddScoped<IExampleService, ExampleService>();
-        services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry

@@ -1,12 +1,11 @@
 using System.Linq.Expressions;
-using System.Reflection;
-using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Projections;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
@@ -23,8 +22,6 @@ public class ExampleServiceTest
 {
     private IFixture _fixture;
 
-    private IDocumentRepository _documentRepository;
-
     private IProtoCacheRepository _protoCacheRepository;
 
     private IMapper _mapper;
@@ -40,7 +37,6 @@ public class ExampleServiceTest
     {
         _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 
-        _documentRepository = _fixture.Freeze<IDocumentRepository>();
         _protoCacheRepository = _fixture.Freeze<IProtoCacheRepository>();
 
         var queue = new Uri("queue:example");
@@ -72,7 +68,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey)).MustNotHaveHappened();
 
         result.ShouldSatisfyAllConditions(
             i => i.ShouldNotBeNull(),
@@ -82,63 +78,63 @@ public class ExampleServiceTest
     }
 
     [Test]
-    public async Task GetCollectionAsync_From_Repository()
+    public async Task GetCollectionAsync_From_Projection()
     {
         // Arrange
-        var document1 = GenerateDocument(A.Dummy<IExample>());
-        var document2 = GenerateDocument(A.Dummy<IExample>());
-        var document3 = GenerateDocument(A.Dummy<IExample>());
-        var documents = new[] { document1, document2, document3 };
+        var projection1 = _fixture.Create<ExampleProjection>();
+        var projection2 = _fixture.Create<ExampleProjection>();
+        var projection3 = _fixture.Create<ExampleProjection>();
+        var projections = new[] { projection1, projection2, projection3 };
 
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey))
             .ReturnsLazily(() => default(IEnumerable<ExampleCollectionDto>));
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._))
-            .ReturnsLazily(() => documents);
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey))
+            .ReturnsLazily(() => projections);
 
         var capturedDtos = default(IEnumerable<ExampleCollectionDto>);
-        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).Invokes(
-            (string _, IEnumerable<ExampleCollectionDto> arg1, DistributedCacheEntryOptions _) =>
+        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).Invokes(
+            (string _, IEnumerable<ExampleCollectionDto> arg1, TimeSpan? _) =>
             {
                 capturedDtos = arg1;
             });
 
-        var expectedDtos = _mapper.Map<IEnumerable<ExampleCollectionDto>>(documents);
+        var expectedDtos = _mapper.Map<IEnumerable<ExampleCollectionDto>>(projections);
 
         // Act
         var result = await _subjectUnderTest.GetCollectionAsync();
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(ApplicationConstants.ExampleCollectionCacheKey, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).MustHaveHappenedOnceExactly();
 
         capturedDtos.ShouldSatisfyAllConditions(
             i => i.ShouldNotBeNull(),
             i => i.ShouldNotBeEmpty(),
-            i => i.Count().ShouldBe(documents.Length),
+            i => i.Count().ShouldBe(projections.Length),
             i => i.ShouldBe(expectedDtos));
 
         result.ShouldSatisfyAllConditions(
             i => i.ShouldNotBeNull(),
             i => i.ShouldNotBeEmpty(),
-            i => i.Count().ShouldBe(documents.Length),
+            i => i.Count().ShouldBe(projections.Length),
             i => i.ShouldBe(expectedDtos));
     }
 
     [Test]
-    public async Task GetCollectionAsync_From_Repository_Without_Document()
+    public async Task GetCollectionAsync_From_Repository_Without_Projection()
     {
         // Arrange
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(ApplicationConstants.ExampleCollectionCacheKey)).ReturnsLazily(() => default(IEnumerable<ExampleCollectionDto>));
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).Returns([]);
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey)).Returns([]);
 
         // Act
         var result = await _subjectUnderTest.GetCollectionAsync();
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<IEnumerable<ExampleCollectionDto>>._, A<DistributedCacheEntryOptions>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<IEnumerable<ExampleCollectionDto>>._, A<TimeSpan?>._)).MustNotHaveHappened();
         A.CallTo(() => _protoCacheRepository.GetAsync<IEnumerable<ExampleCollectionDto>>(A<string>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAllAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAllAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionCacheKey)).MustHaveHappenedOnceExactly();
 
         result.ShouldSatisfyAllConditions(
             i => i.ShouldNotBeNull(),
@@ -160,7 +156,7 @@ public class ExampleServiceTest
 
         // Assert
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionByIdCacheKey(id))).MustNotHaveHappened();
 
         result.ShouldSatisfyAllConditions(
             i => i.ShouldNotBeNull(),
@@ -168,52 +164,54 @@ public class ExampleServiceTest
     }
 
     [Test]
-    public async Task GetAsync_From_Repository()
+    public async Task GetAsync_From_Projection()
     {
         // Arrange
-        var document = GenerateDocument(A.Dummy<IExample>());
-        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(document.Id);
+        var id = _fixture.Create<Guid>();
+        var projection = _fixture.Create<ExampleProjection>() with { Id = id };
+        var cacheKey = ApplicationConstants.ExampleDetailsCacheKey(id);
+        var projectionKey = ApplicationConstants.ExampleProjectionByIdCacheKey(id);
 
-        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).ReturnsLazily(() => document);
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionKey)).ReturnsLazily(() => projection);
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).Returns(default(ExampleDetailsDto));
 
         // Act
-        var result = await _subjectUnderTest.GetAsync(document.Id);
+        var result = await _subjectUnderTest.GetAsync(id);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<DistributedCacheEntryOptions>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<TimeSpan?>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(cacheKey)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(projectionKey)).MustHaveHappenedOnceExactly();
 
         result.ShouldSatisfyAllConditions(
             i => i.ShouldNotBeNull(),
             i => i.ShouldBeOfType<ExampleDetailsDto>(),
-            i => i.Id.ShouldBe(document.Id),
-            i => i.Name.ShouldBe(document.Name),
-            i => i.Description.ShouldBe(document.Description),
+            i => i.Id.ShouldBe(projection.Id),
+            i => i.Name.ShouldBe(projection.Name),
+            i => i.Description.ShouldBe(projection.Description),
             i => i.ExampleValueObject.ShouldSatisfyAllConditions(
                 j => j.ShouldNotBeNull(),
-                j => j.Code.ShouldBe(document.ExampleValueObject.Code),
-                j => j.Value.ShouldBe(document.ExampleValueObject.Value)),
-            i => i.RemoteCode.ShouldBe(document.RemoteCode));
+                j => j.Code.ShouldBe(projection.ExampleValueObject.Code),
+                j => j.Value.ShouldBe(projection.ExampleValueObject.Value)),
+            i => i.RemoteCode.ShouldBe(projection.RemoteCode));
     }
 
     [Test]
-    public async Task GetAsync_Without_Document()
+    public async Task GetAsync_Without_Projection()
     {
         // Arrange
         var id = _fixture.Create<Guid>();
 
-        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).ReturnsLazily(() => default(ExampleDocument));
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionByIdCacheKey(id))).ReturnsLazily(() => default(ExampleProjection));
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).Returns(default(ExampleDetailsDto));
 
         // Act
         var result = await _subjectUnderTest.GetAsync(id);
 
         // Assert
-        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<DistributedCacheEntryOptions>._)).MustNotHaveHappened();
+        A.CallTo(() => _protoCacheRepository.SetAsync(A<string>._, A<ExampleDetailsDto>._, A<TimeSpan?>._)).MustNotHaveHappened();
         A.CallTo(() => _protoCacheRepository.GetAsync<ExampleDetailsDto>(A<string>._)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionByIdCacheKey(id))).MustHaveHappenedOnceExactly();
 
         result.ShouldBeNull();
     }
@@ -277,23 +275,5 @@ public class ExampleServiceTest
             i => i.ShouldNotBeNull(),
             i => i.Code.ShouldBe(dto.ExampleValueObject.Code),
             i => i.Value.ShouldBe(dto.ExampleValueObject.Value));
-    }
-
-    public static ExampleDocument GenerateDocument(IExample source)
-    {
-        var ci = typeof(ExampleDocument).GetConstructor(BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes);
-        var instance = (ExampleDocument)ci!.Invoke(null);
-
-        var config = new TypeAdapterConfig();
-        config.NewConfig<IAggregate, DocumentBase>();
-        config.NewConfig<IExample, ExampleDocument>();
-        config.NewConfig<IExampleValueObject, ExampleValueObject>()
-            // ReSharper disable once AssignNullToNotNullAttribute
-            .MapToConstructor(typeof(ExampleValueObject).GetConstructor(BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes));
-        var mapper = new Mapper(config);
-
-        mapper.Map(A.Dummy<IAggregate>(), instance);
-
-        return mapper.Map(source, instance);
     }
 }
