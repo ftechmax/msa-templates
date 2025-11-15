@@ -154,7 +154,7 @@ public static class Program
             {
                 i.PreSerializeFilters.Add((doc, _) =>
                 {
-                    doc.Servers = new List<Microsoft.OpenApi.Models.OpenApiServer>
+                    doc.Servers = new List<Microsoft.OpenApi.OpenApiServer>
                     {
                         new() { Url = "/api" }
                     };
