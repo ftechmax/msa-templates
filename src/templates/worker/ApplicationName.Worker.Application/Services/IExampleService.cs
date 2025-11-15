@@ -4,7 +4,7 @@ using ApplicationName.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker.Application.Services;
 
-public interface IApplicationService
+public interface IExampleService
 {
     Task<ExampleCreated> HandleAsync(CreateExampleCommand command);
 

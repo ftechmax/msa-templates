@@ -18,5 +18,5 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     chown nginx:nginx /var/run/nginx.pid
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx default.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
+COPY --from=build --chown=nginx:nginx /app/dist/web/browser /usr/share/nginx/html
 USER nginx

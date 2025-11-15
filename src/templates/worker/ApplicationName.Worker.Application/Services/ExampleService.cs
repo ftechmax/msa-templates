@@ -6,7 +6,7 @@ using ArgDefender;
 
 namespace ApplicationName.Worker.Application.Services;
 
-public class ApplicationService(IDocumentRepository documentRepository) : IApplicationService
+public class ExampleService(IDocumentRepository documentRepository) : IExampleService
 {
     public async Task<ExampleCreated> HandleAsync(CreateExampleCommand command)
     {

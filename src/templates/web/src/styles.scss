@@ -1,1 +1,42 @@
-/* You can add global styles to this file, and also import other style files */
+// See: https://github.com/twbs/bootstrap/issues/29853#issuecomment-1765651273
+// @import "bootstrap/scss/functions";
+// @import "bootstrap/scss/variables";
+// @import "bootstrap/scss/variables-dark";
+// @import "bootstrap/scss/maps";
+// @import "bootstrap/scss/mixins";
+// @import "bootstrap/scss/utilities";
+
+// @import "bootstrap/scss/reboot";
+// @import "bootstrap/scss/grid";
+
+@use "bootstrap/scss/bootstrap" as *;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.breadcrumb {
+  li {
+    a {
+      text-decoration: none;
+    }
+  }
+}
+
+.spinner-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba($color: #ffffff, $alpha: 0.25);
+}

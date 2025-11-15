@@ -1,0 +1,8 @@
+<span class="example-pizza-party" matSnackBarLabel>
+  Something went terribly wrong.<br />
+  Provide the following code to the helpdesk: <br />
+  {{ data.traceId }}
+</span>
+<span matSnackBarActions>
+  <button mat-button matSnackBarAction (click)="snackBarRef.dismissWithAction()">OK</button>
+</span>
