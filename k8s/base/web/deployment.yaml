@@ -18,6 +18,7 @@ spec:
       annotations:
         prometheus.io.scrape: 'true'
     spec:
+      serviceAccountName: applicationname
       automountServiceAccountToken: false
       containers:
         - name: applicationname-web
