@@ -18,5 +18,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleCreatedEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleRemoteCodeSetEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Events\ExampleUpdatedEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)projections\ExampleProjection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)projections\ExampleValueObjectProjection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)projections\ProjectionBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Projections\" />
   </ItemGroup>
 </Project>

@@ -1,15 +1,17 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using ApplicationName.Shared.Projections;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts;
 using ArgDefender;
+using MapsterMapper;
 using MongoDB.Driver;
 
 namespace ApplicationName.Worker.Infrastructure;
 
 [ExcludeFromCodeCoverage]
-public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
+public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProtoCacheRepository protoCacheRepository) : IDocumentRepository
 {
     private readonly IMongoDatabase _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
 
@@ -24,7 +26,7 @@ public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
         return await cursor.SingleOrDefaultAsync();
     }
 
-    public Task UpsertAsync(ExampleDocument document)
+    public async Task UpsertAsync(ExampleDocument document)
     {
         Guard.Argument(document, nameof(document)).NotNull();
         Guard.Argument(document.Id, nameof(document.Id)).NotDefault();
@@ -41,7 +43,10 @@ public class DocumentRepository(IMongoClient mongoClient) : IDocumentRepository
             .Set(i => i.ExampleValueObject, document.ExampleValueObject)
             .Set(i => i.RemoteCode, document.RemoteCode);
 
-        return collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });
+        await collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });
+
+        var projection = mapper.Map<ExampleProjection>(document);
+        await protoCacheRepository.SetAsync($"example:projections:{document.Id:N}", projection);
     }
 
     private IMongoCollection<T> GetCollection<T>() where T : DocumentBase
