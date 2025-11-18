@@ -4,6 +4,7 @@ using System.Reflection;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
+using ApplicationName.Worker.Contracts;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using Mapster;
@@ -18,6 +19,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using StackExchange.Redis;
 
 namespace ApplicationName.Worker;
 
@@ -48,6 +50,15 @@ public static class Program
         var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
+
+        // Redis
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:connection-string"]!, true);
+        services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration["redis:connection-string"];
+            options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
+        });
 
         // Mapster
         services.AddMapster();
@@ -82,6 +93,9 @@ public static class Program
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
         services.AddScoped<IExampleService, ExampleService>();
+
+        // Background Services
+        services.AddHostedService<CacheInvalidationService>();
 
         // OpenTelemetry
         var otlpEndpoint = new Uri(configuration["opentelemetry:endpoint"]!);

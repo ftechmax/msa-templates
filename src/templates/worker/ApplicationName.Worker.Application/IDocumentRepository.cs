@@ -7,5 +7,7 @@ public interface IDocumentRepository
 {
     Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase;
 
+    Task<IEnumerable<T>> GetAllAsync<T>() where T : DocumentBase;
+
     Task UpsertAsync(ExampleDocument document);
 }

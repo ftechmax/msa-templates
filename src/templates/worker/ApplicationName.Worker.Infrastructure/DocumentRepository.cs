@@ -26,6 +26,13 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
         return await cursor.SingleOrDefaultAsync();
     }
 
+    public async Task<IEnumerable<T>> GetAllAsync<T>() where T : DocumentBase
+    {
+        var collection = GetCollection<T>();
+        var cursor = await collection.FindAsync(FilterDefinition<T>.Empty);
+        return await cursor.ToListAsync();
+    }
+
     public async Task UpsertAsync(ExampleDocument document)
     {
         Guard.Argument(document, nameof(document)).NotNull();
@@ -46,7 +53,7 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
         await collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });
 
         var projection = mapper.Map<ExampleProjection>(document);
-        await protoCacheRepository.SetAsync($"example:projections:{document.Id:N}", projection);
+        await protoCacheRepository.SetAsync(ApplicationConstants.ExampleProjectionByIdCacheKey(document.Id), projection);
     }
 
     private IMongoCollection<T> GetCollection<T>() where T : DocumentBase
