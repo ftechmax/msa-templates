@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: applicationname-valkey-config
+data:
+  valkey.conf: |
+    # Enable keyspace notifications for expired, evicted, and generic events
+    # E = Keyspace events (published with __keyspace@<db>__ prefix)
+    # g = Generic commands (DEL, EXPIRE, RENAME, etc.)
+    # x = Expired events (generated when a key expires)
+    notify-keyspace-events "Egx"
+    
+    # Configure default user ACL permissions
+    # on = enable the user
+    # nopass = no password required
+    # allkeys = access to all keys
+    # &* = access to all pub/sub channels (required for cache invalidation)
+    # +@all = all commands allowed
+    # -FLUSHALL -FLUSHDB = explicitly deny these destructive commands
+    user default on nopass allkeys &* +@all -FLUSHALL -FLUSHDB

@@ -23,7 +23,6 @@ spec:
       containers:
         - name: applicationname-worker
           image: applicationname-worker:latest
-          imagePullPolicy: Always
           securityContext:
             runAsNonRoot: true
             runAsUser: 10000
@@ -70,3 +69,38 @@ spec:
             requests:
               memory: 30Mi
               cpu: 10m
+        - name: valkey
+          image: valkey/valkey:9.0.0-alpine
+          command:
+            - valkey-server
+            - /etc/valkey/valkey.conf
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - all
+          ports:
+            - name: valkey
+              containerPort: 6379
+          volumeMounts:
+            - name: valkey-data
+              mountPath: /data
+            - name: valkey-config
+              mountPath: /etc/valkey
+          # resources:
+          #   limits:
+          #     memory: 128Mi
+          #     cpu: 100m
+          #   requests:
+          #     memory: 64Mi
+          #     cpu: 50m
+      volumes:
+        - name: valkey-data
+          emptyDir: {}
+        - name: valkey-config
+          configMap:
+            name: valkey-config

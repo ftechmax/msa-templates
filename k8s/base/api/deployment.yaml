@@ -57,8 +57,6 @@ spec:
                 secretKeyRef:
                   name: '{{MONGODB-SECRET-NAME}}'
                   key: connectionString.standard
-            - name: redis__connection-string
-              value: '{{REDIS-SERVICE}}'
           livenessProbe:
             httpGet:
               path: /healthz

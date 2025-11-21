@@ -51,13 +51,17 @@ public static class Program
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
 
-        // Redis
-        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:connection-string"]!, true);
-        services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
+        // Valkey
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
+        redisConfiguration.AbortOnConnectFail = false;
+        redisConfiguration.ConnectRetry = 5;
+        redisConfiguration.ConnectTimeout = 5000;
+        redisConfiguration.SyncTimeout = 5000;
+
+        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration["redis:connection-string"];
-            options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
+            options.ConfigurationOptions = redisConfiguration;
         });
 
         // Mapster

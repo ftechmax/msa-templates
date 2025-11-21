@@ -21,10 +21,12 @@ public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : I
         return ProtoBuf.Serializer.Deserialize<T>(ms);
     }
 
-    public async Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions options = default) where T : class
+    public async Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions? options = null) where T : class
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
         Guard.Argument(obj).NotNull();
+
+        options ??= new DistributedCacheEntryOptions();
 
         await using var ms = new MemoryStream();
 

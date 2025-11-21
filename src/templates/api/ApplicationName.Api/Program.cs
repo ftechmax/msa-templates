@@ -84,13 +84,13 @@ public static class Program
             });
         });
 
-        // Redis
-        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:connection-string"]!, true);
+        // Valkey
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
         services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration["redis:connection-string"];
-            options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
+            options.Configuration = configuration["valkey:connection-string"];
+            ////options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
         });
 
         // Api

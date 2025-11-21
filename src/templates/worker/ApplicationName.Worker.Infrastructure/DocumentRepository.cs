@@ -33,6 +33,50 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
         return await cursor.ToListAsync();
     }
 
+    public async Task<IEnumerable<DocumentBase>> GetAllByTypeAsync(Type documentType)
+    {
+        Guard.Argument(documentType, nameof(documentType)).NotNull();
+
+        // Use reflection to call GetAllAsync<T> with the concrete type
+        var getAllMethod = GetType()
+            .GetMethod(nameof(GetAllAsync))!
+            .MakeGenericMethod(documentType);
+
+        var task = (Task)getAllMethod.Invoke(this, null)!;
+        await task.ConfigureAwait(false);
+        
+        // Get the result from the completed task
+        var resultProperty = task.GetType().GetProperty("Result")!;
+        var result = (IEnumerable<DocumentBase>)resultProperty.GetValue(task)!;
+        return result;
+    }
+
+    public async Task<DocumentBase?> GetByIdAndTypeAsync(Guid id, Type documentType)
+    {
+        Guard.Argument(id, nameof(id)).NotDefault();
+        Guard.Argument(documentType, nameof(documentType)).NotNull();
+
+        // Build expression: d => d.Id == id
+        var parameter = Expression.Parameter(documentType, "d");
+        var idProperty = Expression.Property(parameter, nameof(DocumentBase.Id));
+        var idValue = Expression.Constant(id);
+        var equality = Expression.Equal(idProperty, idValue);
+        var lambda = Expression.Lambda(equality, parameter);
+
+        // Use reflection to call GetAsync<T> with the concrete type
+        var getMethod = GetType()
+            .GetMethod(nameof(GetAsync))!
+            .MakeGenericMethod(documentType);
+
+        var task = (Task)getMethod.Invoke(this, [lambda])!;
+        await task.ConfigureAwait(false);
+        
+        // Get the result from the completed task
+        var resultProperty = task.GetType().GetProperty("Result")!;
+        var result = (DocumentBase?)resultProperty.GetValue(task);
+        return result;
+    }
+
     public async Task UpsertAsync(ExampleDocument document)
     {
         Guard.Argument(document, nameof(document)).NotNull();

@@ -9,5 +9,9 @@ public interface IDocumentRepository
 
     Task<IEnumerable<T>> GetAllAsync<T>() where T : DocumentBase;
 
+    Task<IEnumerable<DocumentBase>> GetAllByTypeAsync(Type documentType);
+
+    Task<DocumentBase?> GetByIdAndTypeAsync(Guid id, Type documentType);
+
     Task UpsertAsync(ExampleDocument document);
 }
