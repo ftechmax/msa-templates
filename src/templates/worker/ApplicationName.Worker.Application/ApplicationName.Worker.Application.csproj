@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="ArgDefender" Version="1.1.0" />
-    <PackageReference Include="MassTransit.Abstractions" Version="8.5.5" />
-    <PackageReference Include="MongoDB.Bson" Version="3.5.0" />
+    <PackageReference Include="MassTransit.Abstractions" Version="8.5.7" />
+    <PackageReference Include="MongoDB.Bson" Version="3.5.2" />
   </ItemGroup>
 
   <ItemGroup>
