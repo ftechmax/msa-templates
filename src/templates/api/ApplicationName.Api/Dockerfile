@@ -6,7 +6,7 @@ ENV COMPlus_EnableDiagnostics=0
 RUN addgroup --gid 20000 dotnet && adduser --uid 10000 --disabled-password --ingroup dotnet dotnet
 ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
 COPY api/ api/
 COPY shared/ shared/
