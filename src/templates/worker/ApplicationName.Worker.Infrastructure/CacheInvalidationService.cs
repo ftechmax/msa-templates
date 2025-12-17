@@ -65,10 +65,9 @@ public class CacheInvalidationService(
         {
             logger.LogInformation("Initializing projections for all registered document types...");
 
-            var mappings = CacheProjectionRegistry.GetMappings();
             var totalCount = 0;
 
-            foreach (var mapping in mappings)
+            foreach (var mapping in CacheProjectionRegistry.Mappings)
             {
                 totalCount += await RebuildProjectionsForDocumentTypeAsync(mapping);
             }
@@ -138,7 +137,7 @@ public class CacheInvalidationService(
                 return; 
             }
 
-            var mapping = CacheProjectionRegistry.GetMappings().FirstOrDefault(i => string.Equals(i.CacheKeyPrefix, cacheKeyPrefix, StringComparison.Ordinal));
+            var mapping = CacheProjectionRegistry.Mappings.FirstOrDefault(i => string.Equals(i.CacheKeyPrefix, cacheKeyPrefix, StringComparison.Ordinal));
             if (mapping == null)
             { 
                 return; 

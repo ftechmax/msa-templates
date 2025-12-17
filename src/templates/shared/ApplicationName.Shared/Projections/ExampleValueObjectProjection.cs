@@ -7,7 +7,7 @@ namespace ApplicationName.Shared.Projections;
 public record ExampleValueObjectProjection : IExampleValueObject
 {
     [ProtoMember(1)]
-    public string Code { get; init; }
+    public required string Code { get; init; }
 
     [ProtoMember(2)]
     public double Value { get; init; }

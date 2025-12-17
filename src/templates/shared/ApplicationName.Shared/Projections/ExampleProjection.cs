@@ -13,7 +13,7 @@ public record ExampleProjection : ProjectionBase, IExample
     public required string Description { get; init; }
 
     [ProtoMember(3)]
-    public ExampleValueObjectProjection ExampleValueObject { get; init; }
+    public required ExampleValueObjectProjection ExampleValueObject { get; init; }
 
     [ProtoMember(4)]
     public int? RemoteCode { get; init; }

@@ -1,5 +1,4 @@
 using ApplicationName.Shared.Projections;
-using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts;
 
@@ -9,20 +8,13 @@ public record CacheProjectionMapping(Type DocumentType, Type ProjectionType, str
 
 /// <summary>
 /// Static registry for cache projection mappings.
-/// Add new document-projection mappings here.
 /// </summary>
 public static class CacheProjectionRegistry
 {
-    private static readonly List<CacheProjectionMapping> Mappings =
+    public static readonly IReadOnlyCollection<CacheProjectionMapping> Mappings = Array.AsReadOnly(
     [
         new CacheProjectionMapping(typeof(ExampleDocument), typeof(ExampleProjection), ApplicationConstants.ExampleCacheKey)
 
-        // Add more mappings here for other document types        
-    ];
-
-    public static IEnumerable<CacheProjectionMapping> GetMappings()
-    {
-        return Mappings;
-    }
+        // Add more mappings here for other document types
+    ]);
 }
-
