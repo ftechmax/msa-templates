@@ -57,11 +57,15 @@ public static class Program
         redisConfiguration.ConnectRetry = 5;
         redisConfiguration.ConnectTimeout = 5000;
         redisConfiguration.SyncTimeout = 5000;
+        redisConfiguration.KeepAlive = 30;
+        redisConfiguration.Protocol = RedisProtocol.Resp3;
 
-        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
+        var multiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
+        services.AddSingleton<IConnectionMultiplexer>(_ => multiplexer);
         services.AddStackExchangeRedisCache(options =>
         {
             options.ConfigurationOptions = redisConfiguration;
+            options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
         });
 
         // Mapster
