@@ -16,7 +16,7 @@ using Shouldly;
 
 namespace ApplicationName.Worker.Test.Consumers;
 
-public class CommandHandlerTest
+public class ExampleCommandHandlerTest
 {
     private IFixture _fixture;
 
@@ -24,7 +24,7 @@ public class CommandHandlerTest
 
     private IExampleService _applicationService;
 
-    private CommandHandler _subjectUnderTest;
+    private ExampleCommandHandler _subjectUnderTest;
 
     [SetUp]
     public void Setup()
@@ -38,7 +38,7 @@ public class CommandHandlerTest
 
         _applicationService = _fixture.Freeze<IExampleService>();
 
-        _subjectUnderTest = _fixture.Create<CommandHandler>();
+        _subjectUnderTest = _fixture.Create<ExampleCommandHandler>();
     }
 
     [Test]

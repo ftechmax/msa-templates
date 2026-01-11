@@ -60,7 +60,7 @@ public static class Program
             EndpointConvention.Map<SetExampleRemoteCodeCommand>(uri);
 
             i.AddConsumer<ExternalEventHandler>();
-            i.AddConsumer<CommandHandler>();
+            i.AddConsumer<ExampleCommandHandler>();
 
             i.UsingRabbitMq((ctx, cfg) =>
             {
@@ -73,7 +73,7 @@ public static class Program
                 cfg.ReceiveEndpoint($"{typeof(Program).Namespace}", e =>
                 {
                     e.ConfigureConsumer<ExternalEventHandler>(ctx);
-                    e.ConfigureConsumer<CommandHandler>(ctx);
+                    e.ConfigureConsumer<ExampleCommandHandler>(ctx);
                 });
             });
         });
