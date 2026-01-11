@@ -25,7 +25,7 @@ public class CacheInvalidationService(
     {
         SingleReader = true,
         SingleWriter = false,
-        FullMode = BoundedChannelFullMode.DropOldest
+        FullMode = BoundedChannelFullMode.DropWrite
     });
 
     private readonly Dictionary<string, CacheProjectionMapping> _mappingsByPrefix =
@@ -59,22 +59,33 @@ public class CacheInvalidationService(
 
     private void OnKeyEvent(RedisChannel channel, RedisValue keyValue)
     {
-        var key = keyValue.ToString();
+        _ = TryEnqueueKey(keyValue.ToString());
+    }
 
+    internal bool TryEnqueueKey(string key)
+    {
         if (!key.StartsWith(ProjectionPrefix, StringComparison.Ordinal))
         {
-            return;
+            return false;
         }
 
         if (!_queuedOrRunning.TryAdd(key, 0))
         {
-            return;
+            return false;
         }
 
-        if (!_queue.Writer.TryWrite(key))
+        if (_queue.Writer.TryWrite(key))
         {
-            _queuedOrRunning.TryRemove(key, out _);
+            return true;
         }
+
+        _queuedOrRunning.TryRemove(key, out _);
+        return false;
+    }
+
+    internal bool IsQueuedOrRunning(string key)
+    {
+        return _queuedOrRunning.ContainsKey(key);
     }
 
     private async Task ProcessQueueAsync(CancellationToken stoppingToken)
@@ -127,7 +138,7 @@ public class CacheInvalidationService(
             var projection = mapper.Map(document, mapping.DocumentType, mapping.ProjectionType);
             var cacheKey = $"{ProjectionPrefix}{mapping.CacheKeyPrefix}:{document.Id:N}";
 
-            await protoCacheRepository.SetAsync(cacheKey, projection); ////, mapping.ProjectionType);
+            await protoCacheRepository.SetAsync(cacheKey, projection);
             count++;
         }
 
@@ -162,12 +173,12 @@ public class CacheInvalidationService(
         stoppingToken.ThrowIfCancellationRequested();
 
         var projection = mapper.Map(document, mapping.DocumentType, mapping.ProjectionType);
-        await protoCacheRepository.SetAsync(cacheKey, projection); ////, mapping.ProjectionType);
+        await protoCacheRepository.SetAsync(cacheKey, projection);
 
         logger.LogInformation("Rebuilt projection {Key}", cacheKey);
     }
 
-    private static bool TryParseProjectionKey(string key, out string cacheKeyPrefix, out Guid id)
+    internal static bool TryParseProjectionKey(string key, out string cacheKeyPrefix, out Guid id)
     {
         cacheKeyPrefix = "";
         id = Guid.Empty;

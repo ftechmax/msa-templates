@@ -8,5 +8,7 @@ public interface IProtoCacheRepository
 
     Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions options = default) where T : class;
 
+    Task SetAsync(string key, object obj, DistributedCacheEntryOptions options = default);
+
     Task RemoveAsync(string key);
 }

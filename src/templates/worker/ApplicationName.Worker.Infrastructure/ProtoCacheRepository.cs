@@ -36,6 +36,21 @@ public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : I
         await distributedCache.SetAsync(key, ms.ToArray(), options);
     }
 
+    public async Task SetAsync(string key, object obj, DistributedCacheEntryOptions? options = null)
+    {
+        Guard.Argument(key).NotNull().NotWhiteSpace();
+        Guard.Argument(obj).NotNull();
+
+        options ??= new DistributedCacheEntryOptions();
+
+        await using var ms = new MemoryStream();
+
+        ProtoBuf.Serializer.NonGeneric.Serialize(ms, obj);
+        ms.Position = 0;
+
+        await distributedCache.SetAsync(key, ms.ToArray(), options);
+    }
+
     public Task RemoveAsync(string key)
     {
         return distributedCache.RemoveAsync(key);
