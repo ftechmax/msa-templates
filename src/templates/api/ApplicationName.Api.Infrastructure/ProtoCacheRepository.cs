@@ -48,6 +48,11 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
         var resultSet = await Database.StringGetAsync([.. keys]);
         foreach (var value in resultSet)
         {
+            if (value == default || value.IsNull)
+            {
+                continue;
+            }
+
             await using var ms = new MemoryStream(value);
             results.Add(ProtoBuf.Serializer.Deserialize<T>(ms));
         }

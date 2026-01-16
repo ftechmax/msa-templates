@@ -6,11 +6,7 @@ param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
     [string]$RabbitMqUserSecret,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
-    [string]$MongoDbUserSecret,
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
-    [string]$RedisServiceName,
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
-    [string]$RedisServiceNamespace
+    [string]$MongoDbUserSecret
 )
 
 # Prepare service name
@@ -46,7 +42,6 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
         (Get-Content -Path $filePath) `
             -creplace '{{RABBITMQ-SECRET-NAME}}', $RabbitMqUserSecret `
             -creplace '{{MONGODB-SECRET-NAME}}', $MongoDbUserSecret `
-            -creplace '{{REDIS-SERVICE}}', "$RedisServiceName.$RedisServiceNamespace.svc" `
             -creplace 'applicationname', $kebabCaseServiceName `
             -creplace 'ApplicationName', $ServiceName `
         | Set-Content -Path $filePath

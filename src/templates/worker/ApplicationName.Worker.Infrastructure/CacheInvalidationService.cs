@@ -193,8 +193,13 @@ public class CacheInvalidationService(
         var colon = rest.IndexOf(':');
         if (colon <= 0) return false;
 
+        if (!Guid.TryParse(rest[(colon + 1)..], out id))
+        {
+            return false;
+        }
+
         cacheKeyPrefix = rest[..colon].ToString();
-        return Guid.TryParse(rest[(colon + 1)..], out id);
+        return true;
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

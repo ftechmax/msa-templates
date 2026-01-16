@@ -10,7 +10,7 @@ public static class ApplicationConstants
 
     public static string ExampleDetailsCacheKey(Guid id) => $"{ExampleCacheKey}:details:{id:N}";
 
-    public static string ExampleProjectionCacheKey => $"projections:{ExampleCacheKey}:*";
+    public static string ExampleProjectionCacheKey => $"projections:{ExampleCacheKey}";
 
     public static string ExampleProjectionByIdCacheKey(Guid id) => $"projections:{ExampleCacheKey}:{id:N}";
 }
