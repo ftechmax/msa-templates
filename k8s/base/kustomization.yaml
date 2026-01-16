@@ -6,3 +6,4 @@ resources:
   - ./worker
   - ./api
   - ./web
+  - ./cache
