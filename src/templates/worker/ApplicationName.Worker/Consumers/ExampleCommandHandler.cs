@@ -7,7 +7,7 @@ using MassTransit;
 
 namespace ApplicationName.Worker.Consumers;
 
-public class CommandHandler(IExampleService applicationService, IMapper mapper) :
+public class ExampleCommandHandler(IExampleService applicationService, IMapper mapper) :
     IConsumer<CreateExampleCommand>,
     IConsumer<UpdateExampleCommand>,
     IConsumer<SetExampleRemoteCodeCommand>
