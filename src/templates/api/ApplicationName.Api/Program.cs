@@ -86,11 +86,19 @@ public static class Program
 
         // Valkey
         var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
-        services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
+        redisConfiguration.AbortOnConnectFail = false;
+        redisConfiguration.ConnectRetry = 5;
+        redisConfiguration.ConnectTimeout = 5000;
+        redisConfiguration.SyncTimeout = 5000;
+        redisConfiguration.KeepAlive = 30;
+        redisConfiguration.Protocol = RedisProtocol.Resp3;
+
+        var multiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
+        services.AddSingleton<IConnectionMultiplexer>(_ => multiplexer);
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration["valkey:connection-string"];
-            ////options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
+            options.ConfigurationOptions = redisConfiguration;
+            options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
         });
 
         // Api
