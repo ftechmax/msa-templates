@@ -8,6 +8,8 @@ namespace ApplicationName.Api.Infrastructure;
 [ExcludeFromCodeCoverage]
 public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultiplexer) : IProtoCacheRepository
 {
+    private const string RedisCacheDataField = "data";
+
     private IDatabase Database => connectionMultiplexer.GetDatabase();
 
     private IServer[] Servers => connectionMultiplexer.GetServers();
@@ -17,7 +19,12 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
         Guard.Argument(key).NotNull().NotWhiteSpace();
 
         var bytes = await Database.StringGetAsync(key);
-        if (bytes == default)
+        if (bytes == default || bytes.IsNull)
+        {
+            bytes = await Database.HashGetAsync(key, RedisCacheDataField);
+        }
+
+        if (bytes == default || bytes.IsNull)
         {
             return default;
         }
@@ -46,8 +53,14 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
         }
 
         var resultSet = await Database.StringGetAsync([.. keys]);
-        foreach (var value in resultSet)
+        for (var i = 0; i < resultSet.Length; i++)
         {
+            var value = resultSet[i];
+            if (value == default || value.IsNull)
+            {
+                value = await Database.HashGetAsync(keys[i], RedisCacheDataField);
+            }
+
             if (value == default || value.IsNull)
             {
                 continue;
