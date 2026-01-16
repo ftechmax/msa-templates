@@ -34,6 +34,8 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        ConfigureConfiguration(builder);
+
         ConfigureLogging(builder.Logging, builder.Configuration);
 
         ConfigureServices(builder.Services, builder.Configuration);
@@ -84,13 +86,21 @@ public static class Program
             });
         });
 
-        // Redis
-        var redisConfiguration = ConfigurationOptions.Parse(configuration["redis:connection-string"]!, true);
-        services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfiguration));
+        // Valkey
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
+        redisConfiguration.AbortOnConnectFail = false;
+        redisConfiguration.ConnectRetry = 5;
+        redisConfiguration.ConnectTimeout = 5000;
+        redisConfiguration.SyncTimeout = 5000;
+        redisConfiguration.KeepAlive = 30;
+        redisConfiguration.Protocol = RedisProtocol.Resp3;
+
+        var multiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
+        services.AddSingleton<IConnectionMultiplexer>(_ => multiplexer);
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration["redis:connection-string"];
-            options.InstanceName = $"{ApplicationConstants.ApplicationKey}:";
+            options.ConfigurationOptions = redisConfiguration;
+            options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
         });
 
         // Api
@@ -105,7 +115,6 @@ public static class Program
 
         // Application
         services.AddScoped<IExampleService, ExampleService>();
-        services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
 
         // OpenTelemetry
@@ -186,5 +195,37 @@ public static class Program
                     opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
+    }
+
+    private static void ConfigureConfiguration(WebApplicationBuilder builder)
+    {
+        if (!builder.Environment.IsDevelopment())
+        {
+            return;
+        }
+
+        // Read appsettings-debug.env and inject each line as environment variable
+        var envFile = Path.Combine("../appsettings-debug.env");
+        if (File.Exists(envFile))
+        {
+            foreach (var line in File.ReadAllLines(envFile))
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("#")) continue;
+                var separatorIndex = trimmed.IndexOf('=');
+                if (separatorIndex > 0)
+                {
+                    var key = trimmed.Substring(0, separatorIndex).Trim();
+                    var value = trimmed.Substring(separatorIndex + 1).Trim();
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        Environment.SetEnvironmentVariable(key, value);
+                    }
+                }
+            }
+        }
+
+        // Read environment variables into the configuration
+        builder.Configuration.AddEnvironmentVariables();
     }
 }

@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using ApplicationName.Shared.Events;
+using ApplicationName.Shared.Projections;
+using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
 using Mapster;
@@ -17,5 +19,10 @@ public class MappingProfile : IRegister
         config.NewConfig<ExampleUpdated, ExampleUpdatedEvent>();
         config.NewConfig<ExampleValueObjectEvent, ExampleValueObjectEventData>();
         config.NewConfig<ExampleRemoteCodeSet, ExampleRemoteCodeSetEvent>();
+
+        // Projections
+        config.NewConfig<DocumentBase, ProjectionBase>();
+        config.NewConfig<ExampleDocument, ExampleProjection>();
+        config.NewConfig<ExampleValueObject, ExampleValueObjectProjection>();
     }
 }

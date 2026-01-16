@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using ApplicationName.Api.Application.Documents;
 using ApplicationName.Api.Contracts.Dtos;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
+using ApplicationName.Shared.Projections;
 using Mapster;
 
 namespace ApplicationName.Api;
@@ -18,8 +18,8 @@ public class MappingProfile : IRegister
         config.NewConfig<ExampleValueObjectDto, ExampleValueObjectEventData>();
 
         // Application -> API
-        config.NewConfig<ExampleDocument, ExampleCollectionDto>();
-        config.NewConfig<ExampleDocument, ExampleDetailsDto>();
-        config.NewConfig<ExampleValueObject, ExampleValueObjectDto>();
+        config.NewConfig<ExampleProjection, ExampleCollectionDto>();
+        config.NewConfig<ExampleProjection, ExampleDetailsDto>();
+        config.NewConfig<ExampleValueObjectProjection, ExampleValueObjectDto>();
     }
 }

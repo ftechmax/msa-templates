@@ -57,8 +57,6 @@ Using the script
 -ServiceName AwesomeApp `
 -RabbitMqUserSecret rabbitmq-default-user `
 -MongoDbUserSecret mongodb-server-admin-admin `
--RedisServiceName redis `
--RedisServiceNamespace redis-system `
 -DestinationFolder c:/git
 ```
 

@@ -8,12 +8,23 @@
 
   <ItemGroup>
     <PackageReference Include="ArgDefender" Version="1.1.0" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
     <PackageReference Include="MongoDB.Bson" Version="3.5.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.5.0" />
+    <PackageReference Include="protobuf-net" Version="3.2.56" />
+    <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ApplicationName.Worker.Application\ApplicationName.Worker.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>ApplicationName.Worker.Test</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: applicationname-cache
+  labels:
+    app: applicationname-cache
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: applicationname-cache
+  template:
+    metadata:
+      labels:
+        app: applicationname-cache
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: valkey
+          image: valkey/valkey:9.0.0-alpine
+          command:
+            - valkey-server
+            - /etc/valkey/valkey.conf
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - all
+          ports:
+            - name: valkey
+              containerPort: 6379
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          volumeMounts:
+            - name: valkey-data
+              mountPath: /data
+            - name: valkey-config
+              mountPath: /etc/valkey
+          # resources:
+          #   limits:
+          #     memory: 128Mi
+          #     cpu: 100m
+          #   requests:
+          #     memory: 64Mi
+          #     cpu: 50m
+      volumes:
+        - name: valkey-data
+          emptyDir: {}
+        - name: valkey-config
+          configMap:
+            name: applicationname-valkey-config

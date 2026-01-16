@@ -4,6 +4,7 @@ using System.Reflection;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
+using ApplicationName.Worker.Contracts;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using Mapster;
@@ -18,6 +19,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using StackExchange.Redis;
 
 namespace ApplicationName.Worker;
 
@@ -29,6 +31,8 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args);
+
+        builder.ConfigureAppConfiguration(ConFigureConfiguration);
 
         builder.ConfigureLogging(ConfigureLogging);
 
@@ -48,6 +52,23 @@ public static class Program
         var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
         clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
         services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
+
+        // Valkey
+        var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
+        redisConfiguration.AbortOnConnectFail = false;
+        redisConfiguration.ConnectRetry = 5;
+        redisConfiguration.ConnectTimeout = 5000;
+        redisConfiguration.SyncTimeout = 5000;
+        redisConfiguration.KeepAlive = 30;
+        redisConfiguration.Protocol = RedisProtocol.Resp3;
+
+        var multiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
+        services.AddSingleton<IConnectionMultiplexer>(_ => multiplexer);
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.ConfigurationOptions = redisConfiguration;
+            options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
+        });
 
         // Mapster
         services.AddMapster();
@@ -80,7 +101,11 @@ public static class Program
 
         // Application
         services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
         services.AddScoped<IExampleService, ExampleService>();
+
+        // Background Services
+        services.AddHostedService<CacheInvalidationService>();
 
         // OpenTelemetry
         var otlpEndpoint = new Uri(configuration["opentelemetry:endpoint"]!);
@@ -122,5 +147,37 @@ public static class Program
                     opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
+    }
+
+    private static void ConFigureConfiguration(HostBuilderContext context, IConfigurationBuilder config)
+    {
+        if (!context.HostingEnvironment.IsDevelopment())
+        {
+            return;
+        }
+
+        // Read appsettings-debug.env and inject each line as environment variable
+        var envFile = Path.Combine("../appsettings-debug.env");
+        if (File.Exists(envFile))
+        {
+            foreach (var line in File.ReadAllLines(envFile))
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("#")) continue;
+                var separatorIndex = trimmed.IndexOf('=');
+                if (separatorIndex > 0)
+                {
+                    var key = trimmed.Substring(0, separatorIndex).Trim();
+                    var value = trimmed.Substring(separatorIndex + 1).Trim();
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        Environment.SetEnvironmentVariable(key, value);
+                    }
+                }
+            }
+        }
+
+        // Read environment variables into the configuration
+        config.AddEnvironmentVariables();
     }
 }
