@@ -56,7 +56,6 @@ Using the script
 .\generator.ps1 `
 -ServiceName AwesomeApp `
 -RabbitMqUserSecret rabbitmq-default-user `
--MongoDbUserSecret mongodb-server-admin-admin `
 -DestinationFolder c:/git
 ```
 
@@ -74,12 +73,14 @@ dotnet new msa-web -n Awesome -o web
 
 ## What you get
 
-These templates are intended to be used together as a small “vertical slice” of a message-driven system:
+These templates are intended to be used together as a "vertical slice" of a message-driven system:
 
 - **Shared**: contracts and shared abstractions used across services within the same domain.
 - **Worker**: consumes commands and external events, applies business logic, persists state, and publishes domain events.
 - **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through SignalR.
 - **Web**: a blank Angular Next frontend scaffolded to work with the API.
+- **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster.
+- **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
 
 The templates come with sensible defaults for:
 

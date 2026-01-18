@@ -52,11 +52,6 @@ spec:
                 secretKeyRef:
                   name: '{{RABBITMQ-SECRET-NAME}}'
                   key: password
-            - name: mongodb__connection-string
-              valueFrom:
-                secretKeyRef:
-                  name: '{{MONGODB-SECRET-NAME}}'
-                  key: connectionString.standard
             - name: valkey__connection-string
               value: 'applicationname-cache:6379'
           livenessProbe:

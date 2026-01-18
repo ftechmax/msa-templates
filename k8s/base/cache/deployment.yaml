@@ -45,13 +45,13 @@ spec:
               mountPath: /data
             - name: valkey-config
               mountPath: /etc/valkey
-          # resources:
-          #   limits:
-          #     memory: 128Mi
-          #     cpu: 100m
-          #   requests:
-          #     memory: 64Mi
-          #     cpu: 50m
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 100m
+            requests:
+              memory: 3Mi
+              cpu: 5m
       volumes:
         - name: valkey-data
           emptyDir: {}

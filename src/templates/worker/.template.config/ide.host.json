@@ -16,13 +16,6 @@
         "text": "The name of the RabbitMQ secret. Run `kubectl get secrets` on your cluster to find it"
       },
       "isVisible": true
-    },
-    {
-      "id": "MongoDbSecret",
-      "name": {
-        "text": "The name of the MongoDB secret. Run `kubectl get secrets` on your cluster to find it"
-      },
-      "isVisible": true
     }
   ]
 }

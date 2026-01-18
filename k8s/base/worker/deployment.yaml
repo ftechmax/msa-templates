@@ -35,6 +35,9 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: applicationname-user
           env:
             - name: rabbitmq__host
               valueFrom:
@@ -52,10 +55,7 @@ spec:
                   name: '{{RABBITMQ-SECRET-NAME}}'
                   key: password
             - name: mongodb__connection-string
-              valueFrom:
-                secretKeyRef:
-                  name: '{{MONGODB-SECRET-NAME}}'
-                  key: connectionString.standard
+              value: 'mongodb://$(database_username):$(database_password)@ferretdb.ferretdb-system.svc:27017/'
             - name: valkey__connection-string
               value: 'applicationname-cache:6379'
           livenessProbe:

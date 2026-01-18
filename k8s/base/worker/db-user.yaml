@@ -1,0 +1,11 @@
+---
+apiVersion: k8s.ftechmax.net/v1alpha1
+kind: FerretDbUser
+metadata:
+  name: applicationname-user
+spec:
+  database: applicationname
+  secret: applicationname-user
+  roles:
+    - readWrite
+    - dbAdmin

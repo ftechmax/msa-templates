@@ -4,9 +4,7 @@ param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
     [string]$ServiceName,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
-    [string]$RabbitMqUserSecret,
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
-    [string]$MongoDbUserSecret
+    [string]$RabbitMqUserSecret
 )
 
 # Prepare service name
@@ -41,9 +39,43 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
         
         (Get-Content -Path $filePath) `
             -creplace '{{RABBITMQ-SECRET-NAME}}', $RabbitMqUserSecret `
-            -creplace '{{MONGODB-SECRET-NAME}}', $MongoDbUserSecret `
             -creplace 'applicationname', $kebabCaseServiceName `
             -creplace 'ApplicationName', $ServiceName `
         | Set-Content -Path $filePath
     }
 }
+
+# Create krun.json
+$krunJsonPath = (Join-Path -Path $ProjectFolder -ChildPath 'krun.json')
+$krunJsonContent = @'
+[
+    {
+        "name": "applicationname-worker",
+        "path": "src/worker",
+        "dockerfile": "ApplicationName.Worker",
+        "context": "src/",
+        "intercept_port": 5001
+    },
+    {
+        "name": "applicationname-api",
+        "path": "src/api",
+        "dockerfile": "ApplicationName.Api",
+        "context": "src/",
+        "intercept_port": 5000
+    },
+    {
+        "name": "applicationname-web",
+        "path": "src/web",
+        "dockerfile": ".",
+        "context": "src/web"
+    }
+]
+'@
+
+$krunJsonContent = $krunJsonContent `
+    -creplace 'applicationname', $kebabCaseServiceName `
+    -creplace 'ApplicationName', $ServiceName
+
+$krunJsonContent | Set-Content -Path $krunJsonPath
+Write-Host "Created krun.json: $krunJsonPath"
+
