@@ -59,17 +59,21 @@ Using the script
 -DestinationFolder c:/git
 ```
 
-Or manually
+This will create a folder `c:/git/awesome-app` that contains the worker, API, web, and shared projects, along with Kubernetes manifests to deploy them.
+
+### Gateway configuration
+
+The Kubernetes Gateway API HTTPRoutes in the generated k8s manifests reference an existing Istio Gateway (typically a single shared LoadBalancer per cluster). You can override the target Gateway using optional parameters when running the generator:
 
 ```console
-mkdir -p c:/git/awesome/src
-cp ./k8s c:/git/awesome/
-cd c:/git/awesome/src
-dotnet new msa-shared -n Awesome -o shared
-dotnet new msa-worker -n Awesome -o worker
-dotnet new msa-api -n Awesome -o api
-dotnet new msa-web -n Awesome -o web
+-GatewayNamespace istio-ingress `
+-GatewayName gateway
 ```
+
+Defaults are:
+
+- GatewayNamespace: istio-ingress
+- GatewayName: gateway
 
 ## What you get
 

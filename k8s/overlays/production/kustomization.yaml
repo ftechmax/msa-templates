@@ -4,6 +4,14 @@ kind: Kustomization
 namespace: default
 resources:
   - ./../../base
+patches:
+  - target:
+      kind: HTTPRoute
+    patch: |-
+      - op: replace
+        path: /spec/hostnames
+        value:
+          - applicationname.{{DOMAIN}}
 images:
   - name: applicationname-worker
     newName: '{{REGISTRY}}/applicationname-worker'
