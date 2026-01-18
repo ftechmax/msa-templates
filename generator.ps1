@@ -4,7 +4,11 @@ param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
     [string]$ServiceName,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
-    [string]$RabbitMqUserSecret
+    [string]$RabbitMqUserSecret,
+    [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
+    [string]$GatewayNamespace = "istio-ingress",
+    [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)] 
+    [string]$GatewayName = "gateway"
 )
 
 # Prepare service name
@@ -39,6 +43,8 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
         
         (Get-Content -Path $filePath) `
             -creplace '{{RABBITMQ-SECRET-NAME}}', $RabbitMqUserSecret `
+            -creplace '{{GATEWAY-NAMESPACE}}', $GatewayNamespace `
+            -creplace '{{GATEWAY-NAME}}', $GatewayName `
             -creplace 'applicationname', $kebabCaseServiceName `
             -creplace 'ApplicationName', $ServiceName `
         | Set-Content -Path $filePath
