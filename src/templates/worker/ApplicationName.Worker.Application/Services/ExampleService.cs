@@ -10,7 +10,7 @@ public class ExampleService(IDocumentRepository documentRepository) : IExampleSe
 {
     public async Task<ExampleCreated> HandleAsync(CreateExampleCommand command)
     {
-        Guard.Argument(command, nameof(command)).NotNull();
+        Guard.Argument(command).NotNull();
 
         var (aggregate, domainEvent) = ExampleDocument.Create(command);
 
@@ -21,8 +21,8 @@ public class ExampleService(IDocumentRepository documentRepository) : IExampleSe
 
     public async Task<ExampleUpdated> HandleAsync(UpdateExampleCommand command)
     {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.Id, nameof(command.Id)).NotDefault();
+        Guard.Argument(command).NotNull();
+        Guard.Argument(command.Id).NotDefault();
 
         var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 
@@ -35,8 +35,8 @@ public class ExampleService(IDocumentRepository documentRepository) : IExampleSe
 
     public async Task<ExampleRemoteCodeSet> HandleAsync(SetExampleRemoteCodeCommand command)
     {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.Id, nameof(command.Id)).NotDefault();
+        Guard.Argument(command).NotNull();
+        Guard.Argument(command.Id).NotDefault();
 
         var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
 

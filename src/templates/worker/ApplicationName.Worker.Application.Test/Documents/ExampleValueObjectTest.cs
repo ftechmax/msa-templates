@@ -57,7 +57,7 @@ internal class ExampleValueObjectTest
         var act = () => new ExampleValueObject(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Code)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.Code)}");
     }
 
     [Test]
@@ -71,6 +71,6 @@ internal class ExampleValueObjectTest
         var act = () => new ExampleValueObject(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Value)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.Value)}");
     }
 }

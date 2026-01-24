@@ -143,7 +143,7 @@ public class ExampleServiceTest
 
         // Assert
         var exception = await act.ShouldThrowAsync<ArgumentException>();
-        exception.Message.ShouldStartWith($"{nameof(command.Id)}");
+        exception.Message.ShouldMatch($".*{nameof(command.Id)}");
 
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
     }
@@ -213,7 +213,7 @@ public class ExampleServiceTest
 
         // Assert
         var exception = await act.ShouldThrowAsync<ArgumentException>();
-        exception.Message.ShouldStartWith($"{nameof(command.Id)}");
+        exception.Message.ShouldMatch($".*{nameof(command.Id)}");
 
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
     }

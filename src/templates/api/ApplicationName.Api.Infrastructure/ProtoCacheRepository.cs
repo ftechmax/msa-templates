@@ -14,7 +14,7 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
 
     private IServer[] Servers => connectionMultiplexer.GetServers();
 
-    public async Task<T> GetAsync<T>(string key)
+    public async Task<T?> GetAsync<T>(string key)
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
 
@@ -29,7 +29,7 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
             return default;
         }
 
-        await using var ms = new MemoryStream(bytes);
+        await using var ms = new MemoryStream(bytes!);
         return ProtoBuf.Serializer.Deserialize<T>(ms);
     }
 
@@ -66,7 +66,7 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
                 continue;
             }
 
-            await using var ms = new MemoryStream(value);
+            await using var ms = new MemoryStream(value!);
             results.Add(ProtoBuf.Serializer.Deserialize<T>(ms));
         }
 
@@ -83,7 +83,7 @@ public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultip
         ProtoBuf.Serializer.Serialize(ms, obj);
         ms.Position = 0;
 
-        await Database.StringSetAsync(key, ms.ToArray(), expiry);
+        await Database.StringSetAsync(key, ms.ToArray(), expiry, When.Always);
     }
 
     public Task RemoveAsync(string key)

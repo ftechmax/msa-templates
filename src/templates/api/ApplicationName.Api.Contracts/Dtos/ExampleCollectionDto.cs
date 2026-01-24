@@ -12,8 +12,8 @@ public record ExampleCollectionDto
     public DateTime Created { get; init; }
 
     [ProtoMember(3)]
-    public string Name { get; init; }
+    public required string Name { get; init; }
 
     [ProtoMember(4)]
-    public string Description { get; init; }
+    public required string Description { get; init; }
 }

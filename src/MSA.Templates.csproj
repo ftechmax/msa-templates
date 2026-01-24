@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Title>MSA Templates</Title>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>content</ContentTargetFolders>
@@ -26,7 +26,7 @@
     <PackageType>Template</PackageType>
     <Authors>ftechmax</Authors>
     <Description>Templates to use when creating an application using a microservice architecture</Description>
-    <Copyright>Copyright © 2023-2024 ftechmax</Copyright>
+    <Copyright>Copyright © 2023-2026 ftechmax</Copyright>
     <PackageProjectUrl>https://github.com/ftechmax/msa-templates</PackageProjectUrl>
     <PackageIcon>logo-64.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>

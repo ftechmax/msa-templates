@@ -17,7 +17,7 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
 
     public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
-        Guard.Argument(expr, nameof(expr)).NotNull();
+        Guard.Argument(expr).NotNull();
 
         var collection = GetCollection<T>();
 
@@ -35,7 +35,7 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
 
     public async Task<IEnumerable<DocumentBase>> GetAllByTypeAsync(Type documentType)
     {
-        Guard.Argument(documentType, nameof(documentType)).NotNull();
+        Guard.Argument(documentType).NotNull();
 
         // Use reflection to call GetAllAsync<T> with the concrete type
         var getAllMethod = GetType()
@@ -53,8 +53,8 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
 
     public async Task<DocumentBase?> GetByIdAndTypeAsync(Guid id, Type documentType)
     {
-        Guard.Argument(id, nameof(id)).NotDefault();
-        Guard.Argument(documentType, nameof(documentType)).NotNull();
+        Guard.Argument(id).NotDefault();
+        Guard.Argument(documentType).NotNull();
 
         // Build expression: d => d.Id == id
         var parameter = Expression.Parameter(documentType, "d");
@@ -79,10 +79,10 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
 
     public async Task UpsertAsync(ExampleDocument document)
     {
-        Guard.Argument(document, nameof(document)).NotNull();
-        Guard.Argument(document.Id, nameof(document.Id)).NotDefault();
-        Guard.Argument(document.Created, nameof(document.Created)).NotDefault();
-        Guard.Argument(document.Updated, nameof(document.Updated)).NotDefault();
+        Guard.Argument(document).NotNull();
+        Guard.Argument(document.Id).NotDefault();
+        Guard.Argument(document.Created).NotDefault();
+        Guard.Argument(document.Updated).NotDefault();
 
         var collection = GetCollection<ExampleDocument>();
         var updateDefinition = Builders<ExampleDocument>.Update
