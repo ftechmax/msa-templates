@@ -17,10 +17,10 @@ public sealed class ExampleDocument : DocumentBase, IExample
     public ExampleDocument(CreateExampleCommand command)
         : this()
     {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.Name, nameof(command.Name)).NotNull().NotWhiteSpace();
-        Guard.Argument(command.Description, nameof(command.Description)).NotNull().NotWhiteSpace();
-        Guard.Argument(command.ExampleValueObject, nameof(command.ExampleValueObject)).NotNull();
+		Guard.Argument(command).NotNull();
+		Guard.Argument(command.Name).NotNull().NotWhiteSpace();
+		Guard.Argument(command.Description).NotNull().NotWhiteSpace();
+		Guard.Argument(command.ExampleValueObject).NotNull();
 
         Id = Guid.NewGuid();
         Created = Updated = DateTime.UtcNow;
@@ -31,9 +31,9 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
     public ExampleUpdated Handle(UpdateExampleCommand command)
     {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.Description, nameof(command.Description)).NotNull().NotWhiteSpace();
-        Guard.Argument(command.ExampleValueObject, nameof(command.ExampleValueObject)).NotNull();
+		Guard.Argument(command).NotNull();
+		Guard.Argument(command.Description).NotNull().NotWhiteSpace();
+		Guard.Argument(command.ExampleValueObject).NotNull();
 
         Description = command.Description;
         ExampleValueObject = new ExampleValueObject(command.ExampleValueObject);
@@ -43,8 +43,8 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
     public ExampleRemoteCodeSet Handle(SetExampleRemoteCodeCommand command)
     {
-        Guard.Argument(command, nameof(command)).NotNull();
-        Guard.Argument(command.RemoteCode, nameof(command.RemoteCode)).NotDefault().NotNegative();
+		Guard.Argument(command).NotNull();
+		Guard.Argument(command.RemoteCode).NotDefault().NotNegative();
 
         RemoteCode = command.RemoteCode;
 

@@ -72,7 +72,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Name)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.Name)}");
     }
 
     [Test]
@@ -86,7 +86,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Description)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.Description)}");
     }
 
     [Test]
@@ -99,7 +99,7 @@ internal class ExampleDocumentTest
         var act = () => new ExampleDocument(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.ExampleValueObject)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.ExampleValueObject)}");
     }
 
     [Test]
@@ -161,7 +161,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.Description)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.Description)}");
     }
 
     [Test]
@@ -177,7 +177,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.ExampleValueObject)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.ExampleValueObject)}");
     }
 
     [Test]
@@ -217,7 +217,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command)}");
     }
 
     [Test]
@@ -234,7 +234,7 @@ internal class ExampleDocumentTest
         var act = () => document.Handle(command);
 
         // Assert
-        act.ShouldThrow<ArgumentException>().Message.ShouldStartWith($"{nameof(command.RemoteCode)}");
+        act.ShouldThrow<ArgumentException>().Message.ShouldMatch($".*{nameof(command.RemoteCode)}");
     }
 
     [Test]
