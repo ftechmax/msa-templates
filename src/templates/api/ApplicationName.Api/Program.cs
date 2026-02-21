@@ -4,7 +4,6 @@ using System.Reflection;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
-using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
@@ -12,11 +11,6 @@ using FluentValidation;
 using Mapster;
 using MassTransit;
 using MassTransit.Logging;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
-using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -49,12 +43,6 @@ public static class Program
 
     private static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
     {
-        // MongoDB
-        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-        var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
-        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
-
         // SignalR
         services.AddSignalR();
 

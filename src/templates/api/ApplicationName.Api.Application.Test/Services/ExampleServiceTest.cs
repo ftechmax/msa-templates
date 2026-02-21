@@ -1,9 +1,7 @@
-using System.Linq.Expressions;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Api.Contracts.Dtos;
-using ApplicationName.Shared.Aggregates;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Projections;
 using AutoFixture;
@@ -12,7 +10,6 @@ using FakeItEasy;
 using Mapster;
 using MapsterMapper;
 using MassTransit;
-using Microsoft.Extensions.Caching.Distributed;
 using NUnit.Framework;
 using Shouldly;
 

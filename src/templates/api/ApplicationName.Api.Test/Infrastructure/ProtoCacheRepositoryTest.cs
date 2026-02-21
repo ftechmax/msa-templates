@@ -7,10 +7,6 @@ using FakeItEasy;
 using NUnit.Framework;
 using Shouldly;
 using StackExchange.Redis;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApplicationName.Api.Test.Infrastructure;
 
