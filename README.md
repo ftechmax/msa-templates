@@ -49,7 +49,7 @@ dotnet new install MSA.Templates
 
 To use the generator script, clone this repository and run `generator.ps1` with the required parameters:
 
-```console
+```powershell
 .\generator.ps1 `
 -ServiceName AwesomeApp `
 -RabbitMqUserSecret rabbitmq-default-user `
@@ -57,6 +57,10 @@ To use the generator script, clone this repository and run `generator.ps1` with 
 ```
 
 This will create a folder `c:/git/awesome-app` with the following structure:
+
+```sh
+./generator.sh ~/git AwesomeApp rabbitmq-default-user
+```
 
 ```
 awesome-app
