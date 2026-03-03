@@ -19,6 +19,7 @@ If you're new here, start with [Quick start](#quick-start), then read [What you 
 - [Message-driven Service Architecture Templates](#message-driven-service-architecture-templates)
   - [Table of contents](#table-of-contents)
   - [Why this exists](#why-this-exists)
+  - [Prerequisites](#prerequisites)
   - [Quick start](#quick-start)
   - [What you get](#what-you-get)
   - [Message-driven Service Architecture Worker](#message-driven-service-architecture-worker)
@@ -39,28 +40,34 @@ These templates are the accumulation of those lessons, packaged as a starting po
 
 This is not meant to be the only way to do things. It's just a set of defaults that has proven itself in real projects, real incidents, and real deployments.
 
+## Prerequisites
+
+- [.NET SDK 10](https://dotnet.microsoft.com/download)
+- [Node.js LTS](https://nodejs.org/)
+
+
 ## Quick start
 
-Install the latest version of the `MSA.Templates` package:
+Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script automatically installs the matching `MSA.Templates` NuGet package and downloads the matching Kubernetes manifests.
 
-```console
-dotnet new install MSA.Templates
-```
-
-To use the generator script, clone this repository and run `generator.ps1` with the required parameters:
-
-```powershell
-.\generator.ps1 `
--ServiceName AwesomeApp `
--RabbitMqUserSecret rabbitmq-default-user `
--DestinationFolder c:/git
-```
-
-This will create a folder `c:/git/awesome-app` with the following structure:
+**Bash (Linux/macOS):**
 
 ```sh
+curl -fsSLO https://github.com/ftechmax/msa-templates/releases/latest/download/generator.sh && \
+chmod +x generator.sh && \
 ./generator.sh ~/git AwesomeApp rabbitmq-default-user
 ```
+
+**PowerShell (Windows):**
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/ftechmax/msa-templates/releases/latest/download/generator.ps1 -OutFile generator.ps1 ; `
+.\generator.ps1 -DestinationFolder c:/git -ServiceName AwesomeApp -RabbitMqUserSecret rabbitmq-default-user
+```
+
+> ⚠️ Security note: the commands above will run a script pulled from the net. Convenient? Absolutely. Auditable? Not unless you read it first.
+
+This will create a folder with the following structure:
 
 ```
 awesome-app
@@ -68,7 +75,6 @@ awesome-app
 |-- src
 |   |-- api
 |   |-- shared
-|   |-- cache
 |   |-- web
 |   `-- worker
 `-- krun.json
@@ -82,7 +88,7 @@ These templates are intended to be used together as a "vertical slice" of a mess
 - **Worker**: consumes commands and external events, applies business logic, persists state, and publishes domain events.
 - **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through SignalR.
 - **Web**: a blank Angular frontend scaffolded to work with the API.
-- **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster.
+- **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
 - **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
 
 The templates come with sensible defaults for:
@@ -146,9 +152,11 @@ graph LR;
 
 ## Message-driven Service Architecture Web
 
-This creates a simple Angular SPA hosted in an Nginx container and preconfigured to run in a Kubernetes environment. It uses [Transloco](https://ngneat.github.io/transloco/) to manage translations.
+This creates a simple Angular SPA hosted in an Nginx container and preconfigured to run in a Kubernetes environment. It uses [Transloco](https://jsverse.gitbook.io/transloco) to manage translations.
 
-The web template is kept intentionally light, but it's meant to fit the flow:
+For the full breakdown of SignalR integration, translations, and the event handling, see [docs/web.md](docs/web.md).
+
+The web template is kept intentionally light, but it contains everything needed for full API integration.
 
 - **Calls the API** for queries and user-initiated actions.
 - **Triggers commands** indirectly by hitting HTTP endpoints. The API turns those requests into messages.

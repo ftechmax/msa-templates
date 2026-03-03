@@ -8,12 +8,6 @@ updates:
     schedule:
       interval: 'monthly'
     groups:
-      nuget:
-        applies-to: version-updates
-        patterns:
-          - '*'
-        update-types:
-          - 'minor'
       nuget-security:
         applies-to: security-updates
         patterns:
