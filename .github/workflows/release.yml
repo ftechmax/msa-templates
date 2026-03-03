@@ -6,6 +6,9 @@ on:
       - 'main'
     paths:
       - 'src/**'
+      - 'k8s/**'
+      - 'generator.sh'
+      - 'generator.ps1'
   workflow_dispatch:
 
 jobs:
@@ -46,13 +49,23 @@ jobs:
         run: dotnet pack ./src/MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish package
         run: |-
           dotnet nuget push ./artifacts/*${{ steps.gitversion.outputs.semVer }}.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Prepare generator artifacts
+        run: |-
+          apk add --no-cache zip
+          mkdir -p dist
+          sed -i "s/GENERATOR_VERSION=\"develop\"/GENERATOR_VERSION=\"${{ steps.gitversion.outputs.semVer }}\"/" generator.sh
+          sed -i "s/\$GeneratorVersion = \"develop\"/\$GeneratorVersion = \"${{ steps.gitversion.outputs.semVer }}\"/" generator.ps1
+          zip -r dist/msa-generator-k8s-${{ steps.gitversion.outputs.semVer }}.zip k8s/
+          chmod +x generator.sh
+          cp generator.sh generator.ps1 dist/
 
       - name: Create release
         uses: ncipollo/release-action@v1
@@ -62,3 +75,4 @@ jobs:
           name: Release ${{ steps.gitversion.outputs.semVer }}
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'dist/generator.sh,dist/generator.ps1,dist/msa-generator-k8s-*.zip'
