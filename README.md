@@ -41,26 +41,25 @@ This is not meant to be the only way to do things. It's just a set of defaults t
 
 ## Quick start
 
-Install the latest version of the `MSA.Templates` package:
+Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script automatically installs the matching `MSA.Templates` NuGet package and downloads the matching Kubernetes manifests.
 
-```console
-dotnet new install MSA.Templates
-```
-
-To use the generator script, clone this repository and run `generator.ps1` with the required parameters:
-
-```powershell
-.\generator.ps1 `
--ServiceName AwesomeApp `
--RabbitMqUserSecret rabbitmq-default-user `
--DestinationFolder c:/git
-```
-
-This will create a folder `c:/git/awesome-app` with the following structure:
+**Bash (Linux/macOS):**
 
 ```sh
+curl -fsSLO https://github.com/ftechmax/msa-templates/releases/latest/download/generator.sh && \
 ./generator.sh ~/git AwesomeApp rabbitmq-default-user
 ```
+
+**PowerShell (Windows):**
+
+```powershell
+Invoke-WebRequest -Uri https://github.com/ftechmax/msa-templates/releases/latest/download/generator.ps1 -OutFile generator.ps1 ; `
+.\generator.ps1 -DestinationFolder c:/git -ServiceName AwesomeApp -RabbitMqUserSecret rabbitmq-default-user
+```
+
+> ⚠️ Security note: the commands above will run a script pulled from the net. Convenient? Absolutely. Auditable? Not unless you read it first.
+
+This will create a folder with the following structure:
 
 ```
 awesome-app

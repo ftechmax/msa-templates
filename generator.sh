@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+GENERATOR_VERSION="0.0.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GITHUB_REPO="ftechmax/msa-templates"
+
 if [ "$#" -lt 3 ]; then
   echo "Usage: $0 <destination_folder> <service_name> <rabbitmq_user_secret>" >&2
   exit 1
@@ -16,6 +20,23 @@ DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/.\1/g' |
 
 echo "Service name: $KEBAB_CASE_SERVICE_NAME"
 echo "Dot case name: $DOT_CASE_SERVICE_NAME"
+
+# Install matching template version
+echo "Installing MSA.Templates v$GENERATOR_VERSION"
+dotnet new install "MSA.Templates::$GENERATOR_VERSION"
+
+# Resolve k8s source folder
+if [ -d "$SCRIPT_DIR/k8s" ]; then
+  K8S_SOURCE="$SCRIPT_DIR/k8s"
+else
+  echo "Downloading k8s manifests for v$GENERATOR_VERSION..."
+  TEMP_DIR=$(mktemp -d)
+  trap 'rm -rf "$TEMP_DIR"' EXIT
+  DOWNLOAD_URL="https://github.com/$GITHUB_REPO/releases/download/$GENERATOR_VERSION/msa-generator-k8s-$GENERATOR_VERSION.zip"
+  curl -fsSL "$DOWNLOAD_URL" -o "$TEMP_DIR/k8s.zip"
+  unzip -q "$TEMP_DIR/k8s.zip" -d "$TEMP_DIR"
+  K8S_SOURCE="$TEMP_DIR/k8s"
+fi
 
 # Prepare project folder
 PROJECT_FOLDER="$DESTINATION_FOLDER/$KEBAB_CASE_SERVICE_NAME"
@@ -40,7 +61,7 @@ echo "Generating src/web"
 dotnet new msa-web -n "$DOT_CASE_SERVICE_NAME" -o "$PROJECT_FOLDER/src/web"
 
 # Patch k8s folder
-cp -R "./k8s" "$PROJECT_FOLDER"
+cp -R "$K8S_SOURCE" "$PROJECT_FOLDER"
 find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path; do
   echo "Patching $file_path"
   tmp_file="$file_path.tmp"
