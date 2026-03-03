@@ -12,8 +12,10 @@ RABBITMQ_USER_SECRET="$3"
 
 # Prepare service name
 KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/-\1/g' | sed -E 's/^-//' | sed -E 's/ /-/g' | tr '[:upper:]' '[:lower:]')
+DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/.\1/g' | sed -E 's/^\.//')
 
 echo "Service name: $KEBAB_CASE_SERVICE_NAME"
+echo "Dot case name: $DOT_CASE_SERVICE_NAME"
 
 # Prepare project folder
 PROJECT_FOLDER="$DESTINATION_FOLDER/$KEBAB_CASE_SERVICE_NAME"
@@ -26,16 +28,16 @@ fi
 
 # Generate projects
 echo "Generating src/shared"
-dotnet new msa-shared -n "$SERVICE_NAME" -o "$PROJECT_FOLDER/src/shared"
+dotnet new msa-shared -n "$DOT_CASE_SERVICE_NAME" -o "$PROJECT_FOLDER/src/shared"
 
 echo "Generating src/worker"
-dotnet new msa-worker -n "$SERVICE_NAME" -o "$PROJECT_FOLDER/src/worker"
+dotnet new msa-worker -n "$DOT_CASE_SERVICE_NAME" -o "$PROJECT_FOLDER/src/worker"
 
 echo "Generating src/api"
-dotnet new msa-api -n "$SERVICE_NAME" -o "$PROJECT_FOLDER/src/api"
+dotnet new msa-api -n "$DOT_CASE_SERVICE_NAME" -o "$PROJECT_FOLDER/src/api"
 
 echo "Generating src/web"
-dotnet new msa-web -n "$SERVICE_NAME" -o "$PROJECT_FOLDER/src/web"
+dotnet new msa-web -n "$DOT_CASE_SERVICE_NAME" -o "$PROJECT_FOLDER/src/web"
 
 # Patch k8s folder
 cp -R "./k8s" "$PROJECT_FOLDER"
@@ -44,7 +46,7 @@ find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path;
   tmp_file="$file_path.tmp"
   sed -e "s/{{RABBITMQ-SECRET-NAME}}/$RABBITMQ_USER_SECRET/g" \
       -e "s/applicationname/$KEBAB_CASE_SERVICE_NAME/g" \
-      -e "s/ApplicationName/$SERVICE_NAME/g" \
+      -e "s/ApplicationName/$DOT_CASE_SERVICE_NAME/g" \
       "$file_path" > "$tmp_file"
   mv "$tmp_file" "$file_path"
 done
@@ -78,7 +80,7 @@ EOF
 
 sed -i \
   -e "s/applicationname/$KEBAB_CASE_SERVICE_NAME/g" \
-  -e "s/ApplicationName/$SERVICE_NAME/g" \
+  -e "s/ApplicationName/$DOT_CASE_SERVICE_NAME/g" \
   "$KRUN_JSON_PATH"
 
 echo "Created krun.json: $KRUN_JSON_PATH"

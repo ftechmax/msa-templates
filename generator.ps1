@@ -9,7 +9,9 @@ param (
 
 # Prepare service name
 $kebabCaseServiceName = ($ServiceName -creplace '([A-Z])', '-$1' -replace '^-', '' -replace ' ', '-').toLower()
+$dotCaseServiceName = ($ServiceName -creplace '([A-Z])', '.$1' -replace '^\.', '')
 Write-Host "Service name: $kebabCaseServiceName"
+Write-Host "Dot case name: $dotCaseServiceName"
 
 # Prepare project folder
 $ProjectFolder = (Join-Path -Path $DestinationFolder -ChildPath $kebabCaseServiceName)
@@ -22,13 +24,13 @@ if (-not (Test-Path -Path $ProjectFolder -ErrorAction SilentlyContinue)) {
 
 # Generate projects
 Write-Host "Generating src/shared"
-dotnet new msa-shared -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/shared')
+dotnet new msa-shared -n $dotCaseServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/shared')
 Write-Host "Generating src/worker"
-dotnet new msa-worker -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/worker')
+dotnet new msa-worker -n $dotCaseServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/worker')
 Write-Host "Generating src/api"
-dotnet new msa-api -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/api')
+dotnet new msa-api -n $dotCaseServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/api')
 Write-Host "Generating src/web"
-dotnet new msa-web -n $ServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/web')
+dotnet new msa-web -n $dotCaseServiceName -o (Join-Path -Path $ProjectFolder -ChildPath 'src/web')
 
 # Patch k8s folder
 Copy-Item -Path "./k8s" -Destination $ProjectFolder -Recurse -Force
@@ -40,7 +42,7 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
         (Get-Content -Path $filePath) `
             -creplace '{{RABBITMQ-SECRET-NAME}}', $RabbitMqUserSecret `
             -creplace 'applicationname', $kebabCaseServiceName `
-            -creplace 'ApplicationName', $ServiceName `
+            -creplace 'ApplicationName', $dotCaseServiceName `
         | Set-Content -Path $filePath
     }
 }
@@ -74,7 +76,7 @@ $krunJsonContent = @'
 
 $krunJsonContent = $krunJsonContent `
     -creplace 'applicationname', $kebabCaseServiceName `
-    -creplace 'ApplicationName', $ServiceName
+    -creplace 'ApplicationName', $dotCaseServiceName
 
 $krunJsonContent | Set-Content -Path $krunJsonPath
 Write-Host "Created krun.json: $krunJsonPath"
