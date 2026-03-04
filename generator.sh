@@ -22,8 +22,17 @@ echo "Service name: $KEBAB_CASE_SERVICE_NAME"
 echo "Dot case name: $DOT_CASE_SERVICE_NAME"
 
 # Install matching template version
-echo "Installing MSA.Templates v$GENERATOR_VERSION"
-dotnet new install "MSA.Templates::$GENERATOR_VERSION"
+CSPROJ="$SCRIPT_DIR/src/MSA.Templates.csproj"
+if [ -f "$CSPROJ" ]; then
+  echo "Local source detected, packing templates..."
+  dotnet pack "$CSPROJ" -o "$SCRIPT_DIR/artifacts" --nologo -v quiet
+  NUPKG=$(find "$SCRIPT_DIR/artifacts" -name 'MSA.Templates.*.nupkg' -print -quit)
+  echo "Installing $NUPKG"
+  dotnet new install "$NUPKG" --force
+else
+  echo "Installing MSA.Templates v$GENERATOR_VERSION"
+  dotnet new install "MSA.Templates@$GENERATOR_VERSION"
+fi
 
 # Resolve k8s source folder
 if [ -d "$SCRIPT_DIR/k8s" ]; then

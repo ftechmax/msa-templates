@@ -18,8 +18,17 @@ Write-Host "Service name: $kebabCaseServiceName"
 Write-Host "Dot case name: $dotCaseServiceName"
 
 # Install matching template version
-Write-Host "Installing MSA.Templates v$GeneratorVersion"
-dotnet new install "MSA.Templates::$GeneratorVersion"
+$csproj = Join-Path $ScriptDir "src" "MSA.Templates.csproj"
+if (Test-Path -Path $csproj) {
+    Write-Host "Local source detected, packing templates..."
+    dotnet pack $csproj -o (Join-Path $ScriptDir "artifacts") --nologo -v quiet
+    $nupkg = Get-ChildItem -Path (Join-Path $ScriptDir "artifacts") -Filter "MSA.Templates.*.nupkg" | Select-Object -First 1
+    Write-Host "Installing $($nupkg.FullName)"
+    dotnet new install $nupkg.FullName --force
+} else {
+    Write-Host "Installing MSA.Templates v$GeneratorVersion"
+    dotnet new install "MSA.Templates@$GeneratorVersion"
+}
 
 # Resolve k8s source folder
 $k8sLocalPath = Join-Path $ScriptDir "k8s"
