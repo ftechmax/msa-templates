@@ -13,16 +13,21 @@ $GeneratorVersion = "0.0.0"
 $ScriptDir = $PSScriptRoot
 $GitHubRepo = "ftechmax/msa-templates"
 
+# Validate service name is PascalCase
+if ($ServiceName -notmatch '^[A-Z][a-zA-Z0-9]+$') {
+    Write-Error "service_name must be PascalCase (e.g., AwesomeApp). Got: '$ServiceName'"
+    exit 1
+}
+
 # Prepare service name
-$kebabCaseServiceName = ($ServiceName -creplace '([A-Z])', '-$1' -replace '^-', '' -replace ' ', '-').toLower()
+$kebabCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1-$2' -creplace '([a-z0-9])([A-Z])', '$1-$2').toLower()
 $dotCaseServiceName = ($ServiceName -creplace '([A-Z])', '.$1' -replace '^\.', '')
-Write-Host "Service name: $kebabCaseServiceName"
-Write-Host "Dot case name: $dotCaseServiceName"
 
 # Install matching template version
 $csproj = Join-Path $ScriptDir "src" "MSA.Templates.csproj"
 if (Test-Path -Path $csproj) {
     Write-Host "Local source detected, packing templates..."
+    Remove-Item -Path (Join-Path $ScriptDir "artifacts" "MSA.Templates.*.nupkg") -ErrorAction SilentlyContinue
     dotnet pack $csproj -o (Join-Path $ScriptDir "artifacts") --nologo -v quiet
     $nupkg = Get-ChildItem -Path (Join-Path $ScriptDir "artifacts") -Filter "MSA.Templates.*.nupkg" | Select-Object -First 1
     Write-Host "Installing $($nupkg.FullName)"

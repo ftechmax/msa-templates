@@ -15,17 +15,21 @@ SERVICE_NAME="$2"
 RABBITMQ_USER_SECRET="$3"
 NAMESPACE="${4:-default}"
 
-# Prepare service name
-KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/-\1/g' | sed -E 's/^-//' | sed -E 's/ /-/g' | tr '[:upper:]' '[:lower:]')
-DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/.\1/g' | sed -E 's/^\.//')
+# Validate service name is PascalCase
+if [[ ! "$SERVICE_NAME" =~ ^[A-Z][a-zA-Z0-9]+$ ]]; then
+  echo "Error: service_name must be PascalCase (e.g., AwesomeApp). Got: '$SERVICE_NAME'" >&2
+  exit 1
+fi
 
-echo "Service name: $KEBAB_CASE_SERVICE_NAME"
-echo "Dot case name: $DOT_CASE_SERVICE_NAME"
+# Prepare service name
+KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1-\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
+DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/.\1/g' | sed -E 's/^\.//')
 
 # Install matching template version
 CSPROJ="$SCRIPT_DIR/src/MSA.Templates.csproj"
 if [ -f "$CSPROJ" ]; then
   echo "Local source detected, packing templates..."
+  rm -f "$SCRIPT_DIR/artifacts"/MSA.Templates.*.nupkg
   dotnet pack "$CSPROJ" -o "$SCRIPT_DIR/artifacts" --nologo -v quiet
   NUPKG=$(find "$SCRIPT_DIR/artifacts" -name 'MSA.Templates.*.nupkg' -print -quit)
   echo "Installing $NUPKG"
