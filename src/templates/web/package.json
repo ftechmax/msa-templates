@@ -11,9 +11,9 @@
   "dependencies": {
     "@angular/animations": "^20.3.12",
     "@angular/cdk": "^20.2.13",
-    "@angular/common": "^20.3.12",
-    "@angular/compiler": "^20.3.12",
-    "@angular/core": "^20.3.12",
+    "@angular/common": "^20.3.14",
+    "@angular/compiler": "^20.3.16",
+    "@angular/core": "^20.3.17",
     "@angular/forms": "^20.3.12",
     "@angular/material": "^20.2.13",
     "@angular/platform-browser": "^20.3.12",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@angular/build": "^20.3.10",
-    "@angular/cli": "^20.3.10",
+    "@angular/cli": "^20.3.19",
     "@angular/compiler-cli": "^20.3.12",
     "@types/jasmine": "~5.1.0",
     "@types/uuid": "^10.0.0",
