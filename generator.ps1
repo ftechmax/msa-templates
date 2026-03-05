@@ -4,7 +4,9 @@ param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
     [string]$ServiceName,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-    [string]$RabbitMqUserSecret
+    [string]$RabbitMqUserSecret,
+    [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+    [string]$Namespace = "default"
 )
 
 $GeneratorVersion = "0.0.0"
@@ -73,6 +75,7 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
 
         (Get-Content -Path $filePath) `
             -creplace '{{RABBITMQ-SECRET-NAME}}', $RabbitMqUserSecret `
+            -creplace '{{NAMESPACE}}', $Namespace `
             -creplace 'applicationname', $kebabCaseServiceName `
             -creplace 'ApplicationName', $dotCaseServiceName `
         | Set-Content -Path $filePath

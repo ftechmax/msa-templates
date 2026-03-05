@@ -6,13 +6,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GITHUB_REPO="ftechmax/msa-templates"
 
 if [ "$#" -lt 3 ]; then
-  echo "Usage: $0 <destination_folder> <service_name> <rabbitmq_user_secret>" >&2
+  echo "Usage: $0 <destination_folder> <service_name> <rabbitmq_user_secret> [namespace]" >&2
   exit 1
 fi
 
 DESTINATION_FOLDER="$1"
 SERVICE_NAME="$2"
 RABBITMQ_USER_SECRET="$3"
+NAMESPACE="${4:-default}"
 
 # Prepare service name
 KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z])/-\1/g' | sed -E 's/^-//' | sed -E 's/ /-/g' | tr '[:upper:]' '[:lower:]')
@@ -75,6 +76,7 @@ find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path;
   echo "Patching $file_path"
   tmp_file="$file_path.tmp"
   sed -e "s/{{RABBITMQ-SECRET-NAME}}/$RABBITMQ_USER_SECRET/g" \
+      -e "s/{{NAMESPACE}}/$NAMESPACE/g" \
       -e "s/applicationname/$KEBAB_CASE_SERVICE_NAME/g" \
       -e "s/ApplicationName/$DOT_CASE_SERVICE_NAME/g" \
       "$file_path" > "$tmp_file"
