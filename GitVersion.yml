@@ -1,0 +1,4 @@
+workflow: GitFlow/v1
+branches:
+  main:
+    mode: ContinuousDeployment
