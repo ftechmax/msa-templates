@@ -4,7 +4,7 @@ public static class ApplicationConstants
 {
     public const string ApplicationKey = "ApplicationName";
 
-    public const string DatabaseName = "ApplicationName";
+    public const string DatabaseName = "applicationname_snake";
 
     public const string ExampleCacheKey = "example";
 

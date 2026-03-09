@@ -5,15 +5,14 @@ GENERATOR_VERSION="develop"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GITHUB_REPO="ftechmax/msa-templates"
 
-if [ "$#" -lt 3 ]; then
-  echo "Usage: $0 <destination_folder> <service_name> <rabbitmq_user_secret> [namespace]" >&2
+if [ "$#" -lt 2 ]; then
+  echo "Usage: $0 <destination_folder> <service_name> [namespace]" >&2
   exit 1
 fi
 
 DESTINATION_FOLDER="$1"
 SERVICE_NAME="$2"
-RABBITMQ_USER_SECRET="$3"
-NAMESPACE="${4:-default}"
+NAMESPACE="${3:-default}"
 
 # Validate service name is PascalCase
 if [[ ! "$SERVICE_NAME" =~ ^[A-Z][a-zA-Z0-9]+$ ]]; then
@@ -24,6 +23,7 @@ fi
 # Prepare service name
 KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1-\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
 DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1.\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1.\2/g')
+SNAKE_CASE_SERVICE_NAME=$(printf '%s' "$KEBAB_CASE_SERVICE_NAME" | tr '-' '_')
 
 # Install matching template version
 CSPROJ="$SCRIPT_DIR/src/MSA.Templates.csproj"
@@ -82,8 +82,8 @@ cp -R "$K8S_SOURCE" "$PROJECT_FOLDER"
 find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path; do
   echo "Patching $file_path"
   tmp_file="$file_path.tmp"
-  sed -e "s/{{RABBITMQ-SECRET-NAME}}/$RABBITMQ_USER_SECRET/g" \
-      -e "s/{{NAMESPACE}}/$NAMESPACE/g" \
+  sed -e "s/{{NAMESPACE}}/$NAMESPACE/g" \
+      -e "s/applicationname_snake/$SNAKE_CASE_SERVICE_NAME/g" \
       -e "s/applicationname/$KEBAB_CASE_SERVICE_NAME/g" \
       -e "s/ApplicationName/$DOT_CASE_SERVICE_NAME/g" \
       "$file_path" > "$tmp_file"

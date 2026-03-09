@@ -45,7 +45,6 @@ This is not meant to be the only way to do things. It's just a set of defaults t
 - [.NET SDK 10](https://dotnet.microsoft.com/download)
 - [Node.js LTS](https://nodejs.org/)
 
-
 ## Quick start
 
 Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script automatically installs the matching `MSA.Templates` NuGet package and downloads the matching Kubernetes manifests.
@@ -55,14 +54,14 @@ Download the generator script from the [latest release](https://github.com/ftech
 ```sh
 curl -fsSLO https://github.com/ftechmax/msa-templates/releases/latest/download/generator.sh && \
 chmod +x generator.sh && \
-./generator.sh ~/git AwesomeApp rabbitmq-default-user
+./generator.sh ~/git AwesomeApp
 ```
 
 **PowerShell (Windows):**
 
 ```powershell
 Invoke-WebRequest -Uri https://github.com/ftechmax/msa-templates/releases/latest/download/generator.ps1 -OutFile generator.ps1 ; `
-.\generator.ps1 -DestinationFolder c:/git -ServiceName AwesomeApp -RabbitMqUserSecret rabbitmq-default-user
+.\generator.ps1 -DestinationFolder c:/git -ServiceName AwesomeApp
 ```
 
 > ⚠️ Security note: the commands above will run a script pulled from the net. Convenient? Absolutely. Auditable? Not unless you read it first.

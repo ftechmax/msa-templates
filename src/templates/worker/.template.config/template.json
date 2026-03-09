@@ -15,12 +15,28 @@
   "preferNameDirectory": true,
   "primaryOutputs": [{ "path": "ApplicationName.sln" }],
   "symbols": {
-    "RabbitMqSecret": {
-      "type": "parameter",
+    "lowerCaseName": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "name",
+        "toLower": true
+      }
+    },
+    "snakeCaseName": {
+      "type": "generated",
+      "generator": "regex",
       "datatype": "string",
-      "defaultValue": "rabbitmq-default-user",
-      "replaces": "{{RABBITMQ-SECRET-NAME}}",
-      "description": "The name of the RabbitMQ secret"
+      "parameters": {
+        "source": "lowerCaseName",
+        "steps": [
+          {
+            "regex": "\\.",
+            "replacement": "_"
+          }
+        ]
+      },
+      "replaces": "applicationname_snake"
     }
   }
 }

@@ -37,22 +37,19 @@ spec:
               containerPort: 8080
           envFrom:
             - secretRef:
-                name: applicationname-user
+                name: applicationname-database
           env:
             - name: rabbitmq__host
-              valueFrom:
-                secretKeyRef:
-                  name: '{{RABBITMQ-SECRET-NAME}}'
-                  key: host
+              value: rabbitmq.default.svc
             - name: rabbitmq__username
               valueFrom:
                 secretKeyRef:
-                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  name: applicationname-rabbitmq
                   key: username
             - name: rabbitmq__password
               valueFrom:
                 secretKeyRef:
-                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  name: applicationname-rabbitmq
                   key: password
             - name: mongodb__connection-string
               value: 'mongodb://$(database_username):$(database_password)@ferretdb.ferretdb-system.svc:27017/'
