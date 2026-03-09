@@ -3,8 +3,6 @@ param (
     [string]$DestinationFolder = "C:/git",
     [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
     [string]$ServiceName,
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-    [string]$RabbitMqUserSecret,
     [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
     [string]$Namespace = "default"
 )
@@ -22,6 +20,7 @@ if ($ServiceName -notmatch '^[A-Z][a-zA-Z0-9]+$') {
 # Prepare service name
 $kebabCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1-$2' -creplace '([a-z0-9])([A-Z])', '$1-$2').toLower()
 $dotCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1.$2' -creplace '([a-z0-9])([A-Z])', '$1.$2')
+$snakeCaseServiceName = $kebabCaseServiceName -replace '-', '_'
 
 # Install matching template version
 $csproj = Join-Path (Join-Path $ScriptDir "src") "MSA.Templates.csproj"
@@ -84,8 +83,8 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
         Write-Host "Patching $filePath"
 
         (Get-Content -Path $filePath) `
-            -creplace '{{RABBITMQ-SECRET-NAME}}', $RabbitMqUserSecret `
             -creplace '{{NAMESPACE}}', $Namespace `
+            -creplace 'applicationname_snake', $snakeCaseServiceName `
             -creplace 'applicationname', $kebabCaseServiceName `
             -creplace 'ApplicationName', $dotCaseServiceName `
         | Set-Content -Path $filePath

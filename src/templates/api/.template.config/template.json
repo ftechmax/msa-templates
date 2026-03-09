@@ -20,13 +20,6 @@
       "datatype": "bool",
       "defaultValue": "true",
       "description": ""
-    },
-    "RabbitMqSecret": {
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "rabbitmq-default-user",
-      "replaces": "{{RABBITMQ-SECRET-NAME}}",
-      "description": "The name of the RabbitMQ secret"
     }
   }
 }

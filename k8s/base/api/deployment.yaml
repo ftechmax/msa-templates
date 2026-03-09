@@ -38,19 +38,16 @@ spec:
               containerPort: 8080
           env:
             - name: rabbitmq__host
-              valueFrom:
-                secretKeyRef:
-                  name: '{{RABBITMQ-SECRET-NAME}}'
-                  key: host
+              value: rabbitmq.default.svc
             - name: rabbitmq__username
               valueFrom:
                 secretKeyRef:
-                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  name: applicationname-rabbitmq
                   key: username
             - name: rabbitmq__password
               valueFrom:
                 secretKeyRef:
-                  name: '{{RABBITMQ-SECRET-NAME}}'
+                  name: applicationname-rabbitmq
                   key: password
             - name: valkey__connection-string
               value: 'applicationname-cache:6379'
