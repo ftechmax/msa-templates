@@ -28,7 +28,9 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        ConfigureConfiguration(builder);
+#if DEBUG
+        builder.Configuration.AddDotNetEnv(".env", LoadOptions.TraversePath());
+#endif
 
         ConfigureLogging(builder.Logging, builder.Configuration);
 
@@ -183,37 +185,5 @@ public static class Program
                     opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
                 });
         });
-    }
-
-    private static void ConfigureConfiguration(WebApplicationBuilder builder)
-    {
-        if (!builder.Environment.IsDevelopment())
-        {
-            return;
-        }
-
-        // Read appsettings-debug.env and inject each line as environment variable
-        var envFile = Path.Combine("../appsettings-debug.env");
-        if (File.Exists(envFile))
-        {
-            foreach (var line in File.ReadAllLines(envFile))
-            {
-                var trimmed = line.Trim();
-                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("#")) continue;
-                var separatorIndex = trimmed.IndexOf('=');
-                if (separatorIndex > 0)
-                {
-                    var key = trimmed.Substring(0, separatorIndex).Trim();
-                    var value = trimmed.Substring(separatorIndex + 1).Trim();
-                    if (!string.IsNullOrEmpty(key))
-                    {
-                        Environment.SetEnvironmentVariable(key, value);
-                    }
-                }
-            }
-        }
-
-        // Read environment variables into the configuration
-        builder.Configuration.AddEnvironmentVariables();
     }
 }
