@@ -15,6 +15,10 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+#if DEBUG
+using DotNetEnv;
+using DotNetEnv.Configuration;
+#endif
 using StackExchange.Redis;
 
 namespace ApplicationName.Api;

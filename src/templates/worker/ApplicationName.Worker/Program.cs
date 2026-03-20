@@ -4,7 +4,6 @@ using System.Reflection;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
-using ApplicationName.Worker.Contracts;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
 using Mapster;
@@ -19,6 +18,10 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+#if DEBUG
+using DotNetEnv;
+using DotNetEnv.Configuration;
+#endif
 using StackExchange.Redis;
 
 namespace ApplicationName.Worker;
