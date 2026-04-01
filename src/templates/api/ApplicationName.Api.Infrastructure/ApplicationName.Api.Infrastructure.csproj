@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapster" Version="10.0.6" />
     <ProjectReference Include="..\ApplicationName.Api.Application\ApplicationName.Api.Application.csproj" />
     <ProjectReference Include="..\ApplicationName.Api.Contracts\ApplicationName.Api.Contracts.csproj" />
   </ItemGroup>
