@@ -15,18 +15,20 @@ jobs:
   release:
     name: Release
     runs-on: [ubuntu-latest]
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:10.0-alpine
-      options: --user 1001
     permissions:
       contents: write
       packages: write
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v4.5.0
@@ -47,13 +49,9 @@ jobs:
         run: dotnet pack ./src/MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Publish package
-        run: |-
-          dotnet nuget push ./artifacts/*${{ steps.gitversion.outputs.semVer }}.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Prepare generator artifacts
         run: |-
@@ -62,6 +60,10 @@ jobs:
           sed -i "s/\$GeneratorVersion = \"develop\"/\$GeneratorVersion = \"${{ steps.gitversion.outputs.semVer }}\"/" generator.ps1
           chmod +x generator.sh
           cp generator.sh generator.ps1 dist/
+
+      - name: Publish package
+        run: |-
+          dotnet nuget push ./artifacts/*${{ steps.gitversion.outputs.semVer }}.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create release
         uses: ncipollo/release-action@v1
