@@ -14,9 +14,10 @@ updates:
           - '*'
         update-types:
           - 'minor'
-    ignore:
+    allow:
       - dependency-name: '*'
-        update-types: ['version-update:semver-major']
+        update-types:
+          - 'version-update:semver-minor'
 
   - package-ecosystem: 'docker'
     target-branch: 'develop'
