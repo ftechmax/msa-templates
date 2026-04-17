@@ -40,7 +40,7 @@ spec:
                 name: applicationname-database
           env:
             - name: rabbitmq__host
-              value: rabbitmq.default.svc
+              value: {{RABBITMQ_HOST}}
             - name: rabbitmq__username
               valueFrom:
                 secretKeyRef:
@@ -52,7 +52,7 @@ spec:
                   name: applicationname-rabbitmq
                   key: password
             - name: mongodb__connection-string
-              value: 'mongodb://$(database_username):$(database_password)@ferretdb.ferretdb-system.svc:27017/'
+              value: 'mongodb://$(database_username):$(database_password)@{{FERRETDB_HOST}}:27017/'
             - name: valkey__connection-string
               value: 'applicationname-cache:6379'
           livenessProbe:

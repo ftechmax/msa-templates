@@ -3,22 +3,72 @@ set -euo pipefail
 
 GENERATOR_VERSION="develop"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GITHUB_REPO="ftechmax/msa-templates"
 
-if [ "$#" -lt 2 ]; then
-  echo "Usage: $0 <destination_folder> <service_name> [namespace]" >&2
-  exit 1
-fi
+prompt() {
+  local var_name="$1" prompt_text="$2" default="$3"
+  local input value
+  while true; do
+    if [ -n "$default" ]; then
+      read -rp "$prompt_text [$default]: " input
+    else
+      read -rp "$prompt_text: " input
+    fi
+    value="${input:-$default}"
+    if [ -z "$value" ]; then
+      echo "  A value is required." >&2
+      continue
+    fi
+    value="${value/#\~/$HOME}"
+    break
+  done
+  eval "$var_name=\"\$value\""
+}
 
-DESTINATION_FOLDER="$1"
-SERVICE_NAME="$2"
-NAMESPACE="${3:-default}"
+prompt_pascal() {
+  local var_name="$1" prompt_text="$2"
+  local input
+  while true; do
+    read -rp "$prompt_text: " input
+    if [ -z "$input" ]; then
+      echo "  A value is required." >&2
+      continue
+    fi
+    if [[ ! "$input" =~ ^[A-Z][a-zA-Z0-9]+$ ]]; then
+      echo "  Must be PascalCase (e.g., AwesomeApp)." >&2
+      continue
+    fi
+    break
+  done
+  eval "$var_name=\"\$input\""
+}
 
-# Validate service name is PascalCase
-if [[ ! "$SERVICE_NAME" =~ ^[A-Z][a-zA-Z0-9]+$ ]]; then
-  echo "Error: service_name must be PascalCase (e.g., AwesomeApp). Got: '$SERVICE_NAME'" >&2
-  exit 1
-fi
+prompt_host() {
+  local var_name="$1" prompt_text="$2" default="$3"
+  local input value
+  while true; do
+    read -rp "$prompt_text [$default]: " input
+    value="${input:-$default}"
+    if [[ ! "$value" =~ ^[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\.svc$ ]]; then
+      echo "  Must match <name>.<namespace>.svc format." >&2
+      continue
+    fi
+    break
+  done
+  eval "$var_name=\"\$value\""
+}
+
+# Interactive configuration
+echo "MSA Generator $GENERATOR_VERSION"
+echo "-------------------"
+
+prompt        DESTINATION_FOLDER  "Destination folder" "~/git"
+prompt_pascal SERVICE_NAME        "Service name (PascalCase)"
+prompt        NAMESPACE           "Kubernetes namespace" "default"
+prompt_host   RABBITMQ_HOST       "RabbitMQ host" "rabbitmq.rabbitmq-system.svc"
+prompt_host   FERRETDB_HOST       "FerretDB host" "ferretdb.ferretdb-system.svc"
+
+# Extract namespace from RabbitMQ host
+RABBITMQ_CLUSTER_NAMESPACE=$(echo "$RABBITMQ_HOST" | cut -d'.' -f2)
 
 # Prepare service name
 KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1-\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
@@ -46,13 +96,25 @@ fi
 if [ -d "$SCRIPT_DIR/k8s" ]; then
   K8S_SOURCE="$SCRIPT_DIR/k8s"
 else
-  echo "Downloading k8s manifests for v$GENERATOR_VERSION..."
-  TEMP_DIR=$(mktemp -d)
-  trap 'rm -rf "$TEMP_DIR"' EXIT
-  DOWNLOAD_URL="https://github.com/$GITHUB_REPO/releases/download/$GENERATOR_VERSION/msa-generator-k8s-$GENERATOR_VERSION.zip"
-  curl -fsSL "$DOWNLOAD_URL" -o "$TEMP_DIR/k8s.zip"
-  unzip -q "$TEMP_DIR/k8s.zip" -d "$TEMP_DIR"
-  K8S_SOURCE="$TEMP_DIR/k8s"
+  NUGET_PACKAGES="${NUGET_PACKAGES:-$HOME/.nuget/packages}"
+  K8S_SOURCE="$NUGET_PACKAGES/msa.templates/$GENERATOR_VERSION/k8s"
+  TEMPLATE_NUPKG=""
+
+  if [ ! -d "$K8S_SOURCE" ]; then
+    TEMPLATE_HOME="${DOTNET_CLI_HOME:-$HOME}"
+    TEMPLATE_NUPKG="$TEMPLATE_HOME/.templateengine/packages/MSA.Templates.$GENERATOR_VERSION.nupkg"
+    if [ -f "$TEMPLATE_NUPKG" ]; then
+      TEMP_K8S_DIR=$(mktemp -d)
+      trap 'rm -rf "$TEMP_K8S_DIR"' EXIT
+      unzip -q "$TEMPLATE_NUPKG" 'k8s/*' -d "$TEMP_K8S_DIR"
+      K8S_SOURCE="$TEMP_K8S_DIR/k8s"
+    fi
+  fi
+
+  if [ ! -d "$K8S_SOURCE" ]; then
+    echo "k8s manifests not found in $K8S_SOURCE or $TEMPLATE_NUPKG" >&2
+    exit 1
+  fi
 fi
 
 # Prepare project folder
@@ -83,6 +145,9 @@ find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path;
   echo "Patching $file_path"
   tmp_file="$file_path.tmp"
   sed -e "s/{{NAMESPACE}}/$NAMESPACE/g" \
+      -e "s/{{RABBITMQ_HOST}}/$RABBITMQ_HOST/g" \
+      -e "s/{{RABBITMQ_CLUSTER_NAMESPACE}}/$RABBITMQ_CLUSTER_NAMESPACE/g" \
+      -e "s/{{FERRETDB_HOST}}/$FERRETDB_HOST/g" \
       -e "s/applicationname_snake/$SNAKE_CASE_SERVICE_NAME/g" \
       -e "s/applicationname/$KEBAB_CASE_SERVICE_NAME/g" \
       -e "s/ApplicationName/$DOT_CASE_SERVICE_NAME/g" \
@@ -92,28 +157,37 @@ done
 
 # Create krun.json
 KRUN_JSON_PATH="$PROJECT_FOLDER/krun.json"
-cat > "$KRUN_JSON_PATH" <<'EOF'
+cat > "$KRUN_JSON_PATH" <<EOF
 [
-    {
-        "name": "applicationname-worker",
-        "path": "src/worker",
-        "dockerfile": "ApplicationName.Worker",
-        "context": "src/",
-        "intercept_port": 5001
-    },
-    {
-        "name": "applicationname-api",
-        "path": "src/api",
-        "dockerfile": "ApplicationName.Api",
-        "context": "src/",
-        "intercept_port": 5000
-    },
-    {
-        "name": "applicationname-web",
-        "path": "src/web",
-        "dockerfile": ".",
-        "context": "src/web"
-    }
+  {
+    "name": "applicationname-worker",
+    "path": "src/worker",
+    "dockerfile": "ApplicationName.Worker",
+    "context": "src/",
+    "intercept_port": 5001,
+    "service_dependencies": [
+      { "host": "applicationname-cache", "port": 6379 },
+      { "host": "$RABBITMQ_HOST", "port": 5672 },
+      { "host": "$FERRETDB_HOST", "port": 27017 }
+    ]
+  },
+  {
+    "name": "applicationname-api",
+    "path": "src/api",
+    "dockerfile": "ApplicationName.Api",
+    "context": "src/",
+    "intercept_port": 5000,
+    "service_dependencies": [
+      { "host": "applicationname-cache", "port": 6379 },
+      { "host": "$RABBITMQ_HOST", "port": 5672 }
+    ]
+  },
+  {
+    "name": "applicationname-web",
+    "path": "src/web",
+    "dockerfile": ".",
+    "context": "src/web"
+  }
 ]
 EOF
 

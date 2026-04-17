@@ -4,7 +4,7 @@ This project contains a set of templates to scaffold a small message-driven syst
 
 In this repository, **MSA** stands for **Message-driven Service Architecture**: services communicate primarily through commands and events over a message broker, which keeps them loosely coupled and enables independent scaling and deployment.
 
-If you're new here, start with [Quick start](#quick-start), then read [What you get](#what-you-get). The service-specific sections below explain the responsibilities and the reasoning behind the split.
+If you're new here, start with [Quick start](#quick-start), continue with [After generation](#after-generation), then read [What you get](#what-you-get). The service-specific sections below explain the responsibilities and the reasoning behind the split.
 
 [![NuGet](https://img.shields.io/nuget/v/MSA.Templates.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/MSA.Templates/)
 [![Release](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml/badge.svg)](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml)
@@ -21,6 +21,7 @@ If you're new here, start with [Quick start](#quick-start), then read [What you 
   - [Why this exists](#why-this-exists)
   - [Prerequisites](#prerequisites)
   - [Quick start](#quick-start)
+  - [After generation](#after-generation)
   - [What you get](#what-you-get)
   - [Message-driven Service Architecture Worker](#message-driven-service-architecture-worker)
   - [Message-driven Service Architecture API](#message-driven-service-architecture-api)
@@ -43,28 +44,42 @@ This is not meant to be the only way to do things. It's just a set of defaults t
 ## Prerequisites
 
 - [.NET SDK 10](https://dotnet.microsoft.com/download)
-- [Node.js LTS](https://nodejs.org/)
+- [Node.js LTS](https://nodejs.org/) if you want to run or work on the generated Angular web app locally
 
 ## Quick start
 
-Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script automatically installs the matching `MSA.Templates` NuGet package and downloads the matching Kubernetes manifests.
+Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script automatically installs the matching `MSA.Templates` NuGet package.
 
 **Bash (Linux/macOS):**
 
 ```sh
 curl -fsSLO https://github.com/ftechmax/msa-templates/releases/latest/download/generator.sh && \
 chmod +x generator.sh && \
-./generator.sh ~/git AwesomeApp
+./generator.sh
 ```
 
 **PowerShell (Windows):**
 
 ```powershell
 Invoke-WebRequest -Uri https://github.com/ftechmax/msa-templates/releases/latest/download/generator.ps1 -OutFile generator.ps1 ; `
-.\generator.ps1 -DestinationFolder c:/git -ServiceName AwesomeApp
+.\generator.ps1
 ```
 
 > ⚠️ Security note: the commands above will run a script pulled from the net. Convenient? Absolutely. Auditable? Not unless you read it first.
+
+The generator will walk you through the configuration interactively. Each prompt has an opinionated default, so just press Enter to accept it:
+
+```
+MSA Generator vX.Y.Z
+-------------------
+Destination folder [~/git]: ~/git
+Service name (PascalCase): AwesomeApp
+Kubernetes namespace [default]:
+RabbitMQ host [rabbitmq.rabbitmq-system.svc]:
+FerretDB host [ferretdb.ferretdb-system.svc]:
+```
+
+On PowerShell, the default destination folder is `C:/git` instead of `~/git`.
 
 This will create a folder with the following structure:
 
@@ -79,28 +94,39 @@ awesome-app
 `-- krun.json
 ```
 
+## After generation
+
+At this point you have a scaffolded service stack on disk. A good next pass is:
+
+1. Open the generated folder and inspect `src/shared`, `src/worker`, `src/api`, and `src/web`.
+2. Read [docs/worker.md](docs/worker.md), [docs/api.md](docs/api.md), and [docs/web.md](docs/web.md) so you know where to replace the example domain code.
+3. Review [docs/k8s.md](docs/k8s.md) before applying the generated manifests. The `k8s/` folder expects you to already have the platform services in place, typically via [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or something equivalent.
+4. If you use [krun](https://github.com/ftechmax/krun), update or use the generated `krun.json` as your local run configuration.
+
+The generator creates code, manifests, and wiring. It does not start the stack for you.
+
 ## What you get
 
 These templates are intended to be used together as a "vertical slice" of a message-driven system:
 
 - **Shared**: contracts and shared abstractions used across services within the same domain.
-- **Worker**: consumes commands and external events, applies business logic, persists state, and publishes domain events.
+- **Worker**: consumes commands and external events, applies business logic, persists state, and publishes events that represent domain outcomes.
 - **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through SignalR.
-- **Web**: a blank Angular frontend scaffolded to work with the API.
+- **Web**: a lightweight Angular frontend scaffolded to work with the API.
 - **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
 - **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
 
 The templates come with sensible defaults for:
 
 - **Messaging** via MassTransit (Conveyo coming soon!) + RabbitMQ for commands and events
-- **Persistence** via MongoDB.Driver package
+- **Persistence** via the MongoDB.Driver package, typically backed by FerretDB in the generated Kubernetes setup
 - **Caching** via Valkey/Redis using the StackExchange.Redis package
 - **Real-time updates** via SignalR
 - **Observability** via OpenTelemetry for traces, metrics, and logs
 
 ## Message-driven Service Architecture Worker
 
-The worker is the service that **consumes commands/events**, runs domain logic, persists state, and **publishes domain events**. It is preconfigured for Kubernetes and designed to be idempotent, observable, and resilient.
+The worker is the service that **consumes commands/events**, runs domain logic, persists state, and **publishes events that represent domain outcomes**. It is preconfigured for Kubernetes and designed to be idempotent, observable, and resilient.
 
 For the full breakdown of the project structure and handler patterns, see [docs/worker.md](docs/worker.md).
 
@@ -159,7 +185,7 @@ The web template is kept intentionally light, but it contains everything needed 
 
 - **Calls the API** for queries and user-initiated actions.
 - **Triggers commands** indirectly by hitting HTTP endpoints. The API turns those requests into messages.
-- **React to server-side changes**: the architecture supports pushing updates through SignalR so your UI can subscribe to events and refresh relevant screens.
+- **React to server-side changes**: the architecture supports pushing updates through SignalR so your UI can subscribe to published events and refresh relevant screens.
 - **Deploys cleanly** as a static-ish frontend behind Nginx, which maps nicely to Kubernetes.
 
 The goal is to give you a working starting point that matches the rest of the stack, without forcing a specific UI architecture on top.

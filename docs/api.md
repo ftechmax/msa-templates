@@ -11,7 +11,7 @@ The API is intentionally not your domain engine. Its main jobs are:
 - **Send commands** to the worker via the bus using MassTransit. The API should not need direct DB access to do writes.
 - **Serve reads efficiently**: the template uses projections and caches them in Valkey/Redis so read paths stay fast without coupling reads to the write model.
 
-On the “reactive” side, the API also acts as a bridge back to clients. It consumes domain events published by the worker and uses them to:
+On the "reactive" side, the API also acts as a bridge back to clients. It consumes published events from the worker that represent domain outcomes and uses them to:
 
 - **Invalidate/refresh caches** so clients see fresh view models.
 - **Notify connected clients** through SignalR so UIs can update without polling.
@@ -19,6 +19,28 @@ On the “reactive” side, the API also acts as a bridge back to clients. It co
 ## Operational notes
 
 Like the worker, it’s wired for observability via OpenTelemetry and comes with the usual HTTP service niceties such as health checks and Swagger in development.
+
+## Async command loop
+
+The API is the bridge between a synchronous web request and an asynchronous domain workflow.
+
+From the browser's point of view, a command starts as a normal HTTP call. Inside the system, though, that call is only the front door. The API validates the request, maps it to a command, sends it to RabbitMQ, and returns immediately. The actual business outcome only exists later, after the worker has processed the command and published an event or fault.
+
+This means the API has two distinct responsibilities in the same flow:
+
+1. accept and validate the HTTP request
+2. relay the eventual domain outcome back to the client side
+
+In the template, those responsibilities are split cleanly:
+
+- the controller and application service handle the HTTP-facing part
+- the application service maps DTOs to commands and sends them onto the bus
+- `LocalEventHandler` consumes the resulting events and faults
+- that same handler invalidates caches and pushes updates to SignalR clients
+
+So a successful POST or PUT response should usually be read as "accepted for processing", not "the domain change has definitely completed".
+
+That is the server-side half of the pattern described in [Web status service and domain feedback](web.md#status-service-and-domain-feedback). The other half, where commands are actually executed and turned into events, lives in [Worker command handling and event publication](worker.md#command-handling-and-event-publication).
 
 ## Project Structure
 
@@ -50,19 +72,25 @@ For commands, the application service typically follows these steps:
 2. **Create Command**: Convert the DTO into a domain command.
 3. **Send Command**: Send the command to the worker over the bus.
 
+This is intentionally thin. The API does not wait for the worker to finish domain processing before responding. That later outcome returns through the event path described below.
+
 ### Local Event Handler
 
-The API subscribes to domain/integration events from the bus (e.g. `ExampleCreatedEvent`, `ExampleUpdatedEvent`). This is handled by `LocalEventHandler.cs`.
+The API subscribes to published events from the bus (e.g. `ExampleCreatedEvent`, `ExampleUpdatedEvent`). This is handled by `LocalEventHandler.cs`.
 
 The local event handler typically follows these steps:
 1. **Receive Event**: The handler listens for events published by the worker.
 2. **Invalidate Cache**: The handler removes affected cache entries so subsequent queries are consistent.
 3. **Notify Clients**: The handler notifies connected clients (SignalR) that something changed.
 
+This is what closes the loop back to the web app. The browser sends a command over HTTP, but it learns about the real domain result from the event stream that the API forwards over SignalR.
+
 #### Fault notifications
 
 The handler also shows how to forward failures to clients by consuming `Fault<TCommand>` and publishing a `DomainFault` with a correlation id and trace id. Clients can use this information to correlate UI failures with logs and traces.
 
+That fault path is especially important in a message-driven UI because the original HTTP request has already completed by the time the worker discovers the failure.
+
 #### Using a Different Persistence Mechanism
 
-Note that the default read model is MongoDB. This will be replaced by a Valkey read model in the future. However, you can replace it with any other database by implementing the repository interface accordingly.
+Note that the default read model uses MongoDB-compatible storage via `MongoDB.Driver`; in the generated Kubernetes setup that typically means FerretDB. This will be replaced by a Valkey read model in the future. However, you can replace it with any other database by implementing the repository interface accordingly.

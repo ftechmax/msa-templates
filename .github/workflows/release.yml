@@ -59,11 +59,9 @@ jobs:
 
       - name: Prepare generator artifacts
         run: |-
-          apk add --no-cache zip
           mkdir -p dist
           sed -i "s/GENERATOR_VERSION=\"develop\"/GENERATOR_VERSION=\"${{ steps.gitversion.outputs.semVer }}\"/" generator.sh
           sed -i "s/\$GeneratorVersion = \"develop\"/\$GeneratorVersion = \"${{ steps.gitversion.outputs.semVer }}\"/" generator.ps1
-          zip -r dist/msa-generator-k8s-${{ steps.gitversion.outputs.semVer }}.zip k8s/
           chmod +x generator.sh
           cp generator.sh generator.ps1 dist/
 
@@ -75,4 +73,4 @@ jobs:
           name: Release ${{ steps.gitversion.outputs.semVer }}
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: 'dist/generator.sh,dist/generator.ps1,dist/msa-generator-k8s-*.zip'
+          artifacts: 'dist/generator.sh,dist/generator.ps1'

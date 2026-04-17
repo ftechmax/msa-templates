@@ -41,6 +41,7 @@
     <None Include="../logo-64.png" Pack="true" PackagePath="\" />
     <None Include="../LICENSE" Pack="true" PackagePath="\" />
     <None Include="../README.md" Pack="true" PackagePath="\" />
+    <None Include="..\k8s\**\*" Pack="true" PackagePath="k8s\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

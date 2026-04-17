@@ -13,7 +13,7 @@ spec:
     read: '.*'
   rabbitmqClusterReference:
     name: rabbitmq
-    namespace: default
+    namespace: {{RABBITMQ_CLUSTER_NAMESPACE}}
 ---
 apiVersion: rabbitmq.com/v1beta1
 kind: User
@@ -22,6 +22,6 @@ metadata:
 spec:
   rabbitmqClusterReference:
     name: rabbitmq
-    namespace: default
+    namespace: {{RABBITMQ_CLUSTER_NAMESPACE}}
   importCredentialsSecret:
     name: applicationname-rabbitmq

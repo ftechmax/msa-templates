@@ -1,27 +1,60 @@
 # Worker project
 
-The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing domain events. It typically runs as a background service and does not expose HTTP endpoints. The worker project template sets up a robust foundation for building message-driven services using MassTransit with RabbitMQ for messaging, MongoDB for persistence, and OpenTelemetry for observability.
+The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing events that represent domain outcomes. It typically runs as a background service and does not expose HTTP endpoints. The worker project template sets up a robust foundation for building message-driven services using MassTransit with RabbitMQ for messaging, MongoDB-compatible storage, and OpenTelemetry for observability.
 
 ## Responsibilities
 
-In practice, the worker is where you put the “real work”:
+In practice, the worker is where you put the "real work":
 
 - **Consumes commands** from the bus and treats them as the unit of work. Commands should be actionable and explicit, like `CreateOrder` instead of `OrderChanged`.
 - **Handles external events** from other services and translates them into local commands when needed, so domain logic stays behind your own contracts.
-- **Applies domain rules** and produces domain events as the outcome, meaning facts that happened, instead of leaking persistence concerns into handlers.
-- **Persists state** (MongoDB by default) behind a repository abstraction.
-- **Publishes events** back onto the bus so other services (and the API) can react asynchronously.
+- **Applies domain rules** and produces internal domain events as the outcome, meaning facts that happened, instead of leaking persistence concerns into handlers.
+- **Persists state** behind a repository abstraction using MongoDB-compatible storage by default.
+- **Publishes shared events** back onto the bus so other services (and the API) can react asynchronously.
 
 ## Operational notes
 
 - **Idempotent by design** because messages can be delivered more than once.
-- **Observable**: traces, metrics, and logs are emitted via OpenTelemetry so you can answer “what happened to message X?”.
+- **Observable**: traces, metrics, and logs are emitted via OpenTelemetry so you can answer "what happened to message X?".
 - **Resilient**: transient failures should be retryable and visible. MassTransit and RabbitMQ give you the building blocks, and you decide the policy.
 - **Background jobs** belong here too. This template shows a hosted service for cache invalidation.
 
+## Command handling and event publication
+
+The worker is where "command accepted" turns into "domain result happened".
+
+That distinction matters across the whole stack:
+
+- the web sends a command and gets an immediate HTTP response
+- the API puts the command on the bus and returns
+- the worker later consumes that command, performs the real work, and publishes the resulting event
+
+This is the part of the flow that makes the message-driven architecture real. If you want the browser-side view of the same loop, see [Web status service and domain feedback](web.md#status-service-and-domain-feedback). If you want the bridge layer that sits in front of and behind the worker, see [API async command loop](api.md#async-command-loop).
+
+In these docs, "domain event" means the internal result produced by the application/domain layer. Once that result is mapped to a shared contract and published on the bus, it becomes a published event that the API and web app can react to.
+
+In the template, the worker side is split into two layers:
+
+- the command handler is the messaging boundary
+- the application/domain service applies business rules and persists state
+
+The usual flow looks like this:
+
+1. a command arrives from RabbitMQ
+2. `ExampleCommandHandler` passes it to the application service
+3. the application service loads or creates the aggregate and applies domain rules
+4. the updated state is persisted
+5. a domain event is returned from the application layer
+6. the handler maps that domain event to a shared event contract
+7. the handler republishes it onto the bus, preserving the original correlation id
+
+That republished event is what the API later consumes to invalidate caches and notify the web app.
+
+On failures, the worker side is just as important. If command handling throws, the command has still been accepted into the asynchronous pipeline, but the business operation did not complete. That failure can then travel back through the fault path so the API can surface a `DomainFault` to the browser.
+
 ## Project Structure
 
-The worker project is very simple in how it works. Because it is only allowed to communicate via messages, its entry point is a set of message handlers that respond to commands and events. Each handler delegates the actual business logic to a domain service, which encapsulates the core functionality of the service. The domain results in domain events, which are then published by the initial message handler, creating a clean loop.
+The worker project is very simple in how it works. Because it is only allowed to communicate via messages, its entry point is a set of message handlers that respond to commands and events. Each handler delegates the actual business logic to a domain service, which encapsulates the core functionality of the service. The domain results in internal domain events, which are then mapped and published by the initial message handler, creating a clean loop.
 
 ### Command Handler
 
@@ -30,12 +63,14 @@ The `ExampleCommandHandler.cs` file contains the implementation of command handl
 The command handler usually follows these steps:
 1. **Receive Command**: The handler listens for specific commands from the message bus.
 2. **Pass Command to Domain Service**: The handler invokes the appropriate method on the domain service, passing along the entire command object.
-3. **Convert Domain Events**: The domain service processes the command and returns a domain event object. The handler converts this domain event into an integration event suitable for publishing.
-4. **Publish Integration Events**: After processing the command, the handler may publish domain events if the returned domain event object is not null.
+3. **Map Domain Events**: The domain service processes the command and returns a domain event object. The handler maps that domain event into a shared event contract suitable for publishing.
+4. **Publish Events**: After processing the command, the handler may publish the mapped event if the returned domain event object is not null.
+
+Notice what the handler does not do: it does not talk to the web directly and it does not complete an HTTP request. Its responsibility is to turn bus messages into durable domain outcomes and then publish the resulting facts back out.
 
 ### Domain Service
 
-The `ExampleService.cs` file contains the core business logic for the `Example` domain. This service is responsible for processing commands delivered by its `CommandHandler` and generating domain events based on the business rules.
+The `ExampleService.cs` file contains the core business logic for the `Example` domain. This service is responsible for processing commands delivered by its `CommandHandler` and generating internal domain events based on the business rules.
 
 The domain service typically follows these steps:
 1. **Receive Command**: The service receives the command object from the command handler.
@@ -44,9 +79,11 @@ The domain service typically follows these steps:
 4. **Persist Changes**: The service saves the updated aggregate back to the repository.
 5. **Return Domain Events**: The service returns any domain events that were generated as a result of processing the command.
 
+Returning the domain event instead of pushing it directly from deep inside the domain layer keeps the responsibilities tidy: domain code decides what happened, while the outer consumer decides how that fact is published to the rest of the system.
+
 #### Using a Different Persistence Mechanism
 
-Note that the default persistence mechanism is MongoDB, but you can replace it with any other database by implementing the repository interface accordingly.
+Note that the default persistence mechanism uses MongoDB-compatible storage; in the generated Kubernetes setup that typically means FerretDB, but you can replace it with any other database by implementing the repository interface accordingly.
 For event-sourcing scenarios, you can use my [MongoEventStore](https://github.com/ftechmax/mongo-eventstore) library as a starting point. In this case you would store the domain event object returned by the aggregate instead of persisting the aggregate state directly.
 
 ### External Event Handler

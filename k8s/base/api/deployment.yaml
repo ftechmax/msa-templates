@@ -38,7 +38,7 @@ spec:
               containerPort: 8080
           env:
             - name: rabbitmq__host
-              value: rabbitmq.default.svc
+              value: {{RABBITMQ_HOST}}
             - name: rabbitmq__username
               valueFrom:
                 secretKeyRef:
