@@ -151,20 +151,8 @@ public static class Program
     {
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger(i =>
-            {
-                i.PreSerializeFilters.Add((doc, _) =>
-                {
-                    doc.Servers = new List<Microsoft.OpenApi.OpenApiServer>
-                    {
-                        new() { Url = "/api" }
-                    };
-                });
-            });
-            app.UseSwaggerUI(i =>
-            {
-                i.SwaggerEndpoint("/api/swagger/v1/swagger.json", $"{ServiceName} V1");
-            });
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         app.UseAuthorization();
