@@ -137,7 +137,6 @@ public static class Program
             .WithMetrics(builder => builder
                 .SetResourceBuilder(appResourceBuilder)
                 .AddAspNetCoreInstrumentation()
-                .AddProcessInstrumentation()
                 .AddRuntimeInstrumentation()
                 .AddHttpClientInstrumentation()
                 .AddOtlpExporter(configure =>
