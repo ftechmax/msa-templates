@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { EventService } from '../../status.service';
 import { v4 as uuidv4 } from 'uuid';
-import { CommonModule } from '@angular/common';
+
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -23,14 +23,13 @@ import { TranslocoDirective } from '@jsverse/transloco';
 @Component({
   selector: 'app-example-create',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
     MatButtonModule,
-    TranslocoDirective,
-  ],
+    TranslocoDirective
+],
   providers: [ExampleHttpClient],
   templateUrl: './example-create.component.html',
   styleUrl: './example-create.component.scss',
