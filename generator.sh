@@ -66,6 +66,9 @@ prompt_pascal SERVICE_NAME        "Service name (PascalCase)"
 prompt        NAMESPACE           "Kubernetes namespace" "default"
 prompt_host   RABBITMQ_HOST       "RabbitMQ host" "rabbitmq.rabbitmq-system.svc"
 prompt_host   FERRETDB_HOST       "FerretDB host" "ferretdb.ferretdb-system.svc"
+prompt        GATEWAY_NAMESPACE   "Istio Gateway namespace" "istio-ingress"
+prompt        GATEWAY_NAME        "Istio Gateway name" "gateway"
+prompt        DOMAIN              "Base domain" "kube.local"
 
 # Extract namespace from RabbitMQ host
 RABBITMQ_CLUSTER_NAMESPACE=$(echo "$RABBITMQ_HOST" | cut -d'.' -f2)
@@ -148,6 +151,9 @@ find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path;
       -e "s/{{RABBITMQ_HOST}}/$RABBITMQ_HOST/g" \
       -e "s/{{RABBITMQ_CLUSTER_NAMESPACE}}/$RABBITMQ_CLUSTER_NAMESPACE/g" \
       -e "s/{{FERRETDB_HOST}}/$FERRETDB_HOST/g" \
+      -e "s/{{GATEWAY_NAMESPACE}}/$GATEWAY_NAMESPACE/g" \
+      -e "s/{{GATEWAY_NAME}}/$GATEWAY_NAME/g" \
+      -e "s/{{DOMAIN}}/$DOMAIN/g" \
       -e "s/applicationname_snake/$SNAKE_CASE_SERVICE_NAME/g" \
       -e "s/applicationname/$KEBAB_CASE_SERVICE_NAME/g" \
       -e "s/ApplicationName/$DOT_CASE_SERVICE_NAME/g" \

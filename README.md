@@ -77,6 +77,9 @@ Service name (PascalCase): AwesomeApp
 Kubernetes namespace [default]:
 RabbitMQ host [rabbitmq.rabbitmq-system.svc]:
 FerretDB host [ferretdb.ferretdb-system.svc]:
+Istio Gateway namespace [istio-ingress]:
+Istio Gateway name [gateway]:
+Base domain [kube.local]:
 ```
 
 On PowerShell, the default destination folder is `C:/git` instead of `~/git`.

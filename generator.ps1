@@ -64,6 +64,9 @@ $ServiceName       = Prompt-PascalCase -PromptText "Service name (PascalCase)"
 $Namespace         = Prompt-Required  -PromptText "Kubernetes namespace" -Default "default"
 $RabbitmqHost      = Prompt-Host      -PromptText "RabbitMQ host" -Default "rabbitmq.rabbitmq-system.svc"
 $FerretdbHost      = Prompt-Host      -PromptText "FerretDB host" -Default "ferretdb.ferretdb-system.svc"
+$GatewayNamespace  = Prompt-Required  -PromptText "Istio Gateway namespace" -Default "istio-ingress"
+$GatewayName       = Prompt-Required  -PromptText "Istio Gateway name" -Default "gateway"
+$Domain            = Prompt-Required  -PromptText "Base domain" -Default "kube.local"
 
 # Extract namespace from RabbitMQ host (e.g. rabbitmq.rabbitmq-system.svc -> rabbitmq-system)
 $RabbitmqClusterNamespace = ($RabbitmqHost -split '\.')[1]
@@ -150,6 +153,9 @@ Get-ChildItem -Path "$ProjectFolder/k8s" -Recurse | ForEach-Object {
             -creplace '{{RABBITMQ_HOST}}', $RabbitmqHost `
             -creplace '{{RABBITMQ_CLUSTER_NAMESPACE}}', $RabbitmqClusterNamespace `
             -creplace '{{FERRETDB_HOST}}', $FerretdbHost `
+            -creplace '{{GATEWAY_NAMESPACE}}', $GatewayNamespace `
+            -creplace '{{GATEWAY_NAME}}', $GatewayName `
+            -creplace '{{DOMAIN}}', $Domain `
             -creplace 'applicationname_snake', $snakeCaseServiceName `
             -creplace 'applicationname', $kebabCaseServiceName `
             -creplace 'ApplicationName', $dotCaseServiceName `

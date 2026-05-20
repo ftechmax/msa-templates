@@ -13,7 +13,7 @@ The generator copies a ready-to-patch `k8s/` folder into your new service projec
   - `cache/` resources for a per-service Valkey instance
   - `rabbitmq-user.yaml` to provision a RabbitMQ user and permissions for the service
   - `database-user.yaml` to provision a FerretDB user for the service database
-  - `api/mapping.yaml` and `web/mapping.yaml` for Emissary/Ambassador routing
+  - `api/httproute.yaml` and `web/httproute.yaml` for Istio Gateway API routing
 - `k8s/overlays/local/`
   - points images at `registry:5000/...`, a locally deployed registry
   - includes example secrets for RabbitMQ and database credentials
@@ -31,7 +31,8 @@ Before applying the generated manifests, make sure your cluster already provides
 - The RabbitMQ CRDs/controllers needed for `rabbitmq.com/v1beta1` `User` and `Permission` resources, or an equivalent setup that lets those resources reconcile successfully
 - A FerretDB deployment reachable using the hostname you enter in the generator, for example `ferretdb.ferretdb-system.svc`
 - The custom `k8s.ftechmax.net/v1alpha1` `FerretDbUser` CRD/controller, or an equivalent mechanism if you plan to replace that part of the manifests
-- Emissary/Ambassador ingress, or another ingress strategy after you replace the generated `getambassador.io/v3alpha1` `Mapping` resources
+- Istio 1.24+ or another Gateway API implementation, with both the standard **and experimental** channel CRDs from [kubernetes-sigs/gateway-api](https://github.com/kubernetes-sigs/gateway-api) installed. The experimental channel is required for the `CORS` filter.
+- A `Gateway` resource that the generated `HTTPRoute`s can attach to. The generator defaults to a `Gateway` named `gateway` in namespace `istio-ingress`, matching Istio's Gateway API quick start. Override with the `Istio Gateway namespace` / `Istio Gateway name` prompts in the generator if your platform uses a different target.
 - A container registry that your cluster can pull from
 
 The generated base manifests do not install RabbitMQ, FerretDB, ingress, or the supporting operators. They only create the service-specific pieces that plug into that platform.
@@ -48,22 +49,26 @@ The interactive prompts are not cosmetic. They are stamped directly into the man
 - `FerretDB host`
   - becomes part of the worker MongoDB connection string
 - `Service name`
-  - becomes the deployment names, service names, database name, and ingress host pattern
+  - becomes the deployment names, service names, database name, and ingress hostname prefix
+- `Istio Gateway namespace` / `Istio Gateway name`
+  - become the `parentRefs` on the generated `HTTPRoute`s
+- `Base domain`
+  - is appended to the kebab-cased service name to form the `hostnames` entry on each `HTTPRoute`
 
 ## Routing model
 
-The generated manifests assume path-based routing through Emissary/Ambassador:
+The generated manifests assume path-based routing through Istio's Gateway API:
 
 - `/` goes to the web app
-- `/api/` goes to the API
+- `/api/` goes to the API  and rewritten to `/`
 - `/api-hub` goes to the SignalR hub
 
-The generated mappings also expect requests to come in on a host matching `^applicationname\\..+$`, which becomes something like `^awesome-app\\..+$` after generation.
+Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>` — for example `awesome-app.kube.local` if you accept the defaults.
 
 That means one of the following needs to be true:
 
 - your ingress/DNS setup exposes hosts like `awesome-app.your-domain.tld`, or
-- you edit the generated `Mapping` resources to match your environment
+- you edit the generated `HTTPRoute` resources (or add a kustomize overlay patch) to match your environment
 
 ## Overlay usage
 
@@ -111,7 +116,7 @@ That is completely fine. The templates do not require that exact repo, but they 
 - RabbitMQ available by cluster DNS
 - FerretDB available by cluster DNS
 - the CRDs/controllers referenced by the manifests, or your own replacements
-- ingress routing for the generated host and path conventions
+- ingress routing via Gateway API `HTTPRoute` (or replace the generated routes with your own ingress resources)
 - a pullable image registry
 
 If your platform differs, treat the generated `k8s/` folder as a starting point and replace the parts that are platform-specific first: ingress mappings, user provisioning resources, image registry settings, and secret management.
