@@ -4,25 +4,25 @@ This project contains a set of templates to scaffold a small message-driven syst
 
 In this repository, **MSA** stands for **Message-driven Service Architecture**: services communicate primarily through commands and events over a message broker, which keeps them loosely coupled and enables independent scaling and deployment.
 
-If you're new here, start with [Quick start](#quick-start), continue with [After generation](#after-generation), then read [What you get](#what-you-get). The service-specific sections below explain the responsibilities and the reasoning behind the split.
-
-[![NuGet](https://img.shields.io/nuget/v/MSA.Templates.svg?style=flat&logo=nuget)](https://www.nuget.org/packages/MSA.Templates/)
 [![Release](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml/badge.svg)](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml)
 [![codecov](https://codecov.io/gh/ftechmax/msa-templates/graph/badge.svg?token=I4QI609IIQ)](https://codecov.io/gh/ftechmax/msa-templates)
 
 > [!NOTE]
-> The templates currently use **MassTransit**, but this will be removed in a future update and replaced by my own library **Conveyo**: https://github.com/ftechmax/conveyo
+> The templates currently use **MassTransit**, but this will be removed in a future update and replaced by my own library **Conveyo**: https://github.com/ftechmax/conveyo which will also open the door to workers written in Go.
 > MassTransit's licensing model changed, and I want the messaging stack to remain fully open and free.
+
+> [!NOTE]
+> If you previously installed the now-retired `MSA.Templates` NuGet package, you can remove the stale local install with `dotnet new uninstall MSA.Templates`. The new flow does not use `dotnet new`.
 
 ## Table of contents
 
 - [Message-driven Service Architecture Templates](#message-driven-service-architecture-templates)
   - [Table of contents](#table-of-contents)
   - [Why this exists](#why-this-exists)
+  - [What you get](#what-you-get)
   - [Prerequisites](#prerequisites)
   - [Quick start](#quick-start)
   - [After generation](#after-generation)
-  - [What you get](#what-you-get)
   - [Message-driven Service Architecture Worker](#message-driven-service-architecture-worker)
   - [Message-driven Service Architecture API](#message-driven-service-architecture-api)
   - [Message-driven Service Architecture Web](#message-driven-service-architecture-web)
@@ -32,14 +32,33 @@ If you're new here, start with [Quick start](#quick-start), continue with [After
 
 I've been building message-driven systems for ~15 years. Over time you end up rediscovering the same handful of patterns: how services talk to each other, how you model commands and events, how you make failures visible, how you deploy safely, and how you keep a system operable once it's running 24/7.
 
-These templates are the accumulation of those lessons, packaged as a starting point that gets the boring, but critical, parts right:
+These templates are the accumulation of those lessons, packaged as a starting point that tries to get the initial foundation right:
 
 - A clear split between the **HTTP edge** in the API and **asynchronous domain work** in the worker
 - A default stack for **messaging, persistence, caching, and telemetry** that works well in practice
 - **Kubernetes** manifests are included so you can deploy quickly on local, self-hosted, or cloud environments
 - **Opinionated but flexible** architecture that encourages best practices without being restrictive
 
-This is not meant to be the only way to do things. It's just a set of defaults that has proven itself in real projects, real incidents, and real deployments.
+This is not meant to be the only way to do things. It's a set of defaults that has proven itself in real projects I've shippeds.
+
+## What you get
+
+These templates are intended to be used together as a "vertical slice" of a message-driven system:
+
+- **Shared**: contracts and shared abstractions used across services within the same domain.
+- **Worker**: consumes commands and external events, applies business logic, persists state, and publishes events that represent domain outcomes.
+- **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through SignalR.
+- **Web**: a lightweight Angular frontend scaffolded to work with the API.
+- **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
+- **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
+
+The templates come with sensible defaults for:
+
+- **Messaging** via MassTransit (Conveyo coming soon!) on top of RabbitMQ
+- **Persistence** via the MongoDB.Driver package, typically backed by FerretDB in the generated Kubernetes setup
+- **Caching** via Valkey using the StackExchange.Redis package
+- **Real-time updates** via SignalR
+- **Observability** via OpenTelemetry for traces, metrics, and logs
 
 ## Prerequisites
 
@@ -48,7 +67,7 @@ This is not meant to be the only way to do things. It's just a set of defaults t
 
 ## Quick start
 
-Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script automatically installs the matching `MSA.Templates` NuGet package.
+Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script auto-downloads the matching `templates/` + `k8s/` bundle from the same release on first run, or you can download the full zip up front (see below).
 
 **Bash (Linux/macOS):**
 
@@ -66,6 +85,20 @@ Invoke-WebRequest -Uri https://github.com/ftechmax/msa-templates/releases/latest
 ```
 
 > ⚠️ Security note: the commands above will run a script pulled from the net. Convenient? Absolutely. Auditable? Not unless you read it first.
+
+If you'd rather inspect everything before running (or generate on an air-gapped host), grab `msa-templates-vX.Y.Z.zip` from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest), extract it, and run the script from inside:
+
+**Bash:**
+
+```sh
+unzip msa-templates-v*.zip && cd msa-templates && ./generator.sh
+```
+
+**PowerShell:**
+
+```powershell
+Expand-Archive msa-templates-v*.zip ; cd msa-templates ; .\generator.ps1
+```
 
 The generator will walk you through the configuration interactively. Each prompt has an opinionated default, so just press Enter to accept it:
 
@@ -107,25 +140,6 @@ At this point you have a scaffolded service stack on disk. A good next pass is:
 4. If you use [krun](https://github.com/ftechmax/krun), update or use the generated `krun.json` as your local run configuration.
 
 The generator creates code, manifests, and wiring. It does not start the stack for you.
-
-## What you get
-
-These templates are intended to be used together as a "vertical slice" of a message-driven system:
-
-- **Shared**: contracts and shared abstractions used across services within the same domain.
-- **Worker**: consumes commands and external events, applies business logic, persists state, and publishes events that represent domain outcomes.
-- **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through SignalR.
-- **Web**: a lightweight Angular frontend scaffolded to work with the API.
-- **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
-- **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
-
-The templates come with sensible defaults for:
-
-- **Messaging** via MassTransit (Conveyo coming soon!) + RabbitMQ for commands and events
-- **Persistence** via the MongoDB.Driver package, typically backed by FerretDB in the generated Kubernetes setup
-- **Caching** via Valkey/Redis using the StackExchange.Redis package
-- **Real-time updates** via SignalR
-- **Observability** via OpenTelemetry for traces, metrics, and logs
 
 ## Message-driven Service Architecture Worker
 
@@ -169,38 +183,11 @@ The API is the **HTTP edge**: it validates input, serves reads from a local read
 
 For the full breakdown of controllers, application services, and local event handling, see [docs/api.md](docs/api.md).
 
-```mermaid
-graph LR;
-    Wb[Web]-->A[API];
-    A-->Wb;
-    A-- sends commands -->W;
-    W[Worker]-- publishes events -->A;
-    style A fill:#555
-```
-
 ## Message-driven Service Architecture Web
 
-This creates a simple Angular SPA hosted in an Nginx container and preconfigured to run in a Kubernetes environment. It uses [Transloco](https://jsverse.gitbook.io/transloco) to manage translations.
+A simple Angular SPA hosted in an Nginx container, preconfigured to run in a Kubernetes environment. It uses [Transloco](https://jsverse.gitbook.io/transloco) to manage translations.
 
-For the full breakdown of SignalR integration, translations, and the event handling, see [docs/web.md](docs/web.md).
-
-The web template is kept intentionally light, but it contains everything needed for full API integration.
-
-- **Calls the API** for queries and user-initiated actions.
-- **Triggers commands** indirectly by hitting HTTP endpoints. The API turns those requests into messages.
-- **React to server-side changes**: the architecture supports pushing updates through SignalR so your UI can subscribe to published events and refresh relevant screens.
-- **Deploys cleanly** as a static-ish frontend behind Nginx, which maps nicely to Kubernetes.
-
-The goal is to give you a working starting point that matches the rest of the stack, without forcing a specific UI architecture on top.
-
-```mermaid
-graph LR;
-    Wb[Web]-->A[API];
-    A-->Wb;
-    A-- sends commands -->W;
-    W[Worker]-- publishes events -->A;
-    style Wb fill:#555
-```
+For the full breakdown of SignalR integration, translations, and event handling, see [docs/web.md](docs/web.md).
 
 ## How to contribute
 

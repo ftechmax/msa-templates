@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: {{NAMESPACE}}
 resources:
   - ./../../base
+# {{REGISTRY}} and {{IMAGE_TAG}} should be substituted by CI at deploy time.
 images:
   - name: applicationname-worker
     newName: '{{REGISTRY}}/applicationname-worker'

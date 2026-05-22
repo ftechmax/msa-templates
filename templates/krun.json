@@ -1,0 +1,31 @@
+[
+  {
+    "name": "applicationname-worker",
+    "path": "src/worker",
+    "dockerfile": "ApplicationName.Worker",
+    "context": "src/",
+    "intercept_port": 5001,
+    "service_dependencies": [
+      { "host": "applicationname-cache", "port": 6379 },
+      { "host": "{{RABBITMQ_HOST}}", "port": 5672 },
+      { "host": "{{FERRETDB_HOST}}", "port": 27017 }
+    ]
+  },
+  {
+    "name": "applicationname-api",
+    "path": "src/api",
+    "dockerfile": "ApplicationName.Api",
+    "context": "src/",
+    "intercept_port": 5000,
+    "service_dependencies": [
+      { "host": "applicationname-cache", "port": 6379 },
+      { "host": "{{RABBITMQ_HOST}}", "port": 5672 }
+    ]
+  },
+  {
+    "name": "applicationname-web",
+    "path": "src/web",
+    "dockerfile": ".",
+    "context": "src/web"
+  }
+]

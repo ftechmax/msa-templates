@@ -1,0 +1,134 @@
+name: Develop smoke
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  smoke-bash:
+    name: Smoke test Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Run generator.sh
+        run: |
+          chmod +x ./generator.sh
+          printf '%s\n' \
+            /tmp/msa-smoke \
+            AwesomeApp \
+            default \
+            rabbitmq.rabbitmq-system.svc \
+            ferretdb.ferretdb-system.svc \
+            istio-ingress \
+            gateway \
+            kube.local \
+            | ./generator.sh
+
+      - name: Placeholder check
+        run: |
+          set -e
+          ! grep -r 'ApplicationName' /tmp/msa-smoke/awesome-app --exclude-dir=node_modules
+          ! grep -r 'applicationname' /tmp/msa-smoke/awesome-app --exclude-dir=node_modules
+          ! grep -r 'applicationname_snake' /tmp/msa-smoke/awesome-app --exclude-dir=node_modules
+
+      - name: Build api
+        run: dotnet build /tmp/msa-smoke/awesome-app/src/api/Awesome.App.Api.sln
+
+      - name: Build worker
+        run: dotnet build /tmp/msa-smoke/awesome-app/src/worker/Awesome.App.Worker.sln
+
+      - name: Build shared
+        run: dotnet build /tmp/msa-smoke/awesome-app/src/shared/Awesome.App.Shared.sln
+
+      - name: Build web
+        run: |
+          cd /tmp/msa-smoke/awesome-app/src/web
+          npm ci
+          npm run build
+
+      - name: Run unit tests
+        run: |
+          dotnet test /tmp/msa-smoke/awesome-app/src/api/Awesome.App.Api.sln
+          dotnet test /tmp/msa-smoke/awesome-app/src/worker/Awesome.App.Worker.sln
+
+  smoke-pwsh:
+    name: Smoke test Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Run generator.ps1
+        shell: pwsh
+        run: |
+          @(
+            'C:\msa-smoke',
+            'AwesomeApp',
+            'default',
+            'rabbitmq.rabbitmq-system.svc',
+            'ferretdb.ferretdb-system.svc',
+            'istio-ingress',
+            'gateway',
+            'kube.local'
+          ) -join "`r`n" | Set-Content -Path inputs.txt -Encoding ascii
+          cmd /c 'pwsh -NoProfile -NonInteractive -File .\generator.ps1 < inputs.txt'
+
+      - name: Placeholder check
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path C:\msa-smoke\awesome-app -Recurse -File |
+            Where-Object { $_.FullName -notmatch 'node_modules' }
+          $hits = $files | Select-String -Pattern 'ApplicationName', 'applicationname', 'applicationname_snake'
+          if ($hits) {
+            $hits | ForEach-Object { Write-Host $_ }
+            throw "Placeholder leak detected"
+          }
+
+      - name: Build api
+        shell: pwsh
+        run: dotnet build C:\msa-smoke\awesome-app\src\api\Awesome.App.Api.sln
+
+      - name: Build worker
+        shell: pwsh
+        run: dotnet build C:\msa-smoke\awesome-app\src\worker\Awesome.App.Worker.sln
+
+      - name: Build shared
+        shell: pwsh
+        run: dotnet build C:\msa-smoke\awesome-app\src\shared\Awesome.App.Shared.sln
+
+      - name: Build web
+        shell: pwsh
+        run: |
+          cd C:\msa-smoke\awesome-app\src\web
+          npm ci
+          npm run build
+
+      - name: Run unit tests
+        shell: pwsh
+        run: |
+          dotnet test C:\msa-smoke\awesome-app\src\api\Awesome.App.Api.sln
+          dotnet test C:\msa-smoke\awesome-app\src\worker\Awesome.App.Worker.sln

@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'src/**'
+      - 'templates/**'
       - 'k8s/**'
       - 'generator.sh'
       - 'generator.ps1'
@@ -17,7 +17,6 @@ jobs:
     runs-on: [ubuntu-latest]
     permissions:
       contents: write
-      packages: write
 
     steps:
       - name: Checkout
@@ -42,28 +41,30 @@ jobs:
 
       - name: Run dotnet tests and coverage
         run: |-
-          dotnet test ./src/templates/api/ApplicationName.Api.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-          dotnet test ./src/templates/worker/ApplicationName.Worker.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-
-      - name: Create package
-        run: dotnet pack ./src/MSA.Templates.csproj -p:PackageVersion=${{ steps.gitversion.outputs.semVer }} -c Release
+          dotnet test ./templates/api/ApplicationName.Api.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+          dotnet test ./templates/worker/ApplicationName.Worker.sln /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Prepare generator artifacts
+      - name: Prepare release artifacts
         run: |-
+          set -euo pipefail
+          semver="${{ steps.gitversion.outputs.semVer }}"
           mkdir -p dist
-          sed -i "s/GENERATOR_VERSION=\"develop\"/GENERATOR_VERSION=\"${{ steps.gitversion.outputs.semVer }}\"/" generator.sh
-          sed -i "s/\$GeneratorVersion = \"develop\"/\$GeneratorVersion = \"${{ steps.gitversion.outputs.semVer }}\"/" generator.ps1
+          sed -i "s/GENERATOR_VERSION=\"develop\"/GENERATOR_VERSION=\"${semver}\"/" generator.sh
+          sed -i "s/\$GeneratorVersion = \"develop\"/\$GeneratorVersion = \"${semver}\"/" generator.ps1
           chmod +x generator.sh
-          cp generator.sh generator.ps1 dist/
 
-      - name: Publish package
-        run: |-
-          dotnet nuget push ./artifacts/*${{ steps.gitversion.outputs.semVer }}.nupkg --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          staging="$(mktemp -d)/msa-templates"
+          mkdir -p "$staging"
+          cp generator.sh generator.ps1 "$staging/"
+          cp -R templates k8s "$staging/"
+
+          cp generator.sh generator.ps1 dist/
+          (cd "$(dirname "$staging")" && zip -qr "$GITHUB_WORKSPACE/dist/msa-templates-v${semver}.zip" msa-templates)
 
       - name: Create release
         uses: ncipollo/release-action@v1
@@ -73,4 +74,4 @@ jobs:
           name: Release ${{ steps.gitversion.outputs.semVer }}
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: 'dist/generator.sh,dist/generator.ps1'
+          artifacts: 'dist/generator.sh,dist/generator.ps1,dist/msa-templates-v*.zip'
