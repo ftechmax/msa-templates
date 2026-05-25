@@ -8,7 +8,7 @@ In this repository, **MSA** stands for **Message-driven Service Architecture**: 
 [![codecov](https://codecov.io/gh/ftechmax/msa-templates/graph/badge.svg?token=I4QI609IIQ)](https://codecov.io/gh/ftechmax/msa-templates)
 
 > [!NOTE]
-> The templates currently use **MassTransit**, but this will be removed in a future update and replaced by my own library **Conveyo**: https://github.com/ftechmax/conveyo which will also open the door to workers written in Go.
+> The templates currently use **MassTransit**, but this will be removed in a future update and replaced by my own library **Conveyo**: https://github.com/ftechmax/conveyo. Conveyo will also support workers written in Go.
 > MassTransit's licensing model changed, and I want the messaging stack to remain fully open and free.
 
 > [!NOTE]
@@ -32,14 +32,14 @@ In this repository, **MSA** stands for **Message-driven Service Architecture**: 
 
 I've been building message-driven systems for ~15 years. Over time you end up rediscovering the same handful of patterns: how services talk to each other, how you model commands and events, how you make failures visible, how you deploy safely, and how you keep a system operable once it's running 24/7.
 
-These templates are the accumulation of those lessons, packaged as a starting point that tries to get the initial foundation right:
+These templates are the accumulation of those lessons, packaged as a starting point:
 
 - A clear split between the **HTTP edge** in the API and **asynchronous domain work** in the worker
-- A default stack for **messaging, persistence, caching, and telemetry** that works well in practice
-- **Kubernetes** manifests are included so you can deploy quickly on local, self-hosted, or cloud environments
-- **Opinionated but flexible** architecture that encourages best practices without being restrictive
+- A default stack for **messaging, persistence, caching, and telemetry** picked from what I reach for on every project
+- **Kubernetes** manifests included for local, self-hosted, and cloud clusters
+- Opinionated defaults you can rip out: every choice (MassTransit, MongoDB, Valkey, SignalR) is isolated behind its own wiring so you can swap one without touching the rest
 
-This is not meant to be the only way to do things. It's a set of defaults that has proven itself in real projects I've shippeds.
+This is not meant to be the only way to do things. It's the default I've shipped to production more than once.
 
 ## What you get
 
@@ -52,7 +52,7 @@ These templates are intended to be used together as a "vertical slice" of a mess
 - **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
 - **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
 
-The templates come with sensible defaults for:
+The templates come wired up for:
 
 - **Messaging** via MassTransit (Conveyo coming soon!) on top of RabbitMQ
 - **Persistence** via the MongoDB.Driver package, typically backed by FerretDB in the generated Kubernetes setup
@@ -132,18 +132,18 @@ awesome-app
 
 ## After generation
 
-At this point you have a scaffolded service stack on disk. A good next pass is:
+At this point you have a scaffolded service stack on disk. From here:
 
 1. Open the generated folder and inspect `src/shared`, `src/worker`, `src/api`, and `src/web`.
-2. Read [docs/worker.md](docs/worker.md), [docs/api.md](docs/api.md), and [docs/web.md](docs/web.md) so you know where to replace the example domain code.
-3. Review [docs/k8s.md](docs/k8s.md) before applying the generated manifests. The `k8s/` folder expects you to already have the platform services in place, typically via [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or something equivalent.
-4. If you use [krun](https://github.com/ftechmax/krun), update or use the generated `krun.json` as your local run configuration.
+2. Read [docs/worker.md](docs/worker.md), [docs/api.md](docs/api.md), and [docs/web.md](docs/web.md) to find where to replace the example domain code.
+3. Review [docs/k8s.md](docs/k8s.md) before applying the generated manifests. The `k8s/` folder assumes the platform services already exist in the cluster, typically installed via [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or equivalent.
+4. If you use [krun](https://github.com/ftechmax/krun), use the generated `krun.json` as your local run configuration.
 
 The generator creates code, manifests, and wiring. It does not start the stack for you.
 
 ## Message-driven Service Architecture Worker
 
-The worker is the service that **consumes commands/events**, runs domain logic, persists state, and **publishes events that represent domain outcomes**. It is preconfigured for Kubernetes and designed to be idempotent, observable, and resilient.
+The worker is the service that **consumes commands/events**, runs domain logic, persists state, and **publishes events that represent domain outcomes**. It ships with retries and a poison queue on the bus, OpenTelemetry traces across handlers, and a Kubernetes deployment with health probes.
 
 For the full breakdown of the project structure and handler patterns, see [docs/worker.md](docs/worker.md).
 
@@ -156,7 +156,7 @@ graph LR;
     style W fill:#555
 ```
 
-In real systems you often end up with **multiple workers**, typically split by domain or bounded context. The important bit is that they stay independent: each worker consumes its own commands, owns its own state, and can react to events published by other workers.
+In real systems you often end up with **multiple workers**, typically split by domain or bounded context. Each one consumes its own commands, owns its own state, and reacts to events from the others without sharing a database or calling them directly.
 
 Here's a common "two workers" setup. The API sends commands onto the bus, and both workers publish events back. Workers can also subscribe to each other's events without direct coupling.
 

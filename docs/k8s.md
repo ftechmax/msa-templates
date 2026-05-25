@@ -1,8 +1,8 @@
 # Kubernetes manifests
 
-The generated `k8s/` folder is meant to deploy your API, worker, web app, and service-local cache into a cluster that already provides the shared platform services this stack depends on.
+The generated `k8s/` folder deploys your API, worker, web app, and service-local cache into a cluster that already provides the shared platform services this stack depends on.
 
-These manifests are designed to sit on top of [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or an equivalent platform. If you use something else, the important thing is that the capabilities below are present under the hostnames and CRDs the templates expect.
+These manifests assume [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or an equivalent platform. If you use something else, the capabilities listed below need to exist under the hostnames and CRDs the templates expect.
 
 ## What gets generated
 
@@ -60,10 +60,10 @@ The interactive prompts are not cosmetic. They are stamped directly into the man
 The generated manifests assume path-based routing through Istio's Gateway API:
 
 - `/` goes to the web app
-- `/api/` goes to the API  and rewritten to `/`
+- `/api/` goes to the API and is rewritten to `/`
 - `/api-hub` goes to the SignalR hub
 
-Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>` — for example `awesome-app.kube.local` if you accept the defaults.
+Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>`. With the default prompts, that becomes `awesome-app.kube.local`.
 
 That means one of the following needs to be true:
 
@@ -92,7 +92,7 @@ Those overlays are intended to be rendered by your CI/CD pipeline or replaced ma
 
 ## Applying the manifests
 
-For a local-style setup, the usual flow is:
+For a local-style setup:
 
 1. Build and push `applicationname-worker`, `applicationname-api`, and `applicationname-web` images to the registry referenced by your overlay.
 2. Adjust any placeholder secrets or hosts to match your cluster.
@@ -111,7 +111,7 @@ kubectl apply -k k8s/overlays/production
 
 ## If you are not using msa-infrastructure
 
-That is completely fine. The templates do not require that exact repo, but they do require an equivalent platform shape:
+The templates do not require that exact repo, but they do require an equivalent platform setup:
 
 - RabbitMQ available by cluster DNS
 - FerretDB available by cluster DNS
