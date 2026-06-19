@@ -32,7 +32,6 @@ jobs:
             AwesomeApp \
             default \
             rabbitmq.rabbitmq-system.svc \
-            ferretdb.ferretdb-system.svc \
             istio-ingress \
             gateway \
             kube.local \
@@ -90,7 +89,6 @@ jobs:
             'AwesomeApp',
             'default',
             'rabbitmq.rabbitmq-system.svc',
-            'ferretdb.ferretdb-system.svc',
             'istio-ingress',
             'gateway',
             'kube.local'

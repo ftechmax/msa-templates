@@ -9,11 +9,7 @@ using ApplicationName.Worker.Infrastructure;
 using Mapster;
 using MassTransit;
 using MassTransit.Logging;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
-using MongoDB.Driver.Core.Extensions.DiagnosticSources;
+using Npgsql;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -46,6 +42,8 @@ public static class Program
 
         var app = builder.Build();
 
+        await DatabaseInitializer.InitializeAsync(app.Services.GetRequiredService<NpgsqlDataSource>());
+
         await app.RunAsync();
     }
 
@@ -53,11 +51,8 @@ public static class Program
     {
         var configuration = context.Configuration;
 
-        // MongoDB
-        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-        var clientSettings = MongoClientSettings.FromUrl(new MongoUrl(configuration["mongodb:connection-string"]));
-        clientSettings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(clientSettings));
+        // PostgreSQL
+        services.AddSingleton(_ => new NpgsqlDataSourceBuilder(configuration["postgres:connection-string"]).Build());
 
         // Valkey
         var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
@@ -70,11 +65,6 @@ public static class Program
 
         var multiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
         services.AddSingleton<IConnectionMultiplexer>(_ => multiplexer);
-        services.AddStackExchangeRedisCache(options =>
-        {
-            options.ConfigurationOptions = redisConfiguration;
-            options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
-        });
 
         // Mapster
         services.AddMapster();
@@ -122,6 +112,7 @@ public static class Program
             .WithTracing(cfg => cfg
                 .SetResourceBuilder(appResourceBuilder)
                 .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
+                .AddNpgsql()
                 .AddOtlpExporter(configure =>
                 {
                     configure.Endpoint = otlpEndpoint;

@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: {{NAMESPACE}}
 resources:
   - ./database-secret.yaml
+  - ./pgweb.yaml
   - ./rabbitmq-secret.yaml
   - ./../../base
 patches:

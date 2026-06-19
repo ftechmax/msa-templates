@@ -26,6 +26,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-example-collection',
@@ -39,8 +40,9 @@ import { MatIcon } from '@angular/material/icon';
     MatPaginatorModule,
     MatSortModule,
     MatProgressSpinner,
-    MatIcon
-],
+    MatIcon,
+    MatButtonModule,
+  ],
 })
 export class ExampleCollectionComponent implements AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

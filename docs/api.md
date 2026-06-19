@@ -93,4 +93,4 @@ That fault path is especially important in a message-driven UI because the origi
 
 #### Using a Different Persistence Mechanism
 
-Note that the default read model uses MongoDB-compatible storage via `MongoDB.Driver`; in the generated Kubernetes setup that typically means FerretDB. This will be replaced by a Valkey read model in the future. To use another database, implement the repository interface for that store.
+Note that the default read model is served from the Valkey cache via `StackExchange.Redis`. To use another store, implement the repository interface for that backend.

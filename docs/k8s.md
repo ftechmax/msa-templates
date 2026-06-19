@@ -11,8 +11,8 @@ The generator copies a ready-to-patch `k8s/` folder into your new service projec
 - `k8s/base/`
   - `api/`, `worker/`, and `web/` Deployments and Services
   - `cache/` resources for a per-service Valkey instance
+  - `database/` resources for a per-service PostgreSQL StatefulSet
   - `rabbitmq-user.yaml` to provision a RabbitMQ user and permissions for the service
-  - `database-user.yaml` to provision a FerretDB user for the service database
   - `api/httproute.yaml` and `web/httproute.yaml` for Istio Gateway API routing
 - `k8s/overlays/local/`
   - points images at `registry:5000/...`, a locally deployed registry
@@ -29,13 +29,11 @@ Before applying the generated manifests, make sure your cluster already provides
 - A Kubernetes cluster with `kubectl` access
 - A RabbitMQ deployment reachable from the generated namespace using the hostname you enter in the generator, for example `rabbitmq.rabbitmq-system.svc`
 - The RabbitMQ CRDs/controllers needed for `rabbitmq.com/v1beta1` `User` and `Permission` resources, or an equivalent setup that lets those resources reconcile successfully
-- A FerretDB deployment reachable using the hostname you enter in the generator, for example `ferretdb.ferretdb-system.svc`
-- The custom `k8s.ftechmax.net/v1alpha1` `FerretDbUser` CRD/controller, or an equivalent mechanism if you plan to replace that part of the manifests
 - Istio 1.24+ or another Gateway API implementation, with both the standard **and experimental** channel CRDs from [kubernetes-sigs/gateway-api](https://github.com/kubernetes-sigs/gateway-api) installed. The experimental channel is required for the `CORS` filter.
 - A `Gateway` resource that the generated `HTTPRoute`s can attach to. The generator defaults to a `Gateway` named `gateway` in namespace `istio-ingress`, matching Istio's Gateway API quick start. Override with the `Istio Gateway namespace` / `Istio Gateway name` prompts in the generator if your platform uses a different target.
 - A container registry that your cluster can pull from
 
-The generated base manifests do not install RabbitMQ, FerretDB, ingress, or the supporting operators. They only create the service-specific pieces that plug into that platform.
+The generated base manifests do not install RabbitMQ, ingress, or the supporting operators. They only create the service-specific pieces that plug into that platform (the per-service Valkey cache and PostgreSQL database are included in the base manifests).
 
 ## Generator inputs and what they affect
 
@@ -46,8 +44,6 @@ The interactive prompts are not cosmetic. They are stamped directly into the man
 - `RabbitMQ host`
   - becomes the `rabbitmq__host` application setting for the API and worker
   - is also used to derive the RabbitMQ cluster namespace for the user/permission resources
-- `FerretDB host`
-  - becomes part of the worker MongoDB connection string
 - `Service name`
   - becomes the deployment names, service names, database name, and ingress hostname prefix
 - `Istio Gateway namespace` / `Istio Gateway name`
@@ -79,10 +75,13 @@ That means one of the following needs to be true:
 It does three things:
 
 - adds example RabbitMQ and database secrets
+- adds Pgweb at `applicationname-pgweb.<domain>` for local PostgreSQL inspection
 - points images to `registry:5000/applicationname-*`
 - relaxes some runtime settings that are handy in local development
 
 If you use a different local registry, edit the image names before applying the overlay.
+
+Pgweb uses the local database secret for both PostgreSQL access and HTTP basic auth. With the default generator prompts, it is available at `http://applicationname-pgweb.kube.local`.
 
 ### Development and production
 
@@ -114,7 +113,6 @@ kubectl apply -k k8s/overlays/production
 The templates do not require that exact repo, but they do require an equivalent platform setup:
 
 - RabbitMQ available by cluster DNS
-- FerretDB available by cluster DNS
 - the CRDs/controllers referenced by the manifests, or your own replacements
 - ingress routing via Gateway API `HTTPRoute` (or replace the generated routes with your own ingress resources)
 - a pullable image registry

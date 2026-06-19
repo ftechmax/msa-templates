@@ -3,13 +3,13 @@ using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Contracts.Commands;
 using ArgDefender;
-using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 
 namespace ApplicationName.Worker.Application.Documents;
 
 public sealed class ExampleDocument : DocumentBase, IExample
 {
-    [BsonConstructor]
+    [JsonConstructor]
     private ExampleDocument()
     {
     }
@@ -59,12 +59,15 @@ public sealed class ExampleDocument : DocumentBase, IExample
 
     public string Name { get; init; } = string.Empty;
 
+    [JsonInclude]
     public string Description { get; private set; } = string.Empty;
 
+    [JsonInclude]
     public ExampleValueObject ExampleValueObject { get; private set; } = null!;
 
+    [JsonInclude]
     public int? RemoteCode { get; private set; }
 
-    [BsonIgnore]
+    [JsonIgnore]
     IExampleValueObject IExample.ExampleValueObject => ExampleValueObject;
 }

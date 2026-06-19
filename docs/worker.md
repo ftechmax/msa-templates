@@ -1,6 +1,6 @@
 # Worker project
 
-The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing events that represent domain outcomes. It runs as a background service and does not expose HTTP endpoints. The template wires up MassTransit on RabbitMQ for messaging, MongoDB.Driver for persistence (FerretDB in the default Kubernetes setup), and OpenTelemetry for traces, metrics, and logs.
+The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing events that represent domain outcomes. It runs as a background service and does not expose HTTP endpoints. The template wires up MassTransit on RabbitMQ for messaging, Npgsql for persistence (PostgreSQL JSONB, an in-cluster Postgres StatefulSet in the default Kubernetes setup), and OpenTelemetry for traces, metrics, and logs.
 
 ## Responsibilities
 
@@ -9,7 +9,7 @@ In this stack, the worker owns the domain work:
 - **Consumes commands** from the bus and treats them as the unit of work. Commands should be actionable and explicit, like `CreateOrder` instead of `OrderChanged`.
 - **Handles external events** from other services and translates them into local commands when needed, keeping domain logic behind your own contracts.
 - **Applies domain rules** and produces internal domain events as the outcome, rather than leaking persistence concerns into handlers.
-- **Persists state** behind a repository abstraction using MongoDB-compatible storage by default.
+- **Persists state** behind a repository abstraction, storing documents as PostgreSQL JSONB by default.
 - **Publishes shared events** back onto the bus so other services (and the API) can react asynchronously.
 
 ## Operational notes
@@ -83,8 +83,8 @@ Returning the domain event instead of publishing it from inside the domain layer
 
 #### Using a Different Persistence Mechanism
 
-Note that the default persistence mechanism uses MongoDB-compatible storage; in the generated Kubernetes setup that typically means FerretDB. To use another database, implement the repository interface for that store.
-For event-sourcing scenarios, you can use my [MongoEventStore](https://github.com/ftechmax/mongo-eventstore) library as a starting point. In this case you would store the domain event object returned by the aggregate instead of persisting the aggregate state directly.
+Note that the default persistence mechanism stores documents as PostgreSQL JSONB via Npgsql; in the generated Kubernetes setup that means an in-cluster Postgres StatefulSet. Each document type maps to its own table (`id`/`created`/`updated` columns plus a `data jsonb` column), and the schema is created idempotently on startup. To use another database, implement the repository interface for that store.
+For event-sourcing scenarios you would store the domain event object returned by the aggregate instead of persisting the aggregate state directly.
 
 ### External Event Handler
 

@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: applicationname-database
+  labels:
+    app: applicationname-database
+spec:
+  serviceName: applicationname-database
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: applicationname-database
+  template:
+    metadata:
+      labels:
+        app: applicationname-database
+    spec:
+      securityContext:
+        fsGroup: 70
+        fsGroupChangePolicy: OnRootMismatch
+      automountServiceAccountToken: false
+      containers:
+        - name: postgres
+          image: postgres:18-alpine
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 70
+            runAsGroup: 70
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - all
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: applicationname_snake
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: applicationname-database
+                  key: database_username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: applicationname-database
+                  key: database_password
+            - name: PGDATA
+              value: /var/lib/postgresql/18/docker
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 250m
+              ephemeral-storage: 512Mi
+            requests:
+              memory: 32Mi
+              cpu: 10m
+              ephemeral-storage: 128Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

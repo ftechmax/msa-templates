@@ -73,7 +73,6 @@ prompt_required DESTINATION_FOLDER  "Destination folder" "~/git"
 prompt_pascal   SERVICE_NAME        "Service name (PascalCase)"
 prompt_required NAMESPACE           "Kubernetes namespace" "default"
 prompt_host     RABBITMQ_HOST       "RabbitMQ host" "rabbitmq.rabbitmq-system.svc"
-prompt_host     FERRETDB_HOST       "FerretDB host" "ferretdb.ferretdb-system.svc"
 prompt_required GATEWAY_NAMESPACE   "Istio Gateway namespace" "istio-ingress"
 prompt_required GATEWAY_NAME        "Istio Gateway name" "gateway"
 prompt_required DOMAIN              "Base domain" "kube.local"
@@ -171,7 +170,6 @@ substitute_file_contents() {
   sed -e "s/{{NAMESPACE}}/$NAMESPACE/g" \
       -e "s/{{RABBITMQ_HOST}}/$RABBITMQ_HOST/g" \
       -e "s/{{RABBITMQ_CLUSTER_NAMESPACE}}/$RABBITMQ_CLUSTER_NAMESPACE/g" \
-      -e "s/{{FERRETDB_HOST}}/$FERRETDB_HOST/g" \
       -e "s/{{GATEWAY_NAMESPACE}}/$GATEWAY_NAMESPACE/g" \
       -e "s/{{GATEWAY_NAME}}/$GATEWAY_NAME/g" \
       -e "s/{{DOMAIN}}/$DOMAIN/g" \

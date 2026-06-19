@@ -1,80 +1,69 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Text.Json;
 using ApplicationName.Shared.Projections;
 using ApplicationName.Worker.Application;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Contracts;
 using ArgDefender;
 using MapsterMapper;
-using MongoDB.Driver;
+using Npgsql;
+using NpgsqlTypes;
 
 namespace ApplicationName.Worker.Infrastructure;
 
-[ExcludeFromCodeCoverage]
-public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProtoCacheRepository protoCacheRepository) : IDocumentRepository
+[ExcludeFromCodeCoverage] // thin glue: translator + Npgsql + STJ; behaviour covered end-to-end
+public class DocumentRepository(
+    NpgsqlDataSource dataSource,
+    IMapper mapper,
+    IProtoCacheRepository protoCacheRepository) : IDocumentRepository
 {
-    private readonly IMongoDatabase _mongoDatabase = mongoClient.GetDatabase(ApplicationConstants.DatabaseName);
+    private static readonly JsonSerializerOptions JsonOptions = new(); // PascalCase, case-sensitive (NOT Web)
+
+    private static string GetTableName(Type t) => $"{t.Name.ToLowerInvariant()}s"; // ExampleDocument -> exampledocuments
+
+    // runs "SELECT data FROM {table} WHERE {where}" (where/parms optional) and deserializes each row
+    private async Task<List<string>> QueryDataAsync(string table, string? where, NpgsqlParameter[]? parms)
+    {
+        var sql = where is null ? $"SELECT data FROM {table}" : $"SELECT data FROM {table} WHERE {where}";
+        await using var connection = await dataSource.OpenConnectionAsync();
+        await using var command = new NpgsqlCommand(sql, connection);
+        if (parms is not null) command.Parameters.AddRange(parms);
+
+        var rows = new List<string>();
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync()) rows.Add(reader.GetString(0));
+        return rows;
+    }
 
     public async Task<T> GetAsync<T>(Expression<Func<T, bool>> expr) where T : DocumentBase
     {
         Guard.Argument(expr).NotNull();
-
-        var collection = GetCollection<T>();
-
-        var cursor = await collection.FindAsync(expr);
-
-        return await cursor.SingleOrDefaultAsync();
+        var (where, parms) = JsonbPredicateTranslator.Translate(expr);
+        var rows = await QueryDataAsync(GetTableName(typeof(T)), where, parms);
+        if (rows.Count > 1) throw new InvalidOperationException("Sequence contains more than one element"); // mirror SingleOrDefault
+        return rows.Count == 0 ? null! : JsonSerializer.Deserialize<T>(rows[0], JsonOptions)!;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : DocumentBase
     {
-        var collection = GetCollection<T>();
-        var cursor = await collection.FindAsync(FilterDefinition<T>.Empty);
-        return await cursor.ToListAsync();
+        var rows = await QueryDataAsync(GetTableName(typeof(T)), null, null);
+        return rows.Select(j => JsonSerializer.Deserialize<T>(j, JsonOptions)!);
     }
 
     public async Task<IEnumerable<DocumentBase>> GetAllByTypeAsync(Type documentType)
     {
         Guard.Argument(documentType).NotNull();
-
-        // Use reflection to call GetAllAsync<T> with the concrete type
-        var getAllMethod = GetType()
-            .GetMethod(nameof(GetAllAsync))!
-            .MakeGenericMethod(documentType);
-
-        var task = (Task)getAllMethod.Invoke(this, null)!;
-        await task.ConfigureAwait(false);
-        
-        // Get the result from the completed task
-        var resultProperty = task.GetType().GetProperty("Result")!;
-        var result = (IEnumerable<DocumentBase>)resultProperty.GetValue(task)!;
-        return result;
+        var rows = await QueryDataAsync(GetTableName(documentType), null, null);
+        return rows.Select(j => (DocumentBase)JsonSerializer.Deserialize(j, documentType, JsonOptions)!);
     }
 
     public async Task<DocumentBase?> GetByIdAndTypeAsync(Guid id, Type documentType)
     {
         Guard.Argument(id).NotDefault();
         Guard.Argument(documentType).NotNull();
-
-        // Build expression: d => d.Id == id
-        var parameter = Expression.Parameter(documentType, "d");
-        var idProperty = Expression.Property(parameter, nameof(DocumentBase.Id));
-        var idValue = Expression.Constant(id);
-        var equality = Expression.Equal(idProperty, idValue);
-        var lambda = Expression.Lambda(equality, parameter);
-
-        // Use reflection to call GetAsync<T> with the concrete type
-        var getMethod = GetType()
-            .GetMethod(nameof(GetAsync))!
-            .MakeGenericMethod(documentType);
-
-        var task = (Task)getMethod.Invoke(this, [lambda])!;
-        await task.ConfigureAwait(false);
-        
-        // Get the result from the completed task
-        var resultProperty = task.GetType().GetProperty("Result")!;
-        var result = (DocumentBase?)resultProperty.GetValue(task);
-        return result;
+        var rows = await QueryDataAsync(GetTableName(documentType), "id = @id", [new NpgsqlParameter("id", id)]);
+        return rows.Count == 0 ? null : (DocumentBase)JsonSerializer.Deserialize(rows[0], documentType, JsonOptions)!;
     }
 
     public async Task UpsertAsync(ExampleDocument document)
@@ -84,24 +73,27 @@ public class DocumentRepository(IMongoClient mongoClient, IMapper mapper, IProto
         Guard.Argument(document.Created).NotDefault();
         Guard.Argument(document.Updated).NotDefault();
 
-        var collection = GetCollection<ExampleDocument>();
-        var updateDefinition = Builders<ExampleDocument>.Update
-            .SetOnInsert(i => i.Id, document.Id)
-            .SetOnInsert(i => i.Created, document.Created)
-            .Set(i => i.Updated, document.Updated)
-            .SetOnInsert(i => i.Name, document.Name)
-            .Set(i => i.Description, document.Description)
-            .Set(i => i.ExampleValueObject, document.ExampleValueObject)
-            .Set(i => i.RemoteCode, document.RemoteCode);
+        var table = GetTableName(typeof(ExampleDocument));
+        var json = JsonSerializer.Serialize(document, JsonOptions);
 
-        await collection.UpdateOneAsync(i => i.Id == document.Id, updateDefinition, new UpdateOptions { IsUpsert = true });
+        // ON CONFLICT (id) leaves created untouched -> Mongo SetOnInsert(Created)/Set(Updated) semantics.
+        var sql = $"""
+            INSERT INTO {table} (id, created, updated, data)
+            VALUES (@id, @created, @updated, @data)
+            ON CONFLICT (id) DO UPDATE SET updated = EXCLUDED.updated, data = EXCLUDED.data;
+            """;
+
+        await using (var connection = await dataSource.OpenConnectionAsync())
+        await using (var command = new NpgsqlCommand(sql, connection))
+        {
+            command.Parameters.AddWithValue("id", document.Id);
+            command.Parameters.AddWithValue("created", document.Created);
+            command.Parameters.AddWithValue("updated", document.Updated);
+            command.Parameters.Add(new NpgsqlParameter("data", NpgsqlDbType.Jsonb) { Value = json });
+            await command.ExecuteNonQueryAsync();
+        }
 
         var projection = mapper.Map<ExampleProjection>(document);
         await protoCacheRepository.SetAsync(ApplicationConstants.ExampleProjectionByIdCacheKey(document.Id), projection);
-    }
-
-    private IMongoCollection<T> GetCollection<T>() where T : DocumentBase
-    {
-        return _mongoDatabase.GetCollection<T>($"{typeof(T).Name}s");
     }
 }

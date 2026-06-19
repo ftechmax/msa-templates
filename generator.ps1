@@ -73,7 +73,6 @@ $DestinationFolder = Prompt-Required  -PromptText "Destination folder" -Default 
 $ServiceName       = Prompt-PascalCase -PromptText "Service name (PascalCase)"
 $Namespace         = Prompt-Required  -PromptText "Kubernetes namespace" -Default "default"
 $RabbitmqHost      = Prompt-Host      -PromptText "RabbitMQ host" -Default "rabbitmq.rabbitmq-system.svc"
-$FerretdbHost      = Prompt-Host      -PromptText "FerretDB host" -Default "ferretdb.ferretdb-system.svc"
 $GatewayNamespace  = Prompt-Required  -PromptText "Istio Gateway namespace" -Default "istio-ingress"
 $GatewayName       = Prompt-Required  -PromptText "Istio Gateway name" -Default "gateway"
 $Domain            = Prompt-Required  -PromptText "Base domain" -Default "kube.local"
@@ -120,7 +119,6 @@ function Substitute-FileContents {
         -creplace '\{\{NAMESPACE\}\}', $Namespace `
         -creplace '\{\{RABBITMQ_HOST\}\}', $RabbitmqHost `
         -creplace '\{\{RABBITMQ_CLUSTER_NAMESPACE\}\}', $RabbitmqClusterNamespace `
-        -creplace '\{\{FERRETDB_HOST\}\}', $FerretdbHost `
         -creplace '\{\{GATEWAY_NAMESPACE\}\}', $GatewayNamespace `
         -creplace '\{\{GATEWAY_NAME\}\}', $GatewayName `
         -creplace '\{\{DOMAIN\}\}', $Domain `

@@ -61,11 +61,7 @@ export class ExampleCreateComponent implements OnInit, OnDestroy {
     this.event$ = this.eventService.ExampleCreatedEvent.pipe().subscribe(
       (data) => {
         if (data.correlationId == this.correlationId) {
-          this.router.navigate(['/example/details'], {
-            queryParams: {
-              id: data.id,
-            },
-          });
+          this.router.navigate(['/example/details', data.id]);
         }
       }
     );

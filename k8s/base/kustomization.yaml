@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
   - ./sa.yaml
   - ./rabbitmq-user.yaml
-  - ./database-user.yaml
   - ./worker
   - ./api
   - ./web
   - ./cache
+  - ./database

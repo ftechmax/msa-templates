@@ -37,7 +37,7 @@ These templates are the accumulation of those lessons, packaged as a starting po
 - A clear split between the **HTTP edge** in the API and **asynchronous domain work** in the worker
 - A default stack for **messaging, persistence, caching, and telemetry** picked from what I reach for on every project
 - **Kubernetes** manifests included for local, self-hosted, and cloud clusters
-- Opinionated defaults you can rip out: every choice (MassTransit, MongoDB, Valkey, SignalR) is isolated behind its own wiring so you can swap one without touching the rest
+- Opinionated defaults you can rip out: every choice (MassTransit, PostgreSQL, Valkey, SignalR) is isolated behind its own wiring so you can swap one without touching the rest
 
 This is not meant to be the only way to do things. It's the default I've shipped to production more than once.
 
@@ -55,7 +55,7 @@ These templates are intended to be used together as a "vertical slice" of a mess
 The templates come wired up for:
 
 - **Messaging** via MassTransit (Conveyo coming soon!) on top of RabbitMQ
-- **Persistence** via the MongoDB.Driver package, typically backed by FerretDB in the generated Kubernetes setup
+- **Persistence** via the Npgsql package, storing documents as PostgreSQL JSONB (an in-cluster Postgres StatefulSet in the generated Kubernetes setup)
 - **Caching** via Valkey using the StackExchange.Redis package
 - **Real-time updates** via SignalR
 - **Observability** via OpenTelemetry for traces, metrics, and logs
@@ -109,7 +109,6 @@ Destination folder [~/git]: ~/git
 Service name (PascalCase): AwesomeApp
 Kubernetes namespace [default]:
 RabbitMQ host [rabbitmq.rabbitmq-system.svc]:
-FerretDB host [ferretdb.ferretdb-system.svc]:
 Istio Gateway namespace [istio-ingress]:
 Istio Gateway name [gateway]:
 Base domain [kube.local]:

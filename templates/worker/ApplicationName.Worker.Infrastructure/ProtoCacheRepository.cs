@@ -1,58 +1,56 @@
 using System.Diagnostics.CodeAnalysis;
 using ArgDefender;
-using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 
 namespace ApplicationName.Worker.Infrastructure;
 
 [ExcludeFromCodeCoverage]
-public sealed class ProtoCacheRepository(IDistributedCache distributedCache) : IProtoCacheRepository
+public sealed class ProtoCacheRepository(IConnectionMultiplexer connectionMultiplexer) : IProtoCacheRepository
 {
+    private IDatabase Database => connectionMultiplexer.GetDatabase();
+
     public async Task<T?> GetAsync<T>(string key)
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
 
-        var bytes = await distributedCache.GetAsync(key);
-        if (bytes == null)
+        var bytes = await Database.StringGetAsync(key);
+        if (bytes == default || bytes.IsNull)
         {
             return default;
         }
 
-        await using var ms = new MemoryStream(bytes);
+        await using var ms = new MemoryStream(bytes!);
         return ProtoBuf.Serializer.Deserialize<T>(ms);
     }
 
-    public async Task SetAsync<T>(string key, T obj, DistributedCacheEntryOptions? options = null) where T : class
+    public async Task SetAsync<T>(string key, T obj, TimeSpan? expiry = null) where T : class
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
         Guard.Argument(obj).NotNull();
-
-        options ??= new DistributedCacheEntryOptions();
 
         await using var ms = new MemoryStream();
 
         ProtoBuf.Serializer.Serialize(ms, obj);
         ms.Position = 0;
 
-        await distributedCache.SetAsync(key, ms.ToArray(), options);
+        await Database.StringSetAsync(key, ms.ToArray(), expiry, When.Always);
     }
 
-    public async Task SetAsync(string key, object obj, DistributedCacheEntryOptions? options = null)
+    public async Task SetAsync(string key, object obj, TimeSpan? expiry = null)
     {
         Guard.Argument(key).NotNull().NotWhiteSpace();
         Guard.Argument(obj).NotNull();
-
-        options ??= new DistributedCacheEntryOptions();
 
         await using var ms = new MemoryStream();
 
         ProtoBuf.Serializer.NonGeneric.Serialize(ms, obj);
         ms.Position = 0;
 
-        await distributedCache.SetAsync(key, ms.ToArray(), options);
+        await Database.StringSetAsync(key, ms.ToArray(), expiry, When.Always);
     }
 
     public Task RemoveAsync(string key)
     {
-        return distributedCache.RemoveAsync(key);
+        return Database.KeyDeleteAsync(new RedisKey(key));
     }
 }
