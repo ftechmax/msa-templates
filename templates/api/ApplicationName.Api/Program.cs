@@ -7,10 +7,12 @@ using ApplicationName.Api.Consumers;
 using ApplicationName.Api.Infrastructure;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Events;
 using FluentValidation;
 using Mapster;
-using MassTransit;
-using MassTransit.Logging;
+using Conveyo;
+using Conveyo.Diagnostics;
+using Conveyo.RabbitMQ;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -56,18 +58,25 @@ public static class Program
         services.AddMapster();
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
-        // MassTransit + RabbitMQ
-        services.AddMassTransit(i =>
+        // Conveyo + RabbitMQ
+        services.AddConveyo(bus =>
         {
+            // Message type URNs, must match the worker mappings
+            bus.Map<CreateExampleCommand>("applicationname:CreateExampleCommand.v1");
+            bus.Map<UpdateExampleCommand>("applicationname:UpdateExampleCommand.v1");
+            bus.Map<ExampleCreatedEvent>("applicationname:ExampleCreatedEvent.v1");
+            bus.Map<ExampleUpdatedEvent>("applicationname:ExampleUpdatedEvent.v1");
+            bus.Map<ExampleRemoteCodeSetEvent>("applicationname:ExampleRemoteCodeSetEvent.v1");
+
             var uri = new Uri("queue:ApplicationName.Worker");
-            EndpointConvention.Map<CreateExampleCommand>(uri);
-            EndpointConvention.Map<UpdateExampleCommand>(uri);
+            bus.MapEndpointConvention<CreateExampleCommand>(uri);
+            bus.MapEndpointConvention<UpdateExampleCommand>(uri);
 
-            i.AddConsumer<LocalEventHandler>();
+            bus.AddConsumer<LocalEventHandler>();
 
-            i.UsingRabbitMq((ctx, cfg) =>
+            bus.UsingRabbitMq((ctx, cfg) =>
             {
-                cfg.Host(configuration["rabbitmq:host"], configuration["rabbitmq:vhost"], h =>
+                cfg.Host(configuration["rabbitmq:host"]!, configuration["rabbitmq:vhost"]!, h =>
                 {
                     h.Username(configuration["rabbitmq:username"]!);
                     h.Password(configuration["rabbitmq:password"]!);
@@ -128,7 +137,7 @@ public static class Program
                 {
                     options.RecordException = true;
                 })
-                .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
+                .AddSource(DiagnosticHeaders.DefaultListenerName) // Conveyo
                 .AddRedisInstrumentation()
                 .AddOtlpExporter(configure =>
                 {

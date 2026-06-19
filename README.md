@@ -8,10 +8,6 @@ In this repository, **MSA** stands for **Message-driven Service Architecture**: 
 [![codecov](https://codecov.io/gh/ftechmax/msa-templates/graph/badge.svg?token=I4QI609IIQ)](https://codecov.io/gh/ftechmax/msa-templates)
 
 > [!NOTE]
-> The templates currently use **MassTransit**, but this will be removed in a future update and replaced by my own library **Conveyo**: https://github.com/ftechmax/conveyo. Conveyo will also support workers written in Go.
-> MassTransit's licensing model changed, and I want the messaging stack to remain fully open and free.
-
-> [!NOTE]
 > If you previously installed the now-retired `MSA.Templates` NuGet package, you can remove the stale local install with `dotnet new uninstall MSA.Templates`. The new flow does not use `dotnet new`.
 
 ## Table of contents
@@ -37,7 +33,7 @@ These templates are the accumulation of those lessons, packaged as a starting po
 - A clear split between the **HTTP edge** in the API and **asynchronous domain work** in the worker
 - A default stack for **messaging, persistence, caching, and telemetry** picked from what I reach for on every project
 - **Kubernetes** manifests included for local, self-hosted, and cloud clusters
-- Opinionated defaults you can rip out: every choice (MassTransit, PostgreSQL, Valkey, SignalR) is isolated behind its own wiring so you can swap one without touching the rest
+- Opinionated defaults you can rip out: every choice (Conveyo, PostgreSQL, Valkey, SignalR) is isolated behind its own wiring so you can swap one without touching the rest
 
 This is not meant to be the only way to do things. It's the default I've shipped to production more than once.
 
@@ -54,7 +50,7 @@ These templates are intended to be used together as a "vertical slice" of a mess
 
 The templates come wired up for:
 
-- **Messaging** via MassTransit (Conveyo coming soon!) on top of RabbitMQ
+- **Messaging** via Conveyo on top of RabbitMQ
 - **Persistence** via the Npgsql package, storing documents as PostgreSQL JSONB (an in-cluster Postgres StatefulSet in the generated Kubernetes setup)
 - **Caching** via Valkey using the StackExchange.Redis package
 - **Real-time updates** via SignalR

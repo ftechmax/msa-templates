@@ -3,7 +3,7 @@ using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
-using MassTransit;
+using Conveyo;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ApplicationName.Api.Consumers;

@@ -8,7 +8,7 @@ The API should not contain domain logic. Its main jobs are:
 
 - **Own the HTTP contract**: controllers, DTOs, a versioning strategy when you need one, and input validation.
 - **Validate early**: reject bad requests before they become messages that bounce around the system.
-- **Send commands** to the worker via the bus using MassTransit. The API should not need direct DB access to do writes.
+- **Send commands** to the worker via the bus using Conveyo. The API should not need direct DB access to do writes.
 - **Serve reads efficiently**: the template uses projections and caches them in Valkey/Redis so read paths stay fast without coupling reads to the write model.
 
 The API also bridges worker events back to connected clients. It consumes published events from the worker and uses them to:

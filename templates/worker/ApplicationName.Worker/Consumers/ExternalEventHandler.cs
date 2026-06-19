@@ -1,6 +1,6 @@
 using ApplicationName.Worker.Contracts.Commands;
 using MapsterMapper;
-using MassTransit;
+using Conveyo;
 using Other.Worker.Contracts.Commands;
 
 namespace ApplicationName.Worker.Consumers;

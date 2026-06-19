@@ -5,7 +5,7 @@ using ApplicationName.Shared.Events;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
-using MassTransit;
+using Conveyo;
 using NUnit.Framework;
 
 namespace ApplicationName.Api.Test.Consumers

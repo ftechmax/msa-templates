@@ -1,6 +1,6 @@
 # Worker project
 
-The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing events that represent domain outcomes. It runs as a background service and does not expose HTTP endpoints. The template wires up MassTransit on RabbitMQ for messaging, Npgsql for persistence (PostgreSQL JSONB, an in-cluster Postgres StatefulSet in the default Kubernetes setup), and OpenTelemetry for traces, metrics, and logs.
+The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing events that represent domain outcomes. It runs as a background service and does not expose HTTP endpoints. The template wires up Conveyo on RabbitMQ for messaging, Npgsql for persistence (PostgreSQL JSONB, an in-cluster Postgres StatefulSet in the default Kubernetes setup), and OpenTelemetry for traces, metrics, and logs.
 
 ## Responsibilities
 
@@ -16,7 +16,7 @@ In this stack, the worker owns the domain work:
 
 - Handlers must be **idempotent** because RabbitMQ can redeliver the same message after a worker restart or ack timeout.
 - OpenTelemetry exports traces, metrics, and logs, so you can answer "what happened to message X?" from a single trace ID.
-- Transient failures go through MassTransit's retry pipeline, and unrecoverable ones land in `_error` queues. The template ships defaults; you set the retry counts and backoff per consumer.
+- Transient failures go through Conveyo's retry pipeline (exponential backoff), and unrecoverable ones are published as a `Fault` and moved to a `{queue}_error` queue. The template ships defaults; you set the retry counts and backoff per consumer.
 - Background jobs belong here too. The template shows a hosted service for cache invalidation.
 
 ## Command handling and event publication

@@ -9,7 +9,7 @@ using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
 using Mapster;
 using MapsterMapper;
-using MassTransit;
+using Conveyo;
 using NUnit.Framework;
 using Shouldly;
 
@@ -25,8 +25,6 @@ public class ExampleServiceTest
 
     private IBus _bus;
 
-    private ISendEndpoint _sendEndpoint;
-
     private ExampleService _subjectUnderTest;
 
     [SetUp]
@@ -36,13 +34,7 @@ public class ExampleServiceTest
 
         _protoCacheRepository = _fixture.Freeze<IProtoCacheRepository>();
 
-        var queue = new Uri("queue:example");
-        EndpointConvention.Map<CreateExampleCommand>(queue);
-        EndpointConvention.Map<UpdateExampleCommand>(queue);
-
         _bus = _fixture.Freeze<IBus>();
-        _sendEndpoint = _fixture.Freeze<ISendEndpoint>();
-        A.CallTo(() => _bus.GetSendEndpoint(A<Uri>._)).Returns(_sendEndpoint);
 
         var mapperConfig = new TypeAdapterConfig();
         mapperConfig.Scan(typeof(MappingProfile).Assembly);
@@ -220,7 +212,7 @@ public class ExampleServiceTest
         var dto = _fixture.Create<CreateExampleDto>();
 
         var capturedCommand = default(CreateExampleCommand);
-        A.CallTo(() => _sendEndpoint.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).Invokes(
+        A.CallTo(() => _bus.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).Invokes(
             (CreateExampleCommand arg0, CancellationToken _) =>
             {
                 capturedCommand = arg0;
@@ -230,7 +222,7 @@ public class ExampleServiceTest
         await _subjectUnderTest.HandleAsync(dto);
 
         // Assert
-        A.CallTo(() => _sendEndpoint.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _bus.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
         capturedCommand.ShouldNotBeNull();
         capturedCommand.Name.ShouldSatisfyAllConditions(
@@ -246,7 +238,7 @@ public class ExampleServiceTest
         var dto = _fixture.Create<UpdateExampleDto>();
 
         var capturedCommand = default(UpdateExampleCommand);
-        A.CallTo(() => _sendEndpoint.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).Invokes(
+        A.CallTo(() => _bus.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).Invokes(
             (UpdateExampleCommand arg0, CancellationToken _) =>
             {
                 capturedCommand = arg0;
@@ -256,7 +248,7 @@ public class ExampleServiceTest
         await _subjectUnderTest.HandleAsync(id, dto);
 
         // Assert
-        A.CallTo(() => _sendEndpoint.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _bus.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
 
         capturedCommand.ShouldNotBeNull();
         capturedCommand.CorrelationId.ShouldSatisfyAllConditions(

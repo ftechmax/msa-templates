@@ -10,7 +10,7 @@ using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
 using Mapster;
 using MapsterMapper;
-using MassTransit;
+using Conveyo;
 using NUnit.Framework;
 using Shouldly;
 

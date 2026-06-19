@@ -6,10 +6,14 @@ using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Consumers;
 using ApplicationName.Worker.Contracts.Commands;
 using ApplicationName.Worker.Infrastructure;
+using ApplicationName.Shared.Commands;
+using ApplicationName.Shared.Events;
 using Mapster;
-using MassTransit;
-using MassTransit.Logging;
+using Conveyo;
+using Conveyo.Diagnostics;
+using Conveyo.RabbitMQ;
 using Npgsql;
+using Other.Worker.Contracts.Commands;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -70,18 +74,27 @@ public static class Program
         services.AddMapster();
         TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
 
-        // MassTransit
-        services.AddMassTransit(i =>
+        // Conveyo
+        services.AddConveyo(bus =>
         {
+            // Message type URNs. Commands/events shared with the API must use the same URN on both sides
+            bus.Map<CreateExampleCommand>("applicationname:CreateExampleCommand.v1");
+            bus.Map<UpdateExampleCommand>("applicationname:UpdateExampleCommand.v1");
+            bus.Map<SetExampleRemoteCodeCommand>("applicationname:SetExampleRemoteCodeCommand.v1");
+            bus.Map<ExampleCreatedEvent>("applicationname:ExampleCreatedEvent.v1");
+            bus.Map<ExampleUpdatedEvent>("applicationname:ExampleUpdatedEvent.v1");
+            bus.Map<ExampleRemoteCodeSetEvent>("applicationname:ExampleRemoteCodeSetEvent.v1");
+            bus.Map<ExternalEvent>("other:ExternalEvent.v1");
+
             var uri = new Uri($"queue:{ServiceName}");
-            EndpointConvention.Map<SetExampleRemoteCodeCommand>(uri);
+            bus.MapEndpointConvention<SetExampleRemoteCodeCommand>(uri);
 
-            i.AddConsumer<ExternalEventHandler>();
-            i.AddConsumer<ExampleCommandHandler>();
+            bus.AddConsumer<ExternalEventHandler>();
+            bus.AddConsumer<ExampleCommandHandler>();
 
-            i.UsingRabbitMq((ctx, cfg) =>
+            bus.UsingRabbitMq((ctx, cfg) =>
             {
-                cfg.Host(configuration["rabbitmq:host"], configuration["rabbitmq:vhost"], h =>
+                cfg.Host(configuration["rabbitmq:host"]!, configuration["rabbitmq:vhost"]!, h =>
                 {
                     h.Username(configuration["rabbitmq:username"]!);
                     h.Password(configuration["rabbitmq:password"]!);
@@ -111,19 +124,13 @@ public static class Program
         services.AddOpenTelemetry()
             .WithTracing(cfg => cfg
                 .SetResourceBuilder(appResourceBuilder)
-                .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit
+                .AddSource(DiagnosticHeaders.DefaultListenerName) // Conveyo
                 .AddNpgsql()
-                .AddOtlpExporter(configure =>
-                {
-                    configure.Endpoint = otlpEndpoint;
-                }))
+                .AddOtlpExporter(configure => configure.Endpoint = otlpEndpoint))
             .WithMetrics(cfg => cfg
                 .SetResourceBuilder(appResourceBuilder)
                 .AddRuntimeInstrumentation()
-                .AddOtlpExporter(configure =>
-                {
-                    configure.Endpoint = otlpEndpoint;
-                })
+                .AddOtlpExporter(configure => configure.Endpoint = otlpEndpoint)
         );
     }
 
@@ -138,10 +145,7 @@ public static class Program
             configure.IncludeFormattedMessage = true;
             configure.SetResourceBuilder(ResourceBuilder.CreateDefault()
                     .AddService(ServiceName, autoGenerateServiceInstanceId: false, serviceInstanceId: Dns.GetHostName()))
-                .AddOtlpExporter(opts =>
-                {
-                    opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!);
-                });
+                .AddOtlpExporter(opts => opts.Endpoint = new Uri(configuration["opentelemetry:endpoint"]!));
         });
     }
 }

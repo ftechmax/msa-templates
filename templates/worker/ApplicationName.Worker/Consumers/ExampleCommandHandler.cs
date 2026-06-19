@@ -3,7 +3,7 @@ using ApplicationName.Shared.Events;
 using ApplicationName.Worker.Application.Services;
 using ApplicationName.Worker.Contracts.Commands;
 using MapsterMapper;
-using MassTransit;
+using Conveyo;
 
 namespace ApplicationName.Worker.Consumers;
 
