@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
-import { SignalRService } from './signalr.service';
+import { SseService } from './sse.service';
 
 @Component({
     selector: 'app-root',
@@ -12,14 +12,13 @@ import { SignalRService } from './signalr.service';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'web';
 
-  constructor(private signalrService: SignalRService) {}
+  constructor(private sseService: SseService) {}
 
   ngOnInit(): void {
-    this.signalrService.startConnection();
-    this.signalrService.addStatusListener();
+    this.sseService.connect();
   }
 
   ngOnDestroy(): void {
-    this.signalrService.stopConnection();
+    this.sseService.disconnect();
   }
 }

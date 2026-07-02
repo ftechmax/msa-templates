@@ -57,7 +57,6 @@ The generated manifests assume path-based routing through Istio's Gateway API:
 
 - `/` goes to the web app
 - `/api/` goes to the API and is rewritten to `/`
-- `/api-hub` goes to the SignalR hub
 
 Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>`. With the default prompts, that becomes `awesome-app.kube.local`.
 

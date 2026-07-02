@@ -14,7 +14,7 @@ The API should not contain domain logic. Its main jobs are:
 The API also bridges worker events back to connected clients. It consumes published events from the worker and uses them to:
 
 - **Invalidate/refresh caches** so later queries return updated view models.
-- **Notify connected clients** through SignalR so UIs can update without polling.
+- **Notify connected clients** through Server-Sent Events (SSE) so UIs can update without polling.
 
 ## Operational notes
 
@@ -36,7 +36,7 @@ In the template, those responsibilities are split across separate pieces:
 - the controller and application service handle the HTTP-facing part
 - the application service maps DTOs to commands and sends them onto the bus
 - `LocalEventHandler` consumes the resulting events and faults
-- that same handler invalidates caches and pushes updates to SignalR clients
+- that same handler invalidates caches and pushes updates to SSE clients
 
 After a POST or PUT, the response only tells the client that the API accepted and queued the command. The business result comes back later through the event or fault path.
 
@@ -44,7 +44,7 @@ The browser side of this flow is described in [Web status service and domain fee
 
 ## Project Structure
 
-The API's entry point is a set of HTTP endpoints (controllers). Each endpoint delegates to an application service. Queries are served from a local read model; writes turn into commands sent to the worker. The worker publishes events back, which the API consumes to invalidate caches and notify connected clients over SignalR.
+The API's entry point is a set of HTTP endpoints (controllers). Each endpoint delegates to an application service. Queries are served from a local read model; writes turn into commands sent to the worker. The worker publishes events back, which the API consumes to invalidate caches and notify connected clients over Server-Sent Events (SSE).
 
 ### Controller
 
@@ -81,9 +81,9 @@ The API subscribes to published events from the bus (e.g. `ExampleCreatedEvent`,
 The local event handler:
 1. **Receive Event**: The handler listens for events published by the worker.
 2. **Invalidate Cache**: The handler removes affected cache entries so subsequent queries are consistent.
-3. **Notify Clients**: The handler notifies connected clients (SignalR) that something changed.
+3. **Notify Clients**: The handler broadcasts to connected clients over Server-Sent Events (through `IServerSentEventsService`) that something changed.
 
-This is the return path to the web app. The browser sends a command over HTTP, and the API forwards the resulting event or fault over SignalR.
+This is the return path to the web app. The browser sends a command over HTTP, and the API forwards the resulting event or fault over SSE. Clients connect to the `/events` endpoint (exposed as `/api/events` through the ingress) using the browser's native `EventSource`.
 
 #### Fault notifications
 

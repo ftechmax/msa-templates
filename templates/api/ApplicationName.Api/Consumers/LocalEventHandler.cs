@@ -1,14 +1,14 @@
 using System.Diagnostics;
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Contracts;
+using ApplicationName.Api.ServerSentEvents;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using Conveyo;
-using Microsoft.AspNetCore.SignalR;
 
 namespace ApplicationName.Api.Consumers;
 
-public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository protoCacheRepository) :
+public class LocalEventHandler(IServerSentEventsService events, IProtoCacheRepository protoCacheRepository) :
     IConsumer<ExampleCreatedEvent>,
     IConsumer<ExampleUpdatedEvent>,
     IConsumer<ExampleRemoteCodeSetEvent>
@@ -17,7 +17,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
     {
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCollectionCacheKey);
 
-        await hub.Clients.All.SendAsync(nameof(ExampleCreatedEvent), new
+        await events.PublishAsync(nameof(ExampleCreatedEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id,
@@ -29,7 +29,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(context.Message.Id));
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleCollectionCacheKey);
 
-        await hub.Clients.All.SendAsync(nameof(ExampleUpdatedEvent), new
+        await events.PublishAsync(nameof(ExampleUpdatedEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id,
@@ -40,7 +40,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
     {
         await protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(context.Message.Id));
 
-        await hub.Clients.All.SendAsync(nameof(ExampleRemoteCodeSetEvent), new
+        await events.PublishAsync(nameof(ExampleRemoteCodeSetEvent), new
         {
             context.Message.CorrelationId,
             context.Message.Id
@@ -49,7 +49,7 @@ public class LocalEventHandler(IHubContext<ApiHub> hub, IProtoCacheRepository pr
 
     public async Task Consume(ConsumeContext<Fault<CreateExampleCommand>> context)
     {
-        await hub.Clients.All.SendAsync($"{nameof(DomainFault)}_{nameof(CreateExampleCommand)}",
+        await events.PublishAsync($"{nameof(DomainFault)}_{nameof(CreateExampleCommand)}",
             new DomainFault(
                 context.Message.Message.CorrelationId,
                 context.Message.Exceptions[0].Message,

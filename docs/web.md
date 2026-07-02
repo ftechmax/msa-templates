@@ -1,6 +1,6 @@
 # Web project
 
-The web template is a lightweight Angular SPA wired to the rest of the stack: HTTP calls go to the API, real-time updates come in through SignalR, and the production build is served by Nginx.
+The web template is a lightweight Angular SPA wired to the rest of the stack: HTTP calls go to the API, real-time updates stream in over Server-Sent Events (SSE), and the production build is served by Nginx.
 
 The template is intentionally small: it gives you a working shell that matches the API and worker templates without forcing a frontend architecture on day one.
 
@@ -11,7 +11,7 @@ The generated web project comes with:
 - Angular using standalone configuration
 - Angular Material for the base shell and navigation
 - Transloco for localization
-- SignalR client wiring for server-pushed updates
+- Server-Sent Events (SSE) client wiring for server-pushed updates
 - a shared status service (`EventService`) that fans those updates out to the UI
 - a small example feature to replace with your own domain
 - an Nginx-based production container image
@@ -26,8 +26,8 @@ The template is organized around a few simple integration points:
   - the application shell and navigation
 - `src/app/example/`
   - example contracts, routes, and HTTP client code you are expected to replace
-- `src/app/signalr.service.ts`
-  - creates the SignalR connection and listens for events from the API
+- `src/app/sse.service.ts`
+  - opens the SSE connection (native `EventSource`) and listens for events from the API
 - `src/app/status.service.ts`
   - acts as a small in-memory event bus for published events and domain faults inside the SPA
 - `public/i18n/`
@@ -46,26 +46,26 @@ The generated example client follows that convention directly:
 
 That matches the generated ingress setup, where the web app is served from `/` and API traffic is routed separately to `/api/`.
 
-## SignalR integration
+## Server-Sent Events integration
 
-Real-time updates are wired through `/api-hub`.
+Real-time updates are streamed from the API's `/api/events` endpoint.
 
-The generated `SignalRService`:
+The generated `SseService`:
 
-- creates a connection to `/api-hub`
-- subscribes to example events such as `ExampleCreatedEvent`
+- opens a native `EventSource` connection to `/api/events`
+- subscribes to named example events such as `ExampleCreatedEvent`
 - forwards those events into `EventService`
 - exposes fault notifications so the UI can correlate failures with a command
 
-The app starts that connection once at the root, so the event stream is available to whichever screens are active.
+The app opens that connection once at the root, so the event stream is available to whichever screens are active. SSE is unidirectional (server to client) and the browser reconnects automatically if the connection drops, so there is no client library to manage — `EventSource` is built into the browser.
 
-When you replace the example domain, rename the event handlers and group the subscriptions by feature or domain.
+When you replace the example domain, rename the event listeners and group the subscriptions by feature or domain.
 
 ## Status service and domain feedback
 
 `src/app/status.service.ts` is the UI-side entry point for asynchronous command results.
 
-In code it is named `EventService`. It exposes published events and domain faults to the rest of the SPA without every component subscribing to SignalR directly.
+In code it is named `EventService`. It exposes published events and domain faults to the rest of the SPA without every component subscribing to the event stream directly.
 
 For the server-side halves of the same loop, see [API async command loop](api.md#async-command-loop) and [Worker command handling and event publication](worker.md#command-handling-and-event-publication).
 
@@ -76,18 +76,18 @@ When the web app sends a command:
 3. the HTTP request returns quickly
 4. the worker processes the command later
 5. the worker publishes a resulting event that represents the domain outcome, or a fault if processing failed
-6. the API forwards that outcome to the browser over SignalR
-7. `SignalRService` pushes it into `EventService`
+6. the API forwards that outcome to the browser over SSE
+7. `SseService` pushes it into `EventService`
 8. interested components react
 
 At step 3 the API has accepted and queued the command. The domain result arrives later through step 6.
 
-Without the status service, each feature would have to subscribe to SignalR directly and duplicate its own event/fault correlation logic.
+Without the status service, each feature would have to subscribe to the event stream directly and duplicate its own event/fault correlation logic.
 
 ```mermaid
 sequenceDiagram
     participant UI as Web UI
-    participant ES as SignalRService / EventService
+    participant ES as SseService / EventService
     participant API as API
     participant MQ as RabbitMQ
     participant Worker as Worker
@@ -101,13 +101,13 @@ sequenceDiagram
     alt Success
         Worker->>MQ: Publish domain event
         MQ->>API: Deliver event
-        API->>API: Invalidate caches and notify SignalR clients
-        API-->>ES: Event over /api-hub
+        API->>API: Invalidate caches and notify SSE clients
+        API-->>ES: Event over /api/events
         ES-->>UI: Fan out event to subscribers
     else Failure
         Worker-->>MQ: Publish fault message
         MQ->>API: Deliver fault
-        API-->>ES: DomainFault over /api-hub
+        API-->>ES: DomainFault over /api/events
         ES-->>UI: Fan out fault to subscribers
     end
 ```
@@ -117,11 +117,11 @@ sequenceDiagram
 The status service keeps the responsibilities separated:
 
 - the HTTP client sends commands and performs queries
-- `SignalRService` deals with the transport and hub message names
+- `SseService` deals with the transport and event names
 - `EventService` exposes a shared stream of domain outcomes
 - components subscribe only to the events they care about
 
-This keeps the UI reactive without coupling every feature directly to SignalR internals.
+This keeps the UI reactive without coupling every feature directly to the transport.
 
 It also lets multiple parts of the UI react to the same published event independently. When `ExampleCreatedEvent` arrives, a create form can navigate, a collection screen can refresh its list, and a notification area can show a toast. Three subscribers, one event.
 
@@ -151,7 +151,7 @@ Correlation IDs make this practical.
 
 Because many users and many commands may be in flight at once, the browser needs a way to match "this event" back to "that button click". The template does that by sending a correlation ID with the command and expecting the eventual event or fault to carry it back.
 
-The status service carries the correlation ID through `SignalRService` into `EventService`, so the browser can tell which arriving event answers which earlier POST.
+The status service carries the correlation ID through `SseService` into `EventService`, so the browser can tell which arriving event answers which earlier POST.
 
 ### How to extend it
 
@@ -159,16 +159,16 @@ As you replace the example domain:
 
 1. add event and fault types to your contracts
 2. add matching `Subject`s to `EventService`
-3. register the corresponding SignalR handlers in `SignalRService`
+3. register the corresponding event listeners in `SseService`
 4. subscribe from the components, stores, or feature services that care about those outcomes
 
 Try to keep the responsibilities split the same way:
 
-- `SignalRService` should translate transport messages into app events
+- `SseService` should translate transport messages into app events
 - `EventService` should be the shared fan-out point
-- feature code should react to domain outcomes, not parse hub wiring
+- feature code should react to domain outcomes, not parse transport wiring
 
-With that boundary, `SignalRService` contains the hub method names, `EventService` contains the shared app events, and feature code only deals with domain outcomes.
+With that boundary, `SseService` contains the event names, `EventService` contains the shared app events, and feature code only deals with domain outcomes.
 
 ## Translations
 
@@ -189,7 +189,7 @@ npm ci
 npx ng serve --proxy-config proxy.config.json
 ```
 
-The proxy forwards `/api` and `/api-hub` to the generated service host so you can develop the frontend without changing the app code.
+The proxy forwards `/api` (which includes the `/api/events` SSE stream) to the generated service host so you can develop the frontend without changing the app code.
 
 If your API is not reachable at the default host in `proxy.config.json`, update that file to match your environment before starting the dev server.
 
@@ -215,7 +215,7 @@ The first cleanup pass after generation:
 1. replace the example contracts in `src/app/example/contracts.ts`
 2. replace the example HTTP client in `src/app/example/httpclient.ts`
 3. replace the example routes and components with your real feature flow
-4. rename the SignalR event listeners in `src/app/signalr.service.ts`
+4. rename the SSE event listeners in `src/app/sse.service.ts`
 5. adjust the subjects in `src/app/status.service.ts`
 
 Once those pieces are updated, the generated app is a normal Angular app with the message-driven wiring already in place.

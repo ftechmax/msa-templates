@@ -33,7 +33,7 @@ These templates are the accumulation of those lessons, packaged as a starting po
 - A clear split between the **HTTP edge** in the API and **asynchronous domain work** in the worker
 - A default stack for **messaging, persistence, caching, and telemetry** picked from what I reach for on every project
 - **Kubernetes** manifests included for local, self-hosted, and cloud clusters
-- Opinionated defaults you can rip out: every choice (Conveyo, PostgreSQL, Valkey, SignalR) is isolated behind its own wiring so you can swap one without touching the rest
+- Opinionated defaults you can rip out: every choice (Conveyo, PostgreSQL, Valkey, Server-Sent Events) is isolated behind its own wiring so you can swap one without touching the rest
 
 This is not meant to be the only way to do things. It's the default I've shipped to production more than once.
 
@@ -43,7 +43,7 @@ These templates are intended to be used together as a "vertical slice" of a mess
 
 - **Shared**: contracts and shared abstractions used across services within the same domain.
 - **Worker**: consumes commands and external events, applies business logic, persists state, and publishes events that represent domain outcomes.
-- **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through SignalR.
+- **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through Server-Sent Events (SSE).
 - **Web**: a lightweight Angular frontend scaffolded to work with the API.
 - **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
 - **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
@@ -53,7 +53,7 @@ The templates come wired up for:
 - **Messaging** via Conveyo on top of RabbitMQ
 - **Persistence** via the Npgsql package, storing documents as PostgreSQL JSONB (an in-cluster Postgres StatefulSet in the generated Kubernetes setup)
 - **Caching** via Valkey using the StackExchange.Redis package
-- **Real-time updates** via SignalR
+- **Real-time updates** via Server-Sent Events (SSE)
 - **Observability** via OpenTelemetry for traces, metrics, and logs
 
 ## Prerequisites
@@ -174,7 +174,7 @@ graph LR;
 
 ## Message-driven Service Architecture API
 
-The API is the **HTTP edge**: it validates input, serves reads from a local read model, and forwards writes as **commands to the worker** over the message bus. It also consumes events to invalidate caches and notify clients (SignalR).
+The API is the **HTTP edge**: it validates input, serves reads from a local read model, and forwards writes as **commands to the worker** over the message bus. It also consumes events to invalidate caches and notify clients (Server-Sent Events).
 
 For the full breakdown of controllers, application services, and local event handling, see [docs/api.md](docs/api.md).
 
@@ -182,7 +182,7 @@ For the full breakdown of controllers, application services, and local event han
 
 A simple Angular SPA hosted in an Nginx container, preconfigured to run in a Kubernetes environment. It uses [Transloco](https://jsverse.gitbook.io/transloco) to manage translations.
 
-For the full breakdown of SignalR integration, translations, and event handling, see [docs/web.md](docs/web.md).
+For the full breakdown of Server-Sent Events integration, translations, and event handling, see [docs/web.md](docs/web.md).
 
 ## How to contribute
 

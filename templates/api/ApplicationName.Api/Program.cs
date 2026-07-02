@@ -5,6 +5,7 @@ using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Application.Services;
 using ApplicationName.Api.Consumers;
 using ApplicationName.Api.Infrastructure;
+using ApplicationName.Api.ServerSentEvents;
 using ApplicationName.Api.Validators;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
@@ -51,8 +52,8 @@ public static class Program
 
     private static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
     {
-        // SignalR
-        services.AddSignalR();
+        // Server-Sent Events
+        services.AddServerSentEvents();
 
         // Mapster
         services.AddMapster();
@@ -168,7 +169,7 @@ public static class Program
 
         app.MapControllers();
         app.MapHealthChecks("/healthz");
-        app.MapHub<ApiHub>("/api-hub");
+        app.MapServerSentEvents();
     }
 
     private static void ConfigureLogging(ILoggingBuilder builder, ConfigurationManager configuration)

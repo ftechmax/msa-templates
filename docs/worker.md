@@ -29,7 +29,7 @@ That distinction matters across the whole stack:
 - the API puts the command on the bus and returns
 - the worker later consumes that command, applies domain logic, and publishes the resulting event
 
-For the browser-side view of the same loop, see [Web status service and domain feedback](web.md#status-service-and-domain-feedback). For the HTTP and SignalR bridge around the worker, see [API async command loop](api.md#async-command-loop).
+For the browser-side view of the same loop, see [Web status service and domain feedback](web.md#status-service-and-domain-feedback). For the HTTP and Server-Sent Events bridge around the worker, see [API async command loop](api.md#async-command-loop).
 
 In these docs, "domain event" means the internal result produced by the application/domain layer. Once that result is mapped to a shared contract and published on the bus, it becomes a published event that the API and web app can react to.
 
