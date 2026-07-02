@@ -52,7 +52,7 @@ spec:
                   name: applicationname-rabbitmq
                   key: password
             - name: postgres__connection-string
-              value: 'Host=applicationname-database;Port=5432;Database=applicationname_snake;Username=$(database_username);Password=$(database_password)'
+              value: 'Host=applicationname-database;Port=5432;Database=applicationname_snake;Username=$(database_username);Password=$(database_password);GSS Encryption Mode=Disable'
             - name: valkey__connection-string
               value: 'applicationname-cache:6379'
           livenessProbe:
