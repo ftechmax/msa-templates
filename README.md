@@ -1,8 +1,8 @@
 # Message-driven Service Architecture Templates
 
-This project contains a set of templates to scaffold a small message-driven system: a **Web** frontend, an **API**, a **Worker**, and a **Shared** project for contracts.
+These templates scaffold a small message-driven system with a web frontend, an API, a worker, and a shared contracts project.
 
-In this repository, **MSA** stands for **Message-driven Service Architecture**: services communicate primarily through commands and events over a message broker, which keeps them loosely coupled and enables independent scaling and deployment.
+Here, MSA means Message-driven Service Architecture. Services exchange commands and events through a message broker, so they can be deployed and scaled independently.
 
 [![Release](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml/badge.svg)](https://github.com/ftechmax/msa-templates/actions/workflows/release.yml)
 [![codecov](https://codecov.io/gh/ftechmax/msa-templates/graph/badge.svg?token=I4QI609IIQ)](https://codecov.io/gh/ftechmax/msa-templates)
@@ -10,51 +10,37 @@ In this repository, **MSA** stands for **Message-driven Service Architecture**: 
 > [!NOTE]
 > If you previously installed the now-retired `MSA.Templates` NuGet package, you can remove the stale local install with `dotnet new uninstall MSA.Templates`. The new flow does not use `dotnet new`.
 
-## Table of contents
-
-- [Message-driven Service Architecture Templates](#message-driven-service-architecture-templates)
-  - [Table of contents](#table-of-contents)
-  - [Why this exists](#why-this-exists)
-  - [What you get](#what-you-get)
-  - [Prerequisites](#prerequisites)
-  - [Quick start](#quick-start)
-  - [After generation](#after-generation)
-  - [Message-driven Service Architecture Worker](#message-driven-service-architecture-worker)
-  - [Message-driven Service Architecture API](#message-driven-service-architecture-api)
-  - [Message-driven Service Architecture Web](#message-driven-service-architecture-web)
-  - [How to contribute](#how-to-contribute)
-
 ## Why this exists
 
-I've been building message-driven systems for ~15 years. Over time you end up rediscovering the same handful of patterns: how services talk to each other, how you model commands and events, how you make failures visible, how you deploy safely, and how you keep a system operable once it's running 24/7.
+I've been building message-driven systems for about 15 years. Over time you end up rediscovering the same handful of patterns:  how services talk to each other, how commands and events are modelled, how failures stay visible, and how you keep a system operable once it's running 24/7.
 
 These templates are the accumulation of those lessons, packaged as a starting point:
 
-- A clear split between the **HTTP edge** in the API and **asynchronous domain work** in the worker
-- A default stack for **messaging, persistence, caching, and telemetry** picked from what I reach for on every project
-- **Kubernetes** manifests included for local, self-hosted, and cloud clusters
+- A clear split between the HTTP edge in the API and asynchronous domain work in the worker
+- The messaging, persistence, caching, and telemetry stack I tend to reach for on a new project
+- Kubernetes manifests for local, self-hosted, and cloud clusters
 - Opinionated defaults you can rip out: every choice (Conveyo, PostgreSQL, Valkey, Server-Sent Events) is isolated behind its own wiring so you can swap one without touching the rest
 
 This is not meant to be the only way to do things. It's the default I've shipped to production more than once.
 
 ## What you get
 
-These templates are intended to be used together as a "vertical slice" of a message-driven system:
+The templates fit together as a vertical slice of a message-driven system:
 
-- **Shared**: contracts and shared abstractions used across services within the same domain.
-- **Worker**: consumes commands and external events, applies business logic, persists state, and publishes events that represent domain outcomes.
-- **API**: serves HTTP endpoints, validates input, sends commands to the worker, and fans out updates through Server-Sent Events (SSE).
-- **Web**: a lightweight Angular frontend scaffolded to work with the API.
-- **Kubernetes manifests** for deploying the API, Worker and Web to any Kubernetes cluster. See [docs/k8s.md](docs/k8s.md) for the deployment topology and cluster prerequisites.
-- **krun** config files for usage with the [krun](https://github.com/ftechmax/krun) development tool.
+- **Shared** contains contracts and abstractions used by services in the same domain.
+- **Worker** consumes commands and external events, applies business rules, persists state, and publishes domain outcomes.
+- **API** exposes HTTP endpoints, validates input, sends commands to the worker, and forwards updates through Server-Sent Events (SSE).
+- **Web** is an Angular frontend wired to the API.
+- **Kubernetes manifests** deploy the API, worker, web app, PostgreSQL, and Valkey. See [the Kubernetes guide](docs/k8s.md) for the topology and cluster prerequisites.
+- **krun** config file for usage with the [krun](https://github.com/ftechmax/krun) development tool.
 
-The templates come wired up for:
+The generated stack uses:
 
-- **Messaging** via Conveyo on top of RabbitMQ
-- **Persistence** via the Npgsql package, storing documents as PostgreSQL JSONB (an in-cluster Postgres StatefulSet in the generated Kubernetes setup)
-- **Caching** via Valkey using the StackExchange.Redis package
-- **Real-time updates** via Server-Sent Events (SSE)
-- **Observability** via OpenTelemetry for traces, metrics, and logs
+- Conveyo on RabbitMQ for messaging
+- Npgsql and PostgreSQL JSONB for persistence; the Kubernetes manifests include a PostgreSQL StatefulSet
+- Valkey through StackExchange.Redis for caching
+- Server-Sent Events (SSE) for browser updates
+- OpenTelemetry for traces, metrics, and logs
 
 ## Prerequisites
 
@@ -63,7 +49,7 @@ The templates come wired up for:
 
 ## Quick start
 
-Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. The script auto-downloads the matching `templates/` + `k8s/` bundle from the same release on first run, or you can download the full zip up front (see below).
+Download the generator script from the [latest release](https://github.com/ftechmax/msa-templates/releases/latest) and run it. On its first run, the script downloads the matching `templates/` and `k8s/` bundle. To inspect the complete release first, use the zip instructions below.
 
 **Bash (Linux/macOS):**
 
@@ -96,7 +82,7 @@ unzip msa-templates-v*.zip && cd msa-templates && ./generator.sh
 Expand-Archive msa-templates-v*.zip ; cd msa-templates ; .\generator.ps1
 ```
 
-The generator will walk you through the configuration interactively. Each prompt has an opinionated default, so just press Enter to accept it:
+The generator will walk you through the configuration interactively. Each prompt has an opinionated default between `[ ]`, so just press Enter to accept it:
 
 ```
 MSA Generator vX.Y.Z
@@ -112,11 +98,18 @@ Base domain [kube.local]:
 
 On PowerShell, the default destination folder is `C:/git` instead of `~/git`.
 
-This will create a folder with the following structure:
+The generated folder has this structure:
 
 ```
 awesome-app
 |-- k8s
+|   |-- base
+|   `-- overlays
+|       |-- api
+|       |-- cache
+|       |-- database
+|       |-- web
+|       `-- worker
 |-- src
 |   |-- api
 |   |-- shared
@@ -127,20 +120,20 @@ awesome-app
 
 ## After generation
 
-At this point you have a scaffolded service stack on disk. From here:
+Once generation finishes:
 
-1. Open the generated folder and inspect `src/shared`, `src/worker`, `src/api`, and `src/web`.
+1. Open the generated folder and inspect the code in `src/` and the manifests in `k8s/`.
 2. Read [docs/worker.md](docs/worker.md), [docs/api.md](docs/api.md), and [docs/web.md](docs/web.md) to find where to replace the example domain code.
 3. Review [docs/k8s.md](docs/k8s.md) before applying the generated manifests. The `k8s/` folder assumes the platform services already exist in the cluster, typically installed via [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or equivalent.
 4. If you use [krun](https://github.com/ftechmax/krun), use the generated `krun.json` as your local run configuration.
 
 The generator creates code, manifests, and wiring. It does not start the stack for you.
 
-## Message-driven Service Architecture Worker
+## Worker
 
-The worker is the service that **consumes commands/events**, runs domain logic, persists state, and **publishes events that represent domain outcomes**. It ships with retries and a poison queue on the bus, OpenTelemetry traces across handlers, and a Kubernetes deployment with health probes.
+The worker consumes commands and events, runs domain logic, persists state, and publishes events that represent domain outcome. It has bus retries and an error queue, OpenTelemetry tracing across handlers, and Kubernetes health probes.
 
-For the full breakdown of the project structure and handler patterns, see [docs/worker.md](docs/worker.md).
+See [the worker guide](docs/worker.md) for its project structure and handler patterns.
 
 ```mermaid
 graph LR;
@@ -151,9 +144,9 @@ graph LR;
     style W fill:#555
 ```
 
-In real systems you often end up with **multiple workers**, typically split by domain or bounded context. Each one consumes its own commands, owns its own state, and reacts to events from the others without sharing a database or calling them directly.
+Larger systems often have several workers split by domain or bounded context. Each worker consumes its own commands, owns its state, and reacts to events from the others without sharing a database or calling them directly.
 
-Here's a common "two workers" setup. The API sends commands onto the bus, and both workers publish events back. Workers can also subscribe to each other's events without direct coupling.
+In this two-worker setup, the API sends commands through RabbitMQ and both workers publish events back. A worker can also subscribe to the other worker's events.
 
 ```mermaid
 graph LR;
@@ -172,18 +165,18 @@ graph LR;
     style W2 fill:#555
 ```
 
-## Message-driven Service Architecture API
+## API
 
-The API is the **HTTP edge**: it validates input, serves reads from a local read model, and forwards writes as **commands to the worker** over the message bus. It also consumes events to invalidate caches and notify clients (Server-Sent Events).
+The API is the HTTP edge. It validates input, serves a local read model, and forwards writes to the worker as commands. Events from the worker invalidate caches and reach browser clients through SSE.
 
-For the full breakdown of controllers, application services, and local event handling, see [docs/api.md](docs/api.md).
+See [the API guide](docs/api.md) for controllers, application services, and local event handling.
 
-## Message-driven Service Architecture Web
+## Web
 
-A simple Angular SPA hosted in an Nginx container, preconfigured to run in a Kubernetes environment. It uses [Transloco](https://jsverse.gitbook.io/transloco) to manage translations.
+The Angular SPA runs in an Nginx container and uses [Transloco](https://jsverse.gitbook.io/transloco) for translations.
 
-For the full breakdown of Server-Sent Events integration, translations, and event handling, see [docs/web.md](docs/web.md).
+See [the web guide](docs/web.md) for SSE integration, translations, and event handling.
 
 ## How to contribute
 
-Feel free to create an issue or pull request if you feel something is missing!
+Missing something? Open an issue or pull request.

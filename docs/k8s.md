@@ -1,12 +1,12 @@
 # Kubernetes manifests
 
-The generated `k8s/` folder deploys your API, worker, web app, and service-local cache into a cluster that already provides the shared platform services this stack depends on.
+The generated `k8s/` folder deploys the API, worker, web app, PostgreSQL database, and Valkey cache. The target cluster must already provide the shared platform services listed below.
 
 These manifests assume [msa-infrastructure](https://github.com/ftechmax/msa-infrastructure/) or an equivalent platform. If you use something else, the capabilities listed below need to exist under the hostnames and CRDs the templates expect.
 
 ## What gets generated
 
-The generator copies a ready-to-patch `k8s/` folder into your new service project.
+The generator copies this `k8s/` structure into the new service project:
 
 - `k8s/base/`
   - `api/`, `worker/`, and `web/` Deployments and Services
@@ -37,7 +37,7 @@ The generated base manifests do not install RabbitMQ, ingress, or the supporting
 
 ## Generator inputs and what they affect
 
-The interactive prompts are not cosmetic. They are stamped directly into the manifests and application configuration.
+The generator writes its prompt values into the manifests and application configuration.
 
 - `Kubernetes namespace`
   - sets the namespace on the generated overlays
@@ -60,18 +60,15 @@ The generated manifests assume path-based routing through Istio's Gateway API:
 
 Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>`. With the default prompts, that becomes `awesome-app.kube.local`.
 
-That means one of the following needs to be true:
-
-- your ingress/DNS setup exposes hosts like `awesome-app.your-domain.tld`, or
-- you edit the generated `HTTPRoute` resources (or add a kustomize overlay patch) to match your environment
+Your ingress and DNS must expose hosts such as `awesome-app.your-domain.tld`. If they don't, edit the generated `HTTPRoute` resources or add a Kustomize patch for your environment.
 
 ## Overlay usage
 
 ### Local
 
-`k8s/overlays/local` is the easiest starting point when you have a local or self-hosted cluster and a registry reachable as `registry:5000`.
+Use `k8s/overlays/local` for a local or self-hosted cluster with a registry reachable as `registry:5000`.
 
-It does three things:
+It changes four parts of the base:
 
 - adds example RabbitMQ and database secrets
 - adds Pgweb at `applicationname-pgweb.<domain>` for local PostgreSQL inspection
@@ -86,7 +83,7 @@ Pgweb uses the local database secret for both PostgreSQL access and HTTP basic a
 
 `k8s/overlays/development` and `k8s/overlays/production` are template overlays. They still contain `{{REGISTRY}}` and `{{IMAGE_TAG}}` placeholders after generation.
 
-Those overlays are intended to be rendered by your CI/CD pipeline or replaced manually before you apply them. Out of the box, they are not directly deployable until those placeholders are filled in.
+Render those values in CI/CD or replace them manually before applying an overlay. The placeholders make the overlays invalid as direct deployment inputs.
 
 ## Applying the manifests
 

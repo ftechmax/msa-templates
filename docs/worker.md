@@ -1,91 +1,76 @@
 # Worker project
 
-The worker service is responsible for consuming commands and external events, applying business logic, persisting state, and publishing events that represent domain outcomes. It runs as a background service and does not expose HTTP endpoints. The template wires up Conveyo on RabbitMQ for messaging, Npgsql for persistence (PostgreSQL JSONB, an in-cluster Postgres StatefulSet in the default Kubernetes setup), and OpenTelemetry for traces, metrics, and logs.
+The worker consumes commands and external events, applies business rules, persists state, and publishes the outcome. It runs as a background service without HTTP endpoints. Conveyo and RabbitMQ handle messaging, Npgsql stores JSONB documents in PostgreSQL, and OpenTelemetry records traces, metrics, and logs.
 
 ## Responsibilities
 
-In this stack, the worker owns the domain work:
+The worker owns the domain work:
 
-- **Consumes commands** from the bus and treats them as the unit of work. Commands should be actionable and explicit, like `CreateOrder` instead of `OrderChanged`.
-- **Handles external events** from other services and translates them into local commands when needed, keeping domain logic behind your own contracts.
-- **Applies domain rules** and produces internal domain events as the outcome, rather than leaking persistence concerns into handlers.
-- **Persists state** behind a repository abstraction, storing documents as PostgreSQL JSONB by default.
-- **Publishes shared events** back onto the bus so other services (and the API) can react asynchronously.
+- consumes explicit commands such as `CreateOrder` and treats them as the unit of work, not ambiguous messages such as `OrderChanged`
+- translates external events into local commands when another service triggers domain work
+- applies domain rules and returns internal domain events
+- stores state behind a repository abstraction, using PostgreSQL JSONB by default
+- publishes shared event contracts for the API and other services
 
 ## Operational notes
 
-- Handlers must be **idempotent** because RabbitMQ can redeliver the same message after a worker restart or ack timeout.
+- Handlers must be idempotent because RabbitMQ can redeliver a message after a worker restart or acknowledgement timeout.
 - OpenTelemetry exports traces, metrics, and logs, so you can answer "what happened to message X?" from a single trace ID.
-- Transient failures go through Conveyo's retry pipeline (exponential backoff), and unrecoverable ones are published as a `Fault` and moved to a `{queue}_error` queue. The template ships defaults; you set the retry counts and backoff per consumer.
+- Transient failures go through Conveyo's retry pipeline with exponential backoff, and unrecoverable ones are published as a `Fault` and moved to a `{queue}_error` queue. The template ships defaults; you set the retry counts and backoff per consumer.
 - Background jobs belong here too. The template shows a hosted service for cache invalidation.
 
 ## Command handling and event publication
 
 The worker turns accepted commands into persisted state changes and published events.
 
-That distinction matters across the whole stack:
+The web receives an HTTP response as soon as the API queues a command. The worker processes that command later and publishes the result.
 
-- the web sends a command and gets an immediate HTTP response
-- the API puts the command on the bus and returns
-- the worker later consumes that command, applies domain logic, and publishes the resulting event
+For the browser-side view of the same loop, see [Web asynchronous command results](web.md#asynchronous-command-results). For the HTTP and Server-Sent Events bridge around the worker, see [API async command loop](api.md#async-command-loop).
 
-For the browser-side view of the same loop, see [Web status service and domain feedback](web.md#status-service-and-domain-feedback). For the HTTP and Server-Sent Events bridge around the worker, see [API async command loop](api.md#async-command-loop).
+In these docs, a *domain event* is the internal result from the application/domain layer. The command handler maps it to a shared event contract before publishing it for the API and other services.
 
-In these docs, "domain event" means the internal result produced by the application/domain layer. Once that result is mapped to a shared contract and published on the bus, it becomes a published event that the API and web app can react to.
-
-In the template, the worker side is split into two layers:
+The worker splits that work across two layers:
 
 - the command handler is the messaging boundary
 - the application/domain service applies business rules and persists state
 
 The command flow looks like this:
 
-1. a command arrives from RabbitMQ
-2. `ExampleCommandHandler` passes it to the application service
-3. the application service loads or creates the aggregate and applies domain rules
-4. the updated state is persisted
-5. a domain event is returned from the application layer
-6. the handler maps that domain event to a shared event contract
-7. the handler republishes it onto the bus, preserving the original correlation id
+1. A command arrives from RabbitMQ.
+2. `ExampleCommandHandler` passes it to the application service.
+3. The service loads or creates the aggregate, then applies domain rules.
+4. The service persists the updated state and returns a domain event.
+5. The handler maps that event to a shared contract.
+6. The handler publishes the contract with the original correlation ID.
 
-That republished event is what the API later consumes to invalidate caches and notify the web app.
+If command handling throws, the command remains accepted by the asynchronous pipeline but the business operation has failed. Conveyo can publish a fault, which the API forwards to the browser as a `DomainFault`.
 
-If command handling throws, the command has still been accepted into the asynchronous pipeline, but the business operation did not complete. That failure can travel back through the fault path so the API can surface a `DomainFault` to the browser.
+## Project structure
 
-## Project Structure
+Message handlers are the worker's entry points. They delegate business logic to a domain service, map its internal domain events to shared contracts, and publish those contracts.
 
-The worker only communicates via messages. Its entry point is a set of message handlers that respond to commands and events. Each handler delegates business logic to a domain service. The domain service returns internal domain events; the handler maps them to shared event contracts and publishes them back onto the bus.
-
-### Command Handler
+### Command handler
 
 `ExampleCommandHandler.cs` handles incoming commands for the `Example` domain. Add separate command handlers for other sub-domains instead of putting every command in this file.
 
-The command handler does four things:
-1. **Receive Command**: The handler listens for specific commands from the message bus.
-2. **Pass Command to Domain Service**: The handler invokes the appropriate method on the domain service, passing along the entire command object.
-3. **Map Domain Events**: The domain service processes the command and returns a domain event object. The handler maps that domain event into a shared event contract suitable for publishing.
-4. **Publish Events**: After processing the command, the handler may publish the mapped event if the returned domain event object is not null.
+The handler listens for its command types and passes the complete command to the matching domain service method. If the service returns a domain event, the handler maps and publishes it as a shared event contract.
 
-Notice what the handler does not do: it does not talk to the web directly and it does not complete an HTTP request. Its responsibility is to turn bus messages into durable domain outcomes and then publish the resulting facts back out.
+It never talks to the web or completes an HTTP request. Its boundary starts and ends on the message bus.
 
-### Domain Service
+### Domain service
 
 `ExampleService.cs` contains the business logic for the `Example` domain. It processes commands delivered by the command handler and returns internal domain events from the business rules it applies.
 
-The domain service:
-1. **Receive Command**: The service receives the command object from the command handler.
-2. **Create or Hydrate Aggregate**: The service either creates a new aggregate instance or retrieves an existing one from the repository, depending on the command.
-3. **Apply Business Logic**: The service invokes methods on the aggregate to apply business rules and modify its state.
-4. **Persist Changes**: The service saves the updated aggregate back to the repository.
-5. **Return Domain Events**: The service returns any domain events that were generated as a result of processing the command.
+The service receives a command, creates or loads the aggregate, applies its business rules, and saves the new state. It returns any domain events produced by the aggregate.
 
-Returning the domain event instead of publishing it from inside the domain layer keeps the boundary explicit: domain code decides what happened; the outer consumer decides how that fact is published.
+The domain code decides what happened. The outer command handler decides how to publish it.
 
-#### Using a Different Persistence Mechanism
+#### Replacing persistence
 
-Note that the default persistence mechanism stores documents as PostgreSQL JSONB via Npgsql; in the generated Kubernetes setup that means an in-cluster Postgres StatefulSet. Each document type maps to its own table (`id`/`created`/`updated` columns plus a `data jsonb` column), and the schema is created idempotently on startup. To use another database, implement the repository interface for that store.
-For event-sourcing scenarios you would store the domain event object returned by the aggregate instead of persisting the aggregate state directly.
+By default, Npgsql stores documents as PostgreSQL JSONB. The Kubernetes manifests run PostgreSQL as an in-cluster StatefulSet. Each document type has its own table with `id`, `created`, `updated`, and `data jsonb` columns. Startup creates the schema idempotently.
 
-### External Event Handler
+Implement the repository interface to use another database. For event sourcing, store the domain events returned by the aggregate instead of its current state.
 
-`ExternalEventHandler.cs` consumes external domain events. In a real service this could be something like handling `UserCreatedEvent` from an identity service and creating a local profile.
+### External event handler
+
+`ExternalEventHandler.cs` consumes domain events from other services. For example, it could handle `UserCreatedEvent` from an identity service and create a local profile.
