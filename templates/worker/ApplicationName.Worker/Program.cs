@@ -9,6 +9,7 @@ using ApplicationName.Worker.Infrastructure;
 using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using Mapster;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Conveyo;
 using Conveyo.Diagnostics;
 using Conveyo.RabbitMQ;
@@ -33,30 +34,32 @@ public static class Program
 
     public static async Task Main(string[] args)
     {
-        var builder = Host.CreateDefaultBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
 #if DEBUG
-        builder.ConfigureAppConfiguration(config =>
-            config.AddDotNetEnv(".env", LoadOptions.TraversePath()));
+        builder.Configuration.AddDotNetEnv(".env", LoadOptions.TraversePath());
 #endif
 
-        builder.ConfigureLogging(ConfigureLogging);
+        ConfigureLogging(builder.Logging, builder.Configuration);
 
-        builder.ConfigureServices(ConfigureServices);
+        ConfigureServices(builder.Services, builder.Configuration);
 
         var app = builder.Build();
 
-        await DatabaseInitializer.InitializeAsync(app.Services.GetRequiredService<NpgsqlDataSource>());
+        app.MapHealthChecks("/healthz", new HealthCheckOptions { Predicate = _ => false });
+        app.MapHealthChecks("/readyz", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
         await app.RunAsync();
     }
 
-    private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
     {
-        var configuration = context.Configuration;
-
         // PostgreSQL
         services.AddSingleton(_ => new NpgsqlDataSourceBuilder(configuration["postgres:connection-string"]).Build());
+
+        // DB schema initialization
+        services.AddSingleton<DatabaseReadiness>();
+        services.AddHostedService<DatabaseInitializerService>();
 
         // Valkey
         var redisConfiguration = ConfigurationOptions.Parse(configuration["valkey:connection-string"]!, true);
@@ -108,6 +111,11 @@ public static class Program
             });
         });
 
+        // Worker
+        services.AddHealthChecks()
+            .AddCheck<DatabaseReadiness>("database-initialization", tags: ["ready"])
+            .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
+
         // Application
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IProtoCacheRepository, ProtoCacheRepository>();
@@ -134,10 +142,8 @@ public static class Program
         );
     }
 
-    private static void ConfigureLogging(HostBuilderContext context, ILoggingBuilder builder)
+    private static void ConfigureLogging(ILoggingBuilder builder, ConfigurationManager configuration)
     {
-        var configuration = context.Configuration;
-
         builder.AddOpenTelemetry(configure =>
         {
             configure.IncludeScopes = true;

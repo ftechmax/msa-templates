@@ -10,6 +10,7 @@ The generator copies this `k8s/` structure into the new service project:
 
 - `k8s/base/`
   - `api/`, `worker/`, and `web/` Deployments and Services
+  - a liveness probe on `/healthz` for every workload; the API and worker add a startup probe for their cold start and a readiness probe on `/readyz`
   - `cache/` resources for a per-service Valkey instance
   - `database/` resources for a per-service PostgreSQL StatefulSet
   - `rabbitmq-user.yaml` to provision a RabbitMQ user and permissions for the service
@@ -17,7 +18,7 @@ The generator copies this `k8s/` structure into the new service project:
 - `k8s/overlays/local/`
   - points images at `registry:5000/...`, a locally deployed registry
   - includes example secrets for RabbitMQ and database credentials
-  - drops `securityContext`, `livenessProbe`, and `resources` from every Deployment for easier local iteration
+  - drops `securityContext`, `livenessProbe`, and `resources` from every Deployment, plus the API and worker `startupProbe` and `readinessProbe`, for easier local iteration
 - `k8s/overlays/development/` and `k8s/overlays/production/`
   - keep the base manifests intact
   - expect your delivery pipeline to replace `{{REGISTRY}}` and `{{IMAGE_TAG}}`
@@ -73,7 +74,7 @@ It changes four parts of the base:
 - adds example RabbitMQ and database secrets
 - adds Pgweb at `applicationname-pgweb.<domain>` for local PostgreSQL inspection
 - points images to `registry:5000/applicationname-*`
-- removes the `securityContext`, `livenessProbe`, and `resources` blocks from every Deployment
+- removes the `securityContext`, `livenessProbe`, and `resources` blocks from every Deployment, and the API and worker `startupProbe` and `readinessProbe`
 
 If you use a different local registry, edit the image names before applying the overlay.
 

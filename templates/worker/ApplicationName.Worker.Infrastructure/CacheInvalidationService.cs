@@ -13,6 +13,7 @@ public class CacheInvalidationService(
     IConnectionMultiplexer connectionMultiplexer,
     IServiceProvider serviceProvider,
     IMapper mapper,
+    DatabaseReadiness databaseReadiness,
     ILogger<CacheInvalidationService> logger) : BackgroundService
 {
     private const string ProjectionPrefix = "projections:";
@@ -39,6 +40,8 @@ public class CacheInvalidationService(
 
             await _sub.SubscribeAsync(RedisChannel.Literal("__keyevent@0__:del"), OnKeyEvent);
             await _sub.SubscribeAsync(RedisChannel.Literal("__keyevent@0__:expired"), OnKeyEvent);
+
+            await databaseReadiness.WaitUntilReadyAsync(stoppingToken);
 
             await InitializeProjectionsAsync(stoppingToken);
 

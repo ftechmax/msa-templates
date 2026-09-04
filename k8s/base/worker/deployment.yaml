@@ -55,12 +55,23 @@ spec:
               value: 'Host=applicationname-database;Port=5432;Database=applicationname_snake;Username=$(database_username);Password=$(database_password);GSS Encryption Mode=Disable'
             - name: valkey__connection-string
               value: 'applicationname-cache:6379'
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 3
+            timeoutSeconds: 3
+            failureThreshold: 20
           livenessProbe:
             httpGet:
               path: /healthz
               port: 8080
-            initialDelaySeconds: 3
             periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            periodSeconds: 10
           resources:
             limits:
               memory: 100Mi

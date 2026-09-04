@@ -1,6 +1,6 @@
 # Worker project
 
-The worker consumes commands and external events, applies business rules, persists state, and publishes the outcome. It runs as a background service without HTTP endpoints. Conveyo and RabbitMQ handle messaging, Npgsql stores JSONB documents in PostgreSQL, and OpenTelemetry records traces, metrics, and logs.
+The worker consumes commands and external events, applies business rules, persists state, and publishes the outcome. It runs as a background service and serves no API; its only HTTP endpoints are `/healthz` and `/readyz` for the Kubernetes probes. Conveyo and RabbitMQ handle messaging, Npgsql stores JSONB documents in PostgreSQL, and OpenTelemetry records traces, metrics, and logs.
 
 ## Responsibilities
 
@@ -18,6 +18,8 @@ The worker owns the domain work:
 - OpenTelemetry exports traces, metrics, and logs, so you can answer "what happened to message X?" from a single trace ID.
 - Transient failures go through Conveyo's retry pipeline with exponential backoff, and unrecoverable ones are published as a `Fault` and moved to a `{queue}_error` queue. The template ships defaults; you set the retry counts and backoff per consumer.
 - Background jobs belong here too. The template shows a hosted service for cache invalidation.
+- Kestrel listens on port 8080 only to answer probes. `/healthz` is the liveness probe and runs no dependency checks, so a database or bus outage never restarts the pod. `/readyz` is the readiness probe and runs every check tagged `ready`: `database-initialization` and a `database` connection test.
+- `DatabaseInitializerService` creates the schema in the background, retrying for two minutes while PostgreSQL is unavailable, so a database that is still starting costs a wait rather than a pod restart.
 
 ## Command handling and event publication
 

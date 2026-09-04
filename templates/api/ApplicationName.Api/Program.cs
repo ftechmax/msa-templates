@@ -11,6 +11,7 @@ using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using FluentValidation;
 using Mapster;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Conveyo;
 using Conveyo.Diagnostics;
 using Conveyo.RabbitMQ;
@@ -131,7 +132,7 @@ public static class Program
                 .SetResourceBuilder(appResourceBuilder)
                 .AddAspNetCoreInstrumentation(options =>
                 {
-                    options.Filter = req => !(req.Request.Path.Equals("/healthz") || req.Request.Path.Equals("/metrics") || req.Request.Path.StartsWithSegments("/swagger"));
+                    options.Filter = req => !(req.Request.Path.Equals("/healthz") || req.Request.Path.Equals("/readyz") || req.Request.Path.Equals("/metrics") || req.Request.Path.StartsWithSegments("/swagger"));
                     options.RecordException = true;
                 })
                 .AddHttpClientInstrumentation(options =>
@@ -168,7 +169,10 @@ public static class Program
         app.UseResponseCompression();
 
         app.MapControllers();
-        app.MapHealthChecks("/healthz");
+
+        app.MapHealthChecks("/healthz", new HealthCheckOptions { Predicate = _ => false });
+        app.MapHealthChecks("/readyz", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
+
         app.MapServerSentEvents();
     }
 

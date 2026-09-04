@@ -18,7 +18,9 @@ Published worker events return through the API. A local event handler:
 
 ## Operational notes
 
-OpenTelemetry traces a request from the controller through the bus send. The HTTP call and the worker handling share a trace ID. The API also exposes `/healthz` for Kubernetes probes and serves Swagger UI in `Development`.
+OpenTelemetry traces a request from the controller through the bus send. The HTTP call and the worker handling share a trace ID. The API serves Swagger UI in `Development` and exposes two probe endpoints: `/healthz` for liveness, which runs no dependency checks so an outage never restarts the pod, and `/readyz` for readiness, which runs every check tagged `ready`.
+
+Kestrel starts after every hosted service, and Conveyo connects to RabbitMQ in one of them, so the API answers neither endpoint for the first several seconds. The Deployment covers that with a startup probe: Kubernetes disables the liveness and readiness probes until it passes, so a slow bus connection cannot restart the pod. Readiness then keeps the Service from routing traffic to a pod that is not listening yet.
 
 ## Async command loop
 

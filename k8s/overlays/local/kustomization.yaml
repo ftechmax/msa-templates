@@ -17,6 +17,22 @@ patches:
         path: /spec/template/spec/containers/0/livenessProbe
       - op: remove
         path: /spec/template/spec/containers/0/resources
+  - target:
+      kind: Deployment
+      name: applicationname-worker
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/containers/0/startupProbe
+      - op: remove
+        path: /spec/template/spec/containers/0/readinessProbe
+  - target:
+      kind: Deployment
+      name: applicationname-api
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/containers/0/startupProbe
+      - op: remove
+        path: /spec/template/spec/containers/0/readinessProbe
 images:
   - name: applicationname-worker
     newName: registry:5000/applicationname-worker
