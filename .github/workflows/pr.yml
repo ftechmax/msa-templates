@@ -46,8 +46,10 @@ jobs:
           cd ./templates/web
           npm ci
 
-      # - name: Run Unit Tests
-      #   run: npm run test
+      - name: Run Unit Tests
+        run: |
+          cd ./templates/web
+          npm test -- --watch=false
 
       - name: Build Application
         run: |

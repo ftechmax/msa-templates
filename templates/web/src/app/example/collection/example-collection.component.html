@@ -11,7 +11,7 @@
   <div class="mat-elevation-z8">
     <table
       mat-table
-      [dataSource]="model"
+      [dataSource]="model()"
       matSort
       matSortActive="created"
       matSortDirection="desc"
@@ -57,7 +57,7 @@
 
     <mat-paginator
       #paginator
-      [length]="model.length || 0"
+      [length]="model().length || 0"
       [pageIndex]="0"
       [pageSize]="10"
       [pageSizeOptions]="[5, 10, 20]"

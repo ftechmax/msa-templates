@@ -16,7 +16,7 @@
         <mat-error
           >
           <ul>
-            @for (item of form.controls['name'].errors?.['fluentValidationError'];
+            @for (item of form.controls['name'].errors!['fluentValidationError'];
               track item) {
               <i>{{ item }}</i>
             }
@@ -40,7 +40,7 @@
           >
           <ul>
             @for (item of
-              form.controls['description'].errors?.['fluentValidationError']; track
+              form.controls['description'].errors!['fluentValidationError']; track
               item) {
               <i>{{ item }}</i>
             }
@@ -55,7 +55,7 @@
       color="accent"
       type="submit"
       cdkFocusInitial
-      [disabled]="submitting"
+      [disabled]="submitting()"
       >
       Create
     </button>

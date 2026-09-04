@@ -3,7 +3,7 @@ import {
   Component,
   OnDestroy,
   signal,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import {
   Subject,
@@ -49,7 +49,7 @@ export class ExampleCollectionComponent implements AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns = ['name', 'created', 'actions'];
-  model = [] as ExampleCollectionDto[];
+  model = signal<ExampleCollectionDto[]>([]);
   event$: Subscription | null = null;
   data$: Subscription | undefined;
   spinner = signal(false);
@@ -104,7 +104,7 @@ export class ExampleCollectionComponent implements AfterViewInit, OnDestroy {
           return data;
         })
       )
-      .subscribe((data) => (this.model = data));
+      .subscribe((data) => this.model.set(data));
   }
 
   ngOnDestroy(): void {

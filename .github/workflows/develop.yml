@@ -64,6 +64,11 @@ jobs:
           npm ci
           npm run build
 
+      - name: Run web unit tests
+        run: |
+          cd /tmp/msa-smoke/awesome-app/src/web
+          npm test -- --watch=false
+
       - name: Run unit tests
         run: |
           dotnet test /tmp/msa-smoke/awesome-app/src/api/Awesome.App.Api.sln
@@ -129,6 +134,12 @@ jobs:
           cd C:\msa-smoke\awesome-app\src\web
           npm ci
           npm run build
+
+      - name: Run web unit tests
+        shell: pwsh
+        run: |
+          cd C:\msa-smoke\awesome-app\src\web
+          npm test -- --watch=false
 
       - name: Run unit tests
         shell: pwsh

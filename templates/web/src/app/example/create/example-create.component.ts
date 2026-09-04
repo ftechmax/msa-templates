@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { ExampleHttpClient } from '../httpclient';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {
@@ -46,7 +46,7 @@ export class ExampleCreateComponent implements OnInit, OnDestroy {
     }),
   });
 
-  submitting: boolean = false;
+  submitting = signal(false);
   event$: Subscription | null = null;
   fault$: Subscription | null = null;
 
@@ -87,16 +87,16 @@ export class ExampleCreateComponent implements OnInit, OnDestroy {
 
   submit() {
     if (!this.form.valid) {
-      this.submitting = false;
+      this.submitting.set(false);
       return;
     }
 
-    this.submitting = true;
+    this.submitting.set(true);
 
     this.http.create(this.form.value).subscribe({
       error: (response) => {
         //AddValidationErrors(response, this.form);
-        this.submitting = false;
+        this.submitting.set(false);
       },
     });
   }
