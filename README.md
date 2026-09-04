@@ -12,7 +12,7 @@ Here, MSA means Message-driven Service Architecture. Services exchange commands 
 
 ## Why this exists
 
-I've been building message-driven systems for about 15 years. Over time you end up rediscovering the same handful of patterns:  how services talk to each other, how commands and events are modelled, how failures stay visible, and how you keep a system operable once it's running 24/7.
+I've been building message-driven systems for about 15 years. Over time you end up rediscovering the same handful of patterns: how services talk to each other, how commands and events are modelled, how failures stay visible, and how you keep a system operable once it's running 24/7.
 
 These templates are the accumulation of those lessons, packaged as a starting point:
 
@@ -131,7 +131,7 @@ The generator creates code, manifests, and wiring. It does not start the stack f
 
 ## Worker
 
-The worker consumes commands and events, runs domain logic, persists state, and publishes events that represent domain outcome. It has bus retries and an error queue, OpenTelemetry tracing across handlers, and Kubernetes health probes.
+The worker consumes commands and events, runs domain logic, persists state, and publishes events that represent domain outcomes. It has bus retries and an error queue, and OpenTelemetry tracing across handlers.
 
 See [the worker guide](docs/worker.md) for its project structure and handler patterns.
 

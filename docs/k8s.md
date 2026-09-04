@@ -17,7 +17,7 @@ The generator copies this `k8s/` structure into the new service project:
 - `k8s/overlays/local/`
   - points images at `registry:5000/...`, a locally deployed registry
   - includes example secrets for RabbitMQ and database credentials
-  - removes some stricter deployment settings to make local iteration easier
+  - drops `securityContext`, `livenessProbe`, and `resources` from every Deployment for easier local iteration
 - `k8s/overlays/development/` and `k8s/overlays/production/`
   - keep the base manifests intact
   - expect your delivery pipeline to replace `{{REGISTRY}}` and `{{IMAGE_TAG}}`
@@ -73,7 +73,7 @@ It changes four parts of the base:
 - adds example RabbitMQ and database secrets
 - adds Pgweb at `applicationname-pgweb.<domain>` for local PostgreSQL inspection
 - points images to `registry:5000/applicationname-*`
-- relaxes some runtime settings that are handy in local development
+- removes the `securityContext`, `livenessProbe`, and `resources` blocks from every Deployment
 
 If you use a different local registry, edit the image names before applying the overlay.
 

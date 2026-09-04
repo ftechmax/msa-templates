@@ -6,10 +6,10 @@ The API exposes the domain over HTTP. It serves queries from a local read model 
 
 The API does not contain domain logic. It:
 
-- defines the HTTP contract through controllers, DTOs, versioning, and input validation
+- defines the HTTP contract through controllers, DTOs, and input validation
 - rejects invalid requests before they reach the message bus
 - sends commands to the worker through Conveyo instead of writing to its database
-- serves projections from a local read model and caches them in Valkey
+- serves projections that the worker maintains in Valkey, and caches the DTOs it maps from them
 
 Published worker events return through the API. A local event handler:
 
@@ -18,7 +18,7 @@ Published worker events return through the API. A local event handler:
 
 ## Operational notes
 
-OpenTelemetry traces a request from the controller through the bus send. The HTTP call and the worker handling share a trace ID. The API also exposes `/health/live` and `/health/ready` for Kubernetes probes and serves Swagger UI in `Development`.
+OpenTelemetry traces a request from the controller through the bus send. The HTTP call and the worker handling share a trace ID. The API also exposes `/healthz` for Kubernetes probes and serves Swagger UI in `Development`.
 
 ## Async command loop
 
@@ -46,9 +46,9 @@ The controller accepts a request DTO and delegates to the application service. G
 
 For queries, the application service:
 
-1. checks the cache
-2. loads documents from the read model after a cache miss
-3. maps the documents to DTOs and caches the result
+1. checks the DTO cache
+2. loads projections from the read model after a cache miss
+3. maps the projections to DTOs and caches the result
 
 For commands, the application service:
 
