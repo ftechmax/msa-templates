@@ -19,6 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FaultSnackBarComponent } from '../../core/fault-snackbar/fault-snack-bar.component';
 import { DomainFault } from '../../core/contracts';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { AddValidationErrors } from '../../validation-errors';
 
 @Component({
   selector: 'app-example-create',
@@ -95,7 +96,7 @@ export class ExampleCreateComponent implements OnInit, OnDestroy {
 
     this.http.create(this.form.value).subscribe({
       error: (response) => {
-        //AddValidationErrors(response, this.form);
+        AddValidationErrors(response, this.form);
         this.submitting.set(false);
       },
     });

@@ -4,6 +4,12 @@ using ApplicationName.Api.Controllers;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
 using FakeItEasy;
+using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NUnit.Framework;
 using Shouldly;
 
@@ -15,6 +21,10 @@ public class ExampleControllerTest
 
     private IExampleService _applicationService;
 
+    private IValidator<CreateExampleDto> _createExampleDtoValidator;
+
+    private IValidator<UpdateExampleDto> _updateExampleDtoValidator;
+
     private ExampleController _subjectUnderTest;
 
     [SetUp]
@@ -22,7 +32,12 @@ public class ExampleControllerTest
     {
         _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
         _applicationService = _fixture.Freeze<IExampleService>();
+        _createExampleDtoValidator = _fixture.Freeze<IValidator<CreateExampleDto>>();
+        _updateExampleDtoValidator = _fixture.Freeze<IValidator<UpdateExampleDto>>();
         _subjectUnderTest = _fixture.Build<ExampleController>().OmitAutoProperties().Create();
+
+        // ValidationProblem() resolves this from HttpContext.RequestServices, which a unit test has no request for.
+        _subjectUnderTest.ProblemDetailsFactory = new TestProblemDetailsFactory();
     }
 
     [Test]
@@ -72,11 +87,35 @@ public class ExampleControllerTest
         // Arrange
         var dto = _fixture.Create<CreateExampleDto>();
 
+        A.CallTo(() => _createExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
+            .ReturnsLazily(() => new ValidationResult());
+
         // Act
-        await _subjectUnderTest.Post(dto);
+        var result = await _subjectUnderTest.Post(dto);
 
         // Assert
         A.CallTo(() => _applicationService.HandleAsync(dto)).MustHaveHappenedOnceExactly();
+
+        result.ShouldBeOfType<AcceptedResult>();
+    }
+
+    [Test]
+    public async Task Post_With_Invalid_Dto()
+    {
+        // Arrange
+        var dto = _fixture.Create<CreateExampleDto>();
+
+        A.CallTo(() => _createExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
+            .ReturnsLazily(() => new ValidationResult([new ValidationFailure(nameof(CreateExampleDto.Name), "'Name' must not be empty.")]));
+
+        // Act
+        var result = await _subjectUnderTest.Post(dto);
+
+        // Assert
+        A.CallTo(() => _applicationService.HandleAsync(A<CreateExampleDto>._)).MustNotHaveHappened();
+
+        var problemDetails = result.ShouldBeOfType<BadRequestObjectResult>().Value.ShouldBeOfType<ValidationProblemDetails>();
+        problemDetails.Errors.ShouldContainKey(nameof(CreateExampleDto.Name));
     }
 
     [Test]
@@ -86,10 +125,54 @@ public class ExampleControllerTest
         var id = _fixture.Create<Guid>();
         var dto = _fixture.Create<UpdateExampleDto>();
 
+        A.CallTo(() => _updateExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
+            .ReturnsLazily(() => new ValidationResult());
+
         // Act
-        await _subjectUnderTest.Put(id, dto);
+        var result = await _subjectUnderTest.Put(id, dto);
 
         // Assert
         A.CallTo(() => _applicationService.HandleAsync(id, dto)).MustHaveHappenedOnceExactly();
+
+        result.ShouldBeOfType<AcceptedResult>();
+    }
+
+    [Test]
+    public async Task Put_With_Invalid_Dto()
+    {
+        // Arrange
+        var id = _fixture.Create<Guid>();
+        var dto = _fixture.Create<UpdateExampleDto>();
+
+        A.CallTo(() => _updateExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
+            .ReturnsLazily(() => new ValidationResult([new ValidationFailure(nameof(UpdateExampleDto.Description), "'Description' must not be empty.")]));
+
+        // Act
+        var result = await _subjectUnderTest.Put(id, dto);
+
+        // Assert
+        A.CallTo(() => _applicationService.HandleAsync(A<Guid>._, A<UpdateExampleDto>._)).MustNotHaveHappened();
+
+        var problemDetails = result.ShouldBeOfType<BadRequestObjectResult>().Value.ShouldBeOfType<ValidationProblemDetails>();
+        problemDetails.Errors.ShouldContainKey(nameof(UpdateExampleDto.Description));
+    }
+
+    private sealed class TestProblemDetailsFactory : ProblemDetailsFactory
+    {
+        public override ProblemDetails CreateProblemDetails(HttpContext httpContext, int? statusCode = null,
+            string title = null, string type = null, string detail = null, string instance = null)
+        {
+            return new ProblemDetails { Status = statusCode ?? StatusCodes.Status500InternalServerError };
+        }
+
+        public override ValidationProblemDetails CreateValidationProblemDetails(HttpContext httpContext,
+            ModelStateDictionary modelStateDictionary, int? statusCode = null, string title = null,
+            string type = null, string detail = null, string instance = null)
+        {
+            return new ValidationProblemDetails(modelStateDictionary)
+            {
+                Status = statusCode ?? StatusCodes.Status400BadRequest
+            };
+        }
     }
 }
