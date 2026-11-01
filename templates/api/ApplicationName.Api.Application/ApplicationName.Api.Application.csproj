@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ArgDefender" Version="2.1.0" />
-    <PackageReference Include="Mapster.DependencyInjection" Version="10.0.7" />
+    <PackageReference Include="ArgDefender" Version="2.1.1" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="10.0.13" />
     <PackageReference Include="Conveyo" Version="0.1.0-preview.*" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.8" />
-    <PackageReference Include="protobuf-net" Version="3.2.56" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.14" />
+    <PackageReference Include="protobuf-net" Version="3.4.40" />
   </ItemGroup>
 
   <ItemGroup>

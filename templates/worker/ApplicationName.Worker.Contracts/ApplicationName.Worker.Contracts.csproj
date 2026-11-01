@@ -9,7 +9,7 @@
   <Import Project="..\..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
-    <PackageReference Include="protobuf-net" Version="3.2.56" />
+    <PackageReference Include="protobuf-net" Version="3.4.40" />
   </ItemGroup>
 
 </Project>
