@@ -1,0 +1,64 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-api
+spec:
+  podSelector:
+    matchLabels:
+      app: applicationname-api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Ingress gateway
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{GATEWAY_NAMESPACE}}'
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: '{{GATEWAY_NAME}}'
+      ports:
+        - port: 8080
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Valkey
+    - to:
+        - podSelector:
+            matchLabels:
+              app: applicationname-cache
+      ports:
+        - port: 6379
+    # RabbitMQ
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{RABBITMQ_CLUSTER_NAMESPACE}}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: rabbitmq
+      ports:
+        - port: 5672
+    # OpenTelemetry collector
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+          podSelector:
+            matchLabels:
+              app: otel-collector
+      ports:
+        - port: 4317

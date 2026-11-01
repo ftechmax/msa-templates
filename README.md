@@ -89,7 +89,7 @@ MSA Generator vX.Y.Z
 -------------------
 Destination folder [~/git]: ~/git
 Service name (PascalCase): AwesomeApp
-Kubernetes namespace [default]:
+Kubernetes namespace [awesome-app]:
 RabbitMQ host [rabbitmq.rabbitmq-system.svc]:
 Istio Gateway namespace [istio-ingress]:
 Istio Gateway name [gateway]:

@@ -84,3 +84,47 @@ spec:
       backendRefs:
         - name: applicationname-pgweb
           port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-pgweb
+spec:
+  podSelector:
+    matchLabels:
+      app: applicationname-pgweb
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Ingress gateway
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{GATEWAY_NAMESPACE}}'
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: '{{GATEWAY_NAME}}'
+      ports:
+        - port: 8081
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: applicationname-database
+      ports:
+        - port: 5432

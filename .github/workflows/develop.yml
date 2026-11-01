@@ -35,7 +35,7 @@ jobs:
           printf '%s\n' \
             /tmp/msa-smoke \
             AwesomeApp \
-            default \
+            '' \
             rabbitmq.rabbitmq-system.svc \
             istio-ingress \
             gateway \
@@ -48,6 +48,20 @@ jobs:
           ! grep -r 'ApplicationName' /tmp/msa-smoke/awesome-app --exclude-dir=node_modules
           ! grep -r 'applicationname' /tmp/msa-smoke/awesome-app --exclude-dir=node_modules
           ! grep -r 'applicationname_snake' /tmp/msa-smoke/awesome-app --exclude-dir=node_modules
+
+      - name: Validate k8s manifests
+        run: |
+          set -eo pipefail
+          curl -fsSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz \
+            | tar -xz -C "$RUNNER_TEMP" kubeconform
+          for overlay in local development production; do
+            echo "::group::$overlay"
+            kubectl kustomize "/tmp/msa-smoke/awesome-app/k8s/overlays/$overlay" \
+              | "$RUNNER_TEMP/kubeconform" -strict -summary -ignore-missing-schemas \
+                  -schema-location default \
+                  -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+            echo "::endgroup::"
+          done
 
       - name: Build api
         run: dotnet build /tmp/msa-smoke/awesome-app/src/api/Awesome.App.Api.sln
@@ -97,7 +111,7 @@ jobs:
           @(
             'C:\msa-smoke',
             'AwesomeApp',
-            'default',
+            '',
             'rabbitmq.rabbitmq-system.svc',
             'istio-ingress',
             'gateway',

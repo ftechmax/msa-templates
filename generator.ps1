@@ -71,7 +71,12 @@ Write-Host "-------------------"
 
 $DestinationFolder = Prompt-Required  -PromptText "Destination folder" -Default "C:/git"
 $ServiceName       = Prompt-PascalCase -PromptText "Service name (PascalCase)"
-$Namespace         = Prompt-Required  -PromptText "Kubernetes namespace" -Default "default"
+
+$kebabCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1-$2' -creplace '([a-z0-9])([A-Z])', '$1-$2').toLower()
+$dotCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1.$2' -creplace '([a-z0-9])([A-Z])', '$1.$2')
+$snakeCaseServiceName = $kebabCaseServiceName -replace '-', '_'
+
+$Namespace         = Prompt-Required  -PromptText "Kubernetes namespace" -Default $kebabCaseServiceName
 $RabbitmqHost      = Prompt-Host      -PromptText "RabbitMQ host" -Default "rabbitmq.rabbitmq-system.svc"
 $GatewayNamespace  = Prompt-Required  -PromptText "Istio Gateway namespace" -Default "istio-ingress"
 $GatewayName       = Prompt-Required  -PromptText "Istio Gateway name" -Default "gateway"
@@ -79,10 +84,6 @@ $Domain            = Prompt-Required  -PromptText "Base domain" -Default "kube.l
 
 # Extract namespace from RabbitMQ host (rabbitmq.rabbitmq-system.svc -> rabbitmq-system)
 $RabbitmqClusterNamespace = ($RabbitmqHost -split '\.')[1]
-
-$kebabCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1-$2' -creplace '([a-z0-9])([A-Z])', '$1-$2').toLower()
-$dotCaseServiceName = ($ServiceName -creplace '([A-Z]+)([A-Z][a-z])', '$1.$2' -creplace '([a-z0-9])([A-Z])', '$1.$2')
-$snakeCaseServiceName = $kebabCaseServiceName -replace '-', '_'
 
 # Content-substitution allowlist; keep in sync between sh and ps1
 $textExtensions = @(
@@ -221,6 +222,18 @@ try {
     Copy-Item -Path $k8sSource -Destination $ProjectFolder -Recurse -Force
     Get-ChildItem -Path (Join-Path $ProjectFolder 'k8s') -Recurse -File | ForEach-Object {
         Substitute-FileContents -FilePath $_.FullName
+    }
+
+    # Built-in namespaces already exist and must not be owned by the service.
+    if (@('default', 'kube-system', 'kube-public', 'kube-node-lease') -contains $Namespace) {
+        Get-ChildItem -Path (Join-Path $ProjectFolder 'k8s/overlays') -Directory | ForEach-Object {
+            Remove-Item -Path (Join-Path $_.FullName 'namespace.yaml') -Force -ErrorAction SilentlyContinue
+            $kustomizationPath = Join-Path $_.FullName 'kustomization.yaml'
+            $content = Get-Content -Path $kustomizationPath -Raw
+            $patched = $content -replace '(?m)^  - \./namespace\.yaml\r?\n', ''
+            Set-Content -Path $kustomizationPath -Value $patched -NoNewline
+        }
+        Write-Host "Namespace $Namespace is built in; overlays will not create it"
     }
 
     $krunJsonPath = (Join-Path -Path $ProjectFolder -ChildPath 'krun.json')

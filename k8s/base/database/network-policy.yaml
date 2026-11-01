@@ -1,0 +1,21 @@
+---
+# No egress rules: all outbound traffic is denied.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-database
+spec:
+  podSelector:
+    matchLabels:
+      app: applicationname-database
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # PostgreSQL from the worker
+    - from:
+        - podSelector:
+            matchLabels:
+              app: applicationname-worker
+      ports:
+        - port: 5432

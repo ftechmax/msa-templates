@@ -1,0 +1,24 @@
+---
+# No egress rules: all outbound traffic is denied.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-cache
+spec:
+  podSelector:
+    matchLabels:
+      app: applicationname-cache
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Valkey from the API and worker
+    - from:
+        - podSelector:
+            matchLabels:
+              app: applicationname-api
+        - podSelector:
+            matchLabels:
+              app: applicationname-worker
+      ports:
+        - port: 6379

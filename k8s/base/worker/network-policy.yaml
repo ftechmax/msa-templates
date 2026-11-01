@@ -1,0 +1,61 @@
+---
+# No ingress rules: the worker only makes outbound connections, so all inbound traffic is denied.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-worker
+spec:
+  podSelector:
+    matchLabels:
+      app: applicationname-worker
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: applicationname-database
+      ports:
+        - port: 5432
+    # Valkey
+    - to:
+        - podSelector:
+            matchLabels:
+              app: applicationname-cache
+      ports:
+        - port: 6379
+    # RabbitMQ
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{RABBITMQ_CLUSTER_NAMESPACE}}'
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: rabbitmq
+      ports:
+        - port: 5672
+    # OpenTelemetry collector
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+          podSelector:
+            matchLabels:
+              app: otel-collector
+      ports:
+        - port: 4317

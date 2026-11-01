@@ -1,0 +1,24 @@
+---
+# No egress rules: nginx only serves static files, so all outbound traffic is denied.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-web
+spec:
+  podSelector:
+    matchLabels:
+      app: applicationname-web
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Ingress gateway
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{GATEWAY_NAMESPACE}}'
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: '{{GATEWAY_NAME}}'
+      ports:
+        - port: 8080

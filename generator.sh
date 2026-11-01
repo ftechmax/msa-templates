@@ -71,7 +71,12 @@ echo "-------------------"
 
 prompt_required DESTINATION_FOLDER  "Destination folder" "~/git"
 prompt_pascal   SERVICE_NAME        "Service name (PascalCase)"
-prompt_required NAMESPACE           "Kubernetes namespace" "default"
+
+KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1-\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
+DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1.\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1.\2/g')
+SNAKE_CASE_SERVICE_NAME=$(printf '%s' "$KEBAB_CASE_SERVICE_NAME" | tr '-' '_')
+
+prompt_required NAMESPACE           "Kubernetes namespace" "$KEBAB_CASE_SERVICE_NAME"
 prompt_host     RABBITMQ_HOST       "RabbitMQ host" "rabbitmq.rabbitmq-system.svc"
 prompt_required GATEWAY_NAMESPACE   "Istio Gateway namespace" "istio-ingress"
 prompt_required GATEWAY_NAME        "Istio Gateway name" "gateway"
@@ -79,10 +84,6 @@ prompt_required DOMAIN              "Base domain" "kube.local"
 
 # Extract namespace from RabbitMQ host (rabbitmq.rabbitmq-system.svc -> rabbitmq-system)
 RABBITMQ_CLUSTER_NAMESPACE=$(echo "$RABBITMQ_HOST" | cut -d'.' -f2)
-
-KEBAB_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1-\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
-DOT_CASE_SERVICE_NAME=$(printf '%s' "$SERVICE_NAME" | sed -E 's/([A-Z]+)([A-Z][a-z])/\1.\2/g' | sed -E 's/([a-z0-9])([A-Z])/\1.\2/g')
-SNAKE_CASE_SERVICE_NAME=$(printf '%s' "$KEBAB_CASE_SERVICE_NAME" | tr '-' '_')
 
 # Resolve TEMPLATES_SOURCE and K8S_SOURCE
 # 1. Sibling checkout / extracted bundle: templates/ + k8s/ next to script.
@@ -233,6 +234,18 @@ cp -R "$K8S_SOURCE" "$PROJECT_FOLDER"
 find "$PROJECT_FOLDER/k8s" -type f -print0 | while IFS= read -r -d '' file_path; do
   substitute_file_contents "$file_path"
 done
+
+# Built-in namespaces already exist and must not be owned by the service.
+case "$NAMESPACE" in
+  default|kube-system|kube-public|kube-node-lease)
+    for overlay_dir in "$PROJECT_FOLDER"/k8s/overlays/*/; do
+      rm -f "$overlay_dir/namespace.yaml"
+      sed -i.bak '/^  - \.\/namespace\.yaml$/d' "$overlay_dir/kustomization.yaml"
+      rm -f "$overlay_dir/kustomization.yaml.bak"
+    done
+    echo "Namespace $NAMESPACE is built in; overlays will not create it"
+    ;;
+esac
 
 KRUN_JSON_PATH="$PROJECT_FOLDER/krun.json"
 cp "$TEMPLATES_SOURCE/krun.json" "$KRUN_JSON_PATH"

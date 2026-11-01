@@ -1,0 +1,13 @@
+---
+# Denies all traffic to and from every pod in the namespace. The per-workload
+# policies open the connections each workload needs; anything added to the
+# namespace without its own policy stays isolated.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

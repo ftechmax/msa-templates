@@ -1,0 +1,28 @@
+---
+# Lets the traffic-agent sidecar that `krun debug enable` injects reach the krun
+# traffic-manager, so intercepted traffic can be relayed to a local process.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: applicationname-krun-debug
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - applicationname-api
+          - applicationname-worker
+          - applicationname-web
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: krun-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: krun-traffic-manager
+      ports:
+        - port: 8080
