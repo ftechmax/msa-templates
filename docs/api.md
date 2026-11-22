@@ -28,7 +28,7 @@ The API is the bridge between a synchronous web request and an asynchronous doma
 
 The browser starts a command with a normal HTTP call. The API validates the request, maps it to a command, sends it to RabbitMQ, and returns without waiting for the worker. Later, `LocalEventHandler` consumes the resulting event or fault, invalidates any affected cache entries, and pushes the outcome to SSE clients.
 
-A POST or PUT returns `202 Accepted`, which only confirms that the API accepted and queued the command. It is not the business result.
+A POST or PUT returns `202 Accepted`, which only confirms that the API accepted and queued the command. It is not the business result. A PUT for an ID that isn't in the read model returns `404 Not Found` and sends no command.
 
 The browser side of this flow is described in [Web asynchronous command results](web.md#asynchronous-command-results). The worker side is described in [Worker command handling and event publication](worker.md#command-handling-and-event-publication).
 

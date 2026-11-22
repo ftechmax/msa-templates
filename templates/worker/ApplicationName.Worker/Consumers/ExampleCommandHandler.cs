@@ -18,7 +18,7 @@ public class ExampleCommandHandler(IExampleService applicationService, IMapper m
         if (domainEvent != default)
         {
             var @event = mapper.Map<ExampleCreatedEvent>(domainEvent) with { CorrelationId = context.Message.CorrelationId };
-            await context.Publish(@event);
+            await context.Publish(@event, context.CancellationToken);
         }
     }
 
@@ -28,7 +28,7 @@ public class ExampleCommandHandler(IExampleService applicationService, IMapper m
         if (domainEvent != default)
         {
             var @event = mapper.Map<ExampleUpdatedEvent>(domainEvent) with { CorrelationId = context.Message.CorrelationId };
-            await context.Publish(@event);
+            await context.Publish(@event, context.CancellationToken);
         }
     }
 
@@ -38,7 +38,7 @@ public class ExampleCommandHandler(IExampleService applicationService, IMapper m
         if (domainEvent != default)
         {
             var @event = mapper.Map<ExampleRemoteCodeSetEvent>(domainEvent) with { CorrelationId = context.Message.CorrelationId };
-            await context.Publish(@event);
+            await context.Publish(@event, context.CancellationToken);
         }
     }
 }

@@ -61,20 +61,28 @@ public sealed class ExampleService(
         return result;
     }
 
-    public async Task HandleAsync(CreateExampleDto dto)
+    public async Task HandleAsync(CreateExampleDto dto, CancellationToken cancellationToken)
     {
         Guard.Argument(dto).NotNull();
 
         var command = mapper.Map<CreateExampleCommand>(dto);
-        await bus.Send(command);
+        await bus.Send(command, cancellationToken);
     }
 
-    public async Task HandleAsync(Guid id, UpdateExampleDto dto)
+    public async Task<bool> HandleAsync(Guid id, UpdateExampleDto dto, CancellationToken cancellationToken)
     {
         Guard.Argument(id).NotDefault();
         Guard.Argument(dto).NotNull();
 
+        var projection = await protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionByIdCacheKey(id));
+        if (projection == null)
+        {
+            return false;
+        }
+
         var command = mapper.Map<UpdateExampleCommand>(dto) with { Id = id };
-        await bus.Send(command);
+        await bus.Send(command, cancellationToken);
+
+        return true;
     }
 }

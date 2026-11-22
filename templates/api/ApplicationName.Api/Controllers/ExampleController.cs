@@ -26,31 +26,34 @@ public class ExampleController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateExampleDto dto)
+    public async Task<IActionResult> Post([FromBody] CreateExampleDto dto, CancellationToken cancellationToken)
     {
-        var result = await createExampleDtoValidator.ValidateAsync(dto);
+        var result = await createExampleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!result.IsValid)
         {
             result.AddToModelState(ModelState);
             return ValidationProblem(ModelState);
         }
 
-        await applicationService.HandleAsync(dto);
+        await applicationService.HandleAsync(dto, cancellationToken);
 
         return Accepted();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(Guid id, [FromBody] UpdateExampleDto dto)
+    public async Task<IActionResult> Put(Guid id, [FromBody] UpdateExampleDto dto, CancellationToken cancellationToken)
     {
-        var result = await updateExampleDtoValidator.ValidateAsync(dto);
+        var result = await updateExampleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!result.IsValid)
         {
             result.AddToModelState(ModelState);
             return ValidationProblem(ModelState);
         }
 
-        await applicationService.HandleAsync(id, dto);
+        if (!await applicationService.HandleAsync(id, dto, cancellationToken))
+        {
+            return NotFound();
+        }
 
         return Accepted();
     }

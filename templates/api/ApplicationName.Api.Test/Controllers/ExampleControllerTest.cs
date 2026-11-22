@@ -90,11 +90,13 @@ public class ExampleControllerTest
         A.CallTo(() => _createExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
             .ReturnsLazily(() => new ValidationResult());
 
+        using var cts = new CancellationTokenSource();
+
         // Act
-        var result = await _subjectUnderTest.Post(dto);
+        var result = await _subjectUnderTest.Post(dto, cts.Token);
 
         // Assert
-        A.CallTo(() => _applicationService.HandleAsync(dto)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _applicationService.HandleAsync(dto, cts.Token)).MustHaveHappenedOnceExactly();
 
         result.ShouldBeOfType<AcceptedResult>();
     }
@@ -109,10 +111,10 @@ public class ExampleControllerTest
             .ReturnsLazily(() => new ValidationResult([new ValidationFailure(nameof(CreateExampleDto.Name), "'Name' must not be empty.")]));
 
         // Act
-        var result = await _subjectUnderTest.Post(dto);
+        var result = await _subjectUnderTest.Post(dto, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _applicationService.HandleAsync(A<CreateExampleDto>._)).MustNotHaveHappened();
+        A.CallTo(() => _applicationService.HandleAsync(A<CreateExampleDto>._, A<CancellationToken>._)).MustNotHaveHappened();
 
         var problemDetails = result.ShouldBeOfType<BadRequestObjectResult>().Value.ShouldBeOfType<ValidationProblemDetails>();
         problemDetails.Errors.ShouldContainKey(nameof(CreateExampleDto.Name));
@@ -127,14 +129,34 @@ public class ExampleControllerTest
 
         A.CallTo(() => _updateExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
             .ReturnsLazily(() => new ValidationResult());
+        using var cts = new CancellationTokenSource();
+        A.CallTo(() => _applicationService.HandleAsync(id, dto, cts.Token)).Returns(true);
 
         // Act
-        var result = await _subjectUnderTest.Put(id, dto);
+        var result = await _subjectUnderTest.Put(id, dto, cts.Token);
 
         // Assert
-        A.CallTo(() => _applicationService.HandleAsync(id, dto)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _applicationService.HandleAsync(id, dto, cts.Token)).MustHaveHappenedOnceExactly();
 
         result.ShouldBeOfType<AcceptedResult>();
+    }
+
+    [Test]
+    public async Task Put_With_Unknown_Id()
+    {
+        // Arrange
+        var id = _fixture.Create<Guid>();
+        var dto = _fixture.Create<UpdateExampleDto>();
+
+        A.CallTo(() => _updateExampleDtoValidator.ValidateAsync(dto, A<CancellationToken>._))
+            .ReturnsLazily(() => new ValidationResult());
+        A.CallTo(() => _applicationService.HandleAsync(id, dto, A<CancellationToken>._)).Returns(false);
+
+        // Act
+        var result = await _subjectUnderTest.Put(id, dto, CancellationToken.None);
+
+        // Assert
+        result.ShouldBeOfType<NotFoundResult>();
     }
 
     [Test]
@@ -148,10 +170,10 @@ public class ExampleControllerTest
             .ReturnsLazily(() => new ValidationResult([new ValidationFailure(nameof(UpdateExampleDto.Description), "'Description' must not be empty.")]));
 
         // Act
-        var result = await _subjectUnderTest.Put(id, dto);
+        var result = await _subjectUnderTest.Put(id, dto, CancellationToken.None);
 
         // Assert
-        A.CallTo(() => _applicationService.HandleAsync(A<Guid>._, A<UpdateExampleDto>._)).MustNotHaveHappened();
+        A.CallTo(() => _applicationService.HandleAsync(A<Guid>._, A<UpdateExampleDto>._, A<CancellationToken>._)).MustNotHaveHappened();
 
         var problemDetails = result.ShouldBeOfType<BadRequestObjectResult>().Value.ShouldBeOfType<ValidationProblemDetails>();
         problemDetails.Errors.ShouldContainKey(nameof(UpdateExampleDto.Description));

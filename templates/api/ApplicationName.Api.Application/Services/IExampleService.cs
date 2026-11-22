@@ -8,7 +8,7 @@ public interface IExampleService
 
     Task<ExampleDetailsDto?> GetAsync(Guid id);
 
-    Task HandleAsync(CreateExampleDto dto);
+    Task HandleAsync(CreateExampleDto dto, CancellationToken cancellationToken);
 
-    Task HandleAsync(Guid id, UpdateExampleDto dto);
+    Task<bool> HandleAsync(Guid id, UpdateExampleDto dto, CancellationToken cancellationToken);
 }

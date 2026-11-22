@@ -3,9 +3,11 @@ using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
 using ApplicationName.Worker.Application.Services;
+using ApplicationName.Worker.Contracts;
 using ApplicationName.Worker.Contracts.Commands;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
+using Conveyo;
 using FakeItEasy;
 using NUnit.Framework;
 using Shouldly;
@@ -145,6 +147,42 @@ public class ExampleServiceTest
         var exception = await act.ShouldThrowAsync<ArgumentException>();
         exception.Message.ShouldMatch($".*{nameof(command.Id)}");
 
+        A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
+    }
+
+    [Test]
+    public async Task HandleAsync_UpdateExampleCommand_Without_Document()
+    {
+        // Arrange
+        var command = _fixture.Create<UpdateExampleCommand>();
+
+        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).Returns(default(ExampleDocument));
+
+        // Act
+        var act = () => _subjectUnderTest.HandleAsync(command);
+
+        // Assert
+        var exception = await act.ShouldThrowAsync<DocumentNotFoundException>();
+        exception.ShouldBeAssignableTo<MessageNotConsumedException>();
+        exception.Message.ShouldContain(command.Id.ToString());
+        A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
+    }
+
+    [Test]
+    public async Task HandleAsync_SetExampleRemoteCodeCommand_Without_Document()
+    {
+        // Arrange
+        var command = _fixture.Create<SetExampleRemoteCodeCommand>();
+
+        A.CallTo(() => _documentRepository.GetAsync(A<Expression<Func<ExampleDocument, bool>>>._)).Returns(default(ExampleDocument));
+
+        // Act
+        var act = () => _subjectUnderTest.HandleAsync(command);
+
+        // Assert
+        var exception = await act.ShouldThrowAsync<DocumentNotFoundException>();
+        exception.ShouldBeAssignableTo<MessageNotConsumedException>();
+        exception.Message.ShouldContain(command.Id.ToString());
         A.CallTo(() => _documentRepository.UpsertAsync(A<ExampleDocument>._)).MustNotHaveHappened();
     }
 

@@ -9,6 +9,7 @@
   <Import Project="..\..\shared\ApplicationName.Shared\ApplicationName.Shared.projitems" Label="Shared" />
 
   <ItemGroup>
+    <PackageReference Include="Conveyo" Version="0.1.0-preview.*" />
     <PackageReference Include="protobuf-net" Version="3.4.40" />
   </ItemGroup>
 

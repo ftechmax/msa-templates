@@ -10,6 +10,6 @@ public class ExternalEventHandler(IMapper mapper) : IConsumer<ExternalEvent>
     public Task Consume(ConsumeContext<ExternalEvent> context)
     {
         var command = mapper.Map<SetExampleRemoteCodeCommand>(context.Message);
-        return context.Send(command);
+        return context.Send(command, context.CancellationToken);
     }
 }

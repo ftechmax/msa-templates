@@ -218,11 +218,13 @@ public class ExampleServiceTest
                 capturedCommand = arg0;
             });
 
+        using var cts = new CancellationTokenSource();
+
         // Act
-        await _subjectUnderTest.HandleAsync(dto);
+        await _subjectUnderTest.HandleAsync(dto, cts.Token);
 
         // Assert
-        A.CallTo(() => _bus.Send(A<CreateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _bus.Send(A<CreateExampleCommand>._, cts.Token)).MustHaveHappenedOnceExactly();
 
         capturedCommand.ShouldNotBeNull();
         capturedCommand.Name.ShouldSatisfyAllConditions(
@@ -236,6 +238,9 @@ public class ExampleServiceTest
         // Arrange
         var id = _fixture.Create<Guid>();
         var dto = _fixture.Create<UpdateExampleDto>();
+        var projection = _fixture.Create<ExampleProjection>() with { Id = id };
+
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionByIdCacheKey(id))).Returns(projection);
 
         var capturedCommand = default(UpdateExampleCommand);
         A.CallTo(() => _bus.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).Invokes(
@@ -244,12 +249,15 @@ public class ExampleServiceTest
                 capturedCommand = arg0;
             });
 
+        using var cts = new CancellationTokenSource();
+
         // Act
-        await _subjectUnderTest.HandleAsync(id, dto);
+        var result = await _subjectUnderTest.HandleAsync(id, dto, cts.Token);
 
         // Assert
-        A.CallTo(() => _bus.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _bus.Send(A<UpdateExampleCommand>._, cts.Token)).MustHaveHappenedOnceExactly();
 
+        result.ShouldBeTrue();
         capturedCommand.ShouldNotBeNull();
         capturedCommand.CorrelationId.ShouldSatisfyAllConditions(
             i => i.ShouldNotBe(Guid.Empty),
@@ -264,5 +272,23 @@ public class ExampleServiceTest
             i => i.ShouldNotBeNull(),
             i => i.Code.ShouldBe(dto.ExampleValueObject.Code),
             i => i.Value.ShouldBe(dto.ExampleValueObject.Value));
+    }
+
+    [Test]
+    public async Task HandleAsync_UpdateExampleDto_Without_Projection()
+    {
+        // Arrange
+        var id = _fixture.Create<Guid>();
+        var dto = _fixture.Create<UpdateExampleDto>();
+
+        A.CallTo(() => _protoCacheRepository.GetAsync<ExampleProjection>(ApplicationConstants.ExampleProjectionByIdCacheKey(id))).Returns(default(ExampleProjection));
+
+        // Act
+        var result = await _subjectUnderTest.HandleAsync(id, dto, CancellationToken.None);
+
+        // Assert
+        A.CallTo(() => _bus.Send(A<UpdateExampleCommand>._, A<CancellationToken>._)).MustNotHaveHappened();
+
+        result.ShouldBeFalse();
     }
 }

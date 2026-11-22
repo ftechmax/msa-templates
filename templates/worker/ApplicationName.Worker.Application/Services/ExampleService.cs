@@ -1,6 +1,7 @@
 using ApplicationName.Shared.Commands;
 using ApplicationName.Worker.Application.Documents;
 using ApplicationName.Worker.Application.DomainEvents;
+using ApplicationName.Worker.Contracts;
 using ApplicationName.Worker.Contracts.Commands;
 using ArgDefender;
 
@@ -24,7 +25,8 @@ public class ExampleService(IDocumentRepository documentRepository) : IExampleSe
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Id).NotDefault();
 
-        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
+        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id)
+            ?? throw new DocumentNotFoundException(typeof(ExampleDocument), command.Id);
 
         var domainEvent = document.Handle(command);
 
@@ -38,7 +40,8 @@ public class ExampleService(IDocumentRepository documentRepository) : IExampleSe
         Guard.Argument(command).NotNull();
         Guard.Argument(command.Id).NotDefault();
 
-        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id);
+        var document = await documentRepository.GetAsync<ExampleDocument>(i => i.Id == command.Id)
+            ?? throw new DocumentNotFoundException(typeof(ExampleDocument), command.Id);
 
         var domainEvent = document.Handle(command);
 
