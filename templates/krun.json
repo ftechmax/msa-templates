@@ -1,34 +1,37 @@
-[
-  {
-    "name": "applicationname-worker",
-    "namespace": "{{NAMESPACE}}",
-    "path": "src/worker",
-    "dockerfile": "ApplicationName.Worker",
-    "context": "src/",
-    "intercept_port": 5001,
-    "service_dependencies": [
-      { "host": "applicationname-cache", "port": 6379, "namespace": "{{NAMESPACE}}" },
-      { "host": "applicationname-database", "port": 5432, "namespace": "{{NAMESPACE}}" },
-      { "host": "{{RABBITMQ_HOST}}", "port": 5672 }
-    ]
-  },
-  {
-    "name": "applicationname-api",
-    "namespace": "{{NAMESPACE}}",
-    "path": "src/api",
-    "dockerfile": "ApplicationName.Api",
-    "context": "src/",
-    "intercept_port": 5000,
-    "service_dependencies": [
-      { "host": "applicationname-cache", "port": 6379, "namespace": "{{NAMESPACE}}" },
-      { "host": "{{RABBITMQ_HOST}}", "port": 5672 }
-    ]
-  },
-  {
-    "name": "applicationname-web",
-    "namespace": "{{NAMESPACE}}",
-    "path": "src/web",
-    "dockerfile": ".",
-    "context": "src/web"
-  }
-]
+{
+  "overlays_dir": "k8s/overlays/",
+  "services": [
+    {
+      "name": "applicationname-worker",
+      "namespace": "{{NAMESPACE}}",
+      "path": "src/worker",
+      "dockerfile": "ApplicationName.Worker",
+      "context": "src/",
+      "intercept_port": 5001,
+      "service_dependencies": [
+        { "host": "applicationname-cache", "port": 6379, "namespace": "{{NAMESPACE}}" },
+        { "host": "applicationname-database", "port": 5432, "namespace": "{{NAMESPACE}}" },
+        { "host": "{{RABBITMQ_HOST}}", "port": 5672 }
+      ]
+    },
+    {
+      "name": "applicationname-api",
+      "namespace": "{{NAMESPACE}}",
+      "path": "src/api",
+      "dockerfile": "ApplicationName.Api",
+      "context": "src/",
+      "intercept_port": 5000,
+      "service_dependencies": [
+        { "host": "applicationname-cache", "port": 6379, "namespace": "{{NAMESPACE}}" },
+        { "host": "{{RABBITMQ_HOST}}", "port": 5672 }
+      ]
+    },
+    {
+      "name": "applicationname-web",
+      "namespace": "{{NAMESPACE}}",
+      "path": "src/web",
+      "dockerfile": ".",
+      "context": "src/web"
+    }
+  ]
+}

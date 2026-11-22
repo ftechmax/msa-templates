@@ -11,7 +11,9 @@ namespace ApplicationName.Api.Consumers;
 public class LocalEventHandler(IServerSentEventsService events, IProtoCacheRepository protoCacheRepository) :
     IConsumer<ExampleCreatedEvent>,
     IConsumer<ExampleUpdatedEvent>,
-    IConsumer<ExampleRemoteCodeSetEvent>
+    IConsumer<ExampleRemoteCodeSetEvent>,
+    IConsumer<Fault<CreateExampleCommand>>,
+    IConsumer<Fault<UpdateExampleCommand>>
 {
     public async Task Consume(ConsumeContext<ExampleCreatedEvent> context)
     {
@@ -47,12 +49,22 @@ public class LocalEventHandler(IServerSentEventsService events, IProtoCacheRepos
         });
     }
 
-    public async Task Consume(ConsumeContext<Fault<CreateExampleCommand>> context)
+    public Task Consume(ConsumeContext<Fault<CreateExampleCommand>> context)
     {
-        await events.PublishAsync($"{nameof(DomainFault)}_{nameof(CreateExampleCommand)}",
+        return PublishFaultAsync<CreateExampleCommand>(context.Message.Message.CorrelationId, context.Message);
+    }
+
+    public Task Consume(ConsumeContext<Fault<UpdateExampleCommand>> context)
+    {
+        return PublishFaultAsync<UpdateExampleCommand>(context.Message.Message.CorrelationId, context.Message);
+    }
+
+    private async Task PublishFaultAsync<TCommand>(Guid correlationId, Fault<TCommand> fault) where TCommand : class
+    {
+        await events.PublishAsync($"{nameof(DomainFault)}_{typeof(TCommand).Name}",
             new DomainFault(
-                context.Message.Message.CorrelationId,
-                context.Message.Exceptions[0].Message,
+                correlationId,
+                fault.Exceptions[0].Message,
                 Activity.Current?.TraceId.ToString() ?? string.Empty
             ));
     }

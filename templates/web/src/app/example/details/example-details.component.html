@@ -40,6 +40,15 @@
 
             <dt>Description</dt>
             <dd>{{ example.description }}</dd>
+
+            <dt>Code</dt>
+            <dd>{{ example.exampleValueObject.code }}</dd>
+
+            <dt>Value</dt>
+            <dd>{{ example.exampleValueObject.value }}</dd>
+
+            <dt>Remote code</dt>
+            <dd>{{ example.remoteCode ?? "Not set" }}</dd>
           </dl>
           } @else {
           <p>No example selected.</p>

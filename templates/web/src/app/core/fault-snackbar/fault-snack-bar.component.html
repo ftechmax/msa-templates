@@ -1,8 +1,9 @@
-<span class="example-pizza-party" matSnackBarLabel>
-  Something went terribly wrong.<br />
-  Provide the following code to the helpdesk: <br />
-  {{ data.traceId }}
-</span>
+<div class="fault" matSnackBarLabel>
+  <strong>Your change could not be saved.</strong>
+  <span>Try again. If the problem continues, contact support with this reference:</span>
+  <code>{{ data.traceId }}</code>
+</div>
 <span matSnackBarActions>
-  <button mat-button matSnackBarAction (click)="snackBarRef.dismissWithAction()">OK</button>
+  <button mat-button matSnackBarAction [cdkCopyToClipboard]="data.traceId">Copy reference</button>
+  <button mat-button matSnackBarAction (click)="snackBarRef.dismissWithAction()">Dismiss</button>
 </span>

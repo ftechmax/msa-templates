@@ -93,7 +93,7 @@ Kubernetes namespace [awesome-app]:
 RabbitMQ host [rabbitmq.rabbitmq-system.svc]:
 Istio Gateway namespace [istio-ingress]:
 Istio Gateway name [gateway]:
-Base domain [kube.local]:
+Base domain [kube.internal]:
 ```
 
 On PowerShell, the default destination folder is `C:/git` instead of `~/git`.

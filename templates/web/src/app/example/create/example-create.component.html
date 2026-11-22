@@ -1,63 +1,55 @@
 <ng-container *transloco="let t">
-  <h2 mat-dialog-title>Create Example</h2>
-
-  <p>example-create works!</p>
+  <h2>Create Example</h2>
 
   <form [formGroup]="form" class="form" (submit)="submit()">
     <mat-form-field class="form-field" appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />
-      @if (form.controls['name'].touched && form.controls['name'].invalid) {
-        <mat-error
-          >
-        </mat-error>
+      @if (form.controls.name.hasError('required')) {
+        <mat-error>Name is required.</mat-error>
       }
-      @if (form.controls['name'].errors?.['fluentValidationError']) {
-        <mat-error
-          >
-          <ul>
-            @for (item of form.controls['name'].errors!['fluentValidationError'];
-              track item) {
-              <i>{{ item }}</i>
-            }
-          </ul>
-        </mat-error>
+      @for (error of form.controls.name.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
       }
     </mat-form-field>
     <mat-form-field class="form-field" appearance="outline">
       <mat-label>Description</mat-label>
       <input matInput formControlName="description" />
-      @if (
-        form.controls['description'].touched &&
-        form.controls['description'].invalid
-        ) {
-        <mat-error
-          >
-        </mat-error>
+      @if (form.controls.description.hasError('required')) {
+        <mat-error>Description is required.</mat-error>
       }
-      @if (form.controls['description'].errors?.['fluentValidationError']) {
-        <mat-error
-          >
-          <ul>
-            @for (item of
-              form.controls['description'].errors!['fluentValidationError']; track
-              item) {
-              <i>{{ item }}</i>
-            }
-          </ul>
-        </mat-error>
+      @for (error of form.controls.description.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
       }
     </mat-form-field>
+    <ng-container formGroupName="exampleValueObject">
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Code</mat-label>
+      <input matInput formControlName="code" />
+      @if (form.controls.exampleValueObject.controls.code.hasError('required')) {
+        <mat-error>Code is required.</mat-error>
+      }
+      @for (error of form.controls.exampleValueObject.controls.code.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Value</mat-label>
+      <input matInput type="number" step="any" formControlName="value" />
+      @if (form.controls.exampleValueObject.controls.value.hasError('required')) {
+        <mat-error>Value is required.</mat-error>
+      }
+      @for (error of form.controls.exampleValueObject.controls.value.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+    </mat-form-field>
+    </ng-container>
 
-    <button mat-flat-button mat-dialog-close type="reset">Cancel</button>
-    <button
-      mat-flat-button
-      color="accent"
-      type="submit"
-      cdkFocusInitial
-      [disabled]="submitting()"
-      >
-      Create
-    </button>
+    <div class="form-actions">
+      <a mat-flat-button routerLink="/example">Cancel</a>
+      <button mat-flat-button color="accent" type="submit" [disabled]="submitting()">
+        Create
+      </button>
+    </div>
   </form>
 </ng-container>

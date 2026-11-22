@@ -36,7 +36,7 @@ The ingress sends `/` to the web app and rewrites `/api/` requests for the API.
 
 ## Server-Sent Events
 
-`SseService` opens a native `EventSource` connection to `/api/events`. It listens for named messages such as `ExampleCreatedEvent`, then passes events and faults to `EventService`.
+`SseService` opens a native `EventSource` connection to `/api/events`. It listens for the create, update, and remote code events and for create and update faults, then passes them to `EventService`.
 
 The root component opens one connection for the whole app. SSE only sends data from server to client, and the browser reconnects after a dropped connection without an extra client library.
 
@@ -82,9 +82,9 @@ The HTTP response confirms that the API accepted the command. The event or fault
 
 Several commands may be in flight at once. A correlation ID lets the browser match an incoming event or fault to the action that caused it.
 
-The example create form generates a `correlationId` and includes it in the command. The worker preserves that ID on the published event, and the API includes it in the SSE message. The create component reacts only when the returned ID matches its command.
+The example create and update forms generate a `correlationId` for each submit and include it in the command. The worker preserves that ID on the published event, and the API includes it in the SSE message. Each form reacts only when the returned ID matches its command.
 
-On success, the form navigates and the collection component reloads its data. On failure, the form shows a snackbar. Other components can react to the same event without knowing how SSE transports it.
+On success, the form navigates to the details page. On failure, it shows a snackbar with the trace ID and lets the user try again. The collection reloads on create and update events, and an open details page reloads on update and remote code events for its example, including changes made by someone else.
 
 ### Service boundaries
 

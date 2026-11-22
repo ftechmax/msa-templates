@@ -82,6 +82,7 @@ public static class Program
                 {
                     h.Username(configuration["rabbitmq:username"]!);
                     h.Password(configuration["rabbitmq:password"]!);
+                    h.MaxRetries(3);
                 });
 
                 cfg.ReceiveEndpoint(ServiceName, e =>

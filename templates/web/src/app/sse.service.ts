@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import { EventService } from './status.service';
-import { ExampleCreatedEvent } from './example/contracts';
-import { DomainFault } from './core/contracts';
 
 @Injectable({
   providedIn: 'root',
@@ -14,15 +13,11 @@ export class SseService {
   public connect = () => {
     this.eventSource = new EventSource('/api/events');
 
-    this.eventSource.addEventListener('ExampleCreatedEvent', (event) => {
-      const data: ExampleCreatedEvent = JSON.parse(event.data);
-      this.eventService.ExampleCreatedEvent.next(data);
-    });
-
-    this.eventSource.addEventListener('DomainFault_CreateExampleCommand', (event) => {
-      const data: DomainFault = JSON.parse(event.data);
-      this.eventService.CreateExampleFault.next(data);
-    });
+    this.forward('ExampleCreatedEvent', this.eventService.ExampleCreatedEvent);
+    this.forward('ExampleUpdatedEvent', this.eventService.ExampleUpdatedEvent);
+    this.forward('ExampleRemoteCodeSetEvent', this.eventService.ExampleRemoteCodeSetEvent);
+    this.forward('DomainFault_CreateExampleCommand', this.eventService.CreateExampleFault);
+    this.forward('DomainFault_UpdateExampleCommand', this.eventService.UpdateExampleFault);
 
     this.eventSource.onopen = () => console.log('SSE connection started');
 
@@ -39,4 +34,10 @@ export class SseService {
       this.eventSource = undefined;
     }
   };
+
+  private forward<T>(eventName: string, target: Subject<T>) {
+    this.eventSource?.addEventListener(eventName, (event) => {
+      target.next(JSON.parse((event as MessageEvent).data));
+    });
+  }
 }

@@ -2,11 +2,12 @@ import { Component, Input, OnDestroy, signal } from '@angular/core';
 import { ExampleHttpClient } from '../httpclient';
 import { RouterLink } from '@angular/router';
 import { ExampleDetailsDto } from '../contracts';
-import { Subscription, finalize } from 'rxjs';
+import { Subscription, filter, finalize, merge } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { EventService } from '../../status.service';
 
 @Component({
   selector: 'app-example-details',
@@ -23,6 +24,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class ExampleDetailsComponent implements OnDestroy {
   private details$: Subscription | undefined;
+  private events$: Subscription;
   private currentId = '';
 
   model = signal<ExampleDetailsDto | null>(null);
@@ -43,15 +45,26 @@ export class ExampleDetailsComponent implements OnDestroy {
     return this.currentId;
   }
 
-  constructor(private http: ExampleHttpClient) {}
+  constructor(
+    private http: ExampleHttpClient,
+    eventService: EventService
+  ) {
+    this.events$ = merge(
+      eventService.ExampleUpdatedEvent,
+      eventService.ExampleRemoteCodeSetEvent
+    )
+      .pipe(filter((event) => event.id === this.currentId))
+      .subscribe(() => this.loadDetails(this.currentId, false));
+  }
 
   ngOnDestroy(): void {
     this.details$?.unsubscribe();
+    this.events$.unsubscribe();
   }
 
-  private loadDetails(id: string) {
+  private loadDetails(id: string, showSpinner = true) {
     this.details$?.unsubscribe();
-    this.loading.set(true);
+    this.loading.set(showSpinner);
     this.error.set(false);
 
     this.details$ = this.http

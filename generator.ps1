@@ -80,7 +80,7 @@ $Namespace         = Prompt-Required  -PromptText "Kubernetes namespace" -Defaul
 $RabbitmqHost      = Prompt-Host      -PromptText "RabbitMQ host" -Default "rabbitmq.rabbitmq-system.svc"
 $GatewayNamespace  = Prompt-Required  -PromptText "Istio Gateway namespace" -Default "istio-ingress"
 $GatewayName       = Prompt-Required  -PromptText "Istio Gateway name" -Default "gateway"
-$Domain            = Prompt-Required  -PromptText "Base domain" -Default "kube.local"
+$Domain            = Prompt-Required  -PromptText "Base domain" -Default "kube.internal"
 
 # Extract namespace from RabbitMQ host (rabbitmq.rabbitmq-system.svc -> rabbitmq-system)
 $RabbitmqClusterNamespace = ($RabbitmqHost -split '\.')[1]

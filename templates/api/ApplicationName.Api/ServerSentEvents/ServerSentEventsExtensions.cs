@@ -4,7 +4,11 @@ public static class ServerSentEventsExtensions
 {
     public static IServiceCollection AddServerSentEvents(this IServiceCollection services)
     {
-        return services.AddSingleton<IServerSentEventsService, ServerSentEventsService>();
+        services.AddSingleton<ServerSentEventsService>();
+        services.AddSingleton<IServerSentEventsService>(i => i.GetRequiredService<ServerSentEventsService>());
+        services.AddHostedService(i => i.GetRequiredService<ServerSentEventsService>());
+
+        return services;
     }
 
     public static void MapServerSentEvents(this WebApplication app)

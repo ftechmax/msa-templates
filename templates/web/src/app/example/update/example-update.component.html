@@ -1,1 +1,56 @@
-<p>example-update works!</p>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+    <li class="breadcrumb-item"><a routerLink="/example">Examples</a></li>
+    <li class="breadcrumb-item"><a [routerLink]="['/example', id]">{{ name() || "Details" }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+  </ol>
+</nav>
+
+<h2>Edit {{ name() }}</h2>
+
+@if (loadFailed()) {
+  <p class="text-danger">Unable to load the example.</p>
+} @else {
+  <form [formGroup]="form" class="form" (submit)="submit()">
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description" />
+      @if (form.controls.description.hasError('required')) {
+        <mat-error>Description is required.</mat-error>
+      }
+      @for (error of form.controls.description.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+    </mat-form-field>
+    <ng-container formGroupName="exampleValueObject">
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Code</mat-label>
+      <input matInput formControlName="code" />
+      @if (form.controls.exampleValueObject.controls.code.hasError('required')) {
+        <mat-error>Code is required.</mat-error>
+      }
+      @for (error of form.controls.exampleValueObject.controls.code.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="form-field" appearance="outline">
+      <mat-label>Value</mat-label>
+      <input matInput type="number" step="any" formControlName="value" />
+      @if (form.controls.exampleValueObject.controls.value.hasError('required')) {
+        <mat-error>Value is required.</mat-error>
+      }
+      @for (error of form.controls.exampleValueObject.controls.value.errors?.['fluentValidationError']; track error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+    </mat-form-field>
+    </ng-container>
+
+    <div class="form-actions">
+      <a mat-flat-button [routerLink]="['/example', id]">Cancel</a>
+      <button mat-flat-button color="accent" type="submit" [disabled]="submitting()">
+        Save
+      </button>
+    </div>
+  </form>
+}

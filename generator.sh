@@ -80,7 +80,7 @@ prompt_required NAMESPACE           "Kubernetes namespace" "$KEBAB_CASE_SERVICE_
 prompt_host     RABBITMQ_HOST       "RabbitMQ host" "rabbitmq.rabbitmq-system.svc"
 prompt_required GATEWAY_NAMESPACE   "Istio Gateway namespace" "istio-ingress"
 prompt_required GATEWAY_NAME        "Istio Gateway name" "gateway"
-prompt_required DOMAIN              "Base domain" "kube.local"
+prompt_required DOMAIN              "Base domain" "kube.internal"
 
 # Extract namespace from RabbitMQ host (rabbitmq.rabbitmq-system.svc -> rabbitmq-system)
 RABBITMQ_CLUSTER_NAMESPACE=$(echo "$RABBITMQ_HOST" | cut -d'.' -f2)

@@ -4,12 +4,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import {
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { EventService } from '../../status.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -25,25 +24,25 @@ import { AddValidationErrors } from '../../validation-errors';
   selector: 'app-example-create',
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule,
     MatButtonModule,
-    TranslocoDirective
-],
+    TranslocoDirective,
+  ],
   providers: [ExampleHttpClient],
   templateUrl: './example-create.component.html',
   styleUrl: './example-create.component.scss',
 })
 export class ExampleCreateComponent implements OnInit, OnDestroy {
-  correlationId: string = uuidv4();
+  private correlationId: string | null = null;
+
   form = new FormGroup({
-    correlationId: new FormControl(this.correlationId),
     name: new FormControl('', Validators.required),
     description: new FormControl('', Validators.required),
     exampleValueObject: new FormGroup({
-      code: new FormControl('aaa'), //, Validators.required
-      value: new FormControl('123.45'), //, Validators.required
+      code: new FormControl('aaa', Validators.required),
+      value: new FormControl<number | null>(123.45, Validators.required),
     }),
   });
 
@@ -59,20 +58,20 @@ export class ExampleCreateComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.event$ = this.eventService.ExampleCreatedEvent.pipe().subscribe(
-      (data) => {
-        if (data.correlationId == this.correlationId) {
-          this.router.navigate(['/example/details', data.id]);
-        }
+    this.event$ = this.eventService.ExampleCreatedEvent.subscribe((data) => {
+      if (data.correlationId === this.correlationId) {
+        this.router.navigate(['/example', data.id]);
       }
-    );
+    });
 
-    this.fault$ = this.eventService.CreateExampleFault.pipe().subscribe(
-      (data) => {
+    this.fault$ = this.eventService.CreateExampleFault.subscribe((data) => {
+      if (data.correlationId === this.correlationId) {
         console.error(data);
+        this.correlationId = null;
+        this.submitting.set(false);
         this.openSnackBar(data);
       }
-    );
+    });
   }
 
   private openSnackBar(fault: DomainFault) {
@@ -88,15 +87,19 @@ export class ExampleCreateComponent implements OnInit, OnDestroy {
 
   submit() {
     if (!this.form.valid) {
+      this.form.markAllAsTouched();
       this.submitting.set(false);
       return;
     }
 
     this.submitting.set(true);
+    this.correlationId = uuidv4();
 
-    this.http.create(this.form.value).subscribe({
+    this.http.create({ ...this.form.value, correlationId: this.correlationId }).subscribe({
       error: (response) => {
         AddValidationErrors(response, this.form);
+        this.form.markAllAsTouched();
+        this.correlationId = null;
         this.submitting.set(false);
       },
     });

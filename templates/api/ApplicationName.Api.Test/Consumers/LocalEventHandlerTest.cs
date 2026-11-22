@@ -1,6 +1,8 @@
 using ApplicationName.Api.Application.Repositories;
 using ApplicationName.Api.Consumers;
 using ApplicationName.Api.Contracts;
+using ApplicationName.Api.ServerSentEvents;
+using ApplicationName.Shared.Commands;
 using ApplicationName.Shared.Events;
 using AutoFixture;
 using AutoFixture.AutoFakeItEasy;
@@ -18,6 +20,8 @@ namespace ApplicationName.Api.Test.Consumers
 
             private IProtoCacheRepository _protoCacheRepository;
 
+            private IServerSentEventsService _events;
+
             private LocalEventHandler _subjectUnderTest;
 
             [SetUp]
@@ -26,6 +30,7 @@ namespace ApplicationName.Api.Test.Consumers
                 _fixture = new Fixture().Customize(new AutoFakeItEasyCustomization());
 
                 _protoCacheRepository = _fixture.Freeze<IProtoCacheRepository>();
+                _events = _fixture.Freeze<IServerSentEventsService>();
 
                 _subjectUnderTest = _fixture.Create<LocalEventHandler>();
             }
@@ -78,6 +83,61 @@ namespace ApplicationName.Api.Test.Consumers
                 // Assert
                 A.CallTo(() => _protoCacheRepository.RemoveAsync(ApplicationConstants.ExampleDetailsCacheKey(@event.Id))).MustHaveHappenedOnceExactly();
             }
+
+            [Test]
+            public void Handler_DeclaresFaultConsumers()
+            {
+                Assert.That(_subjectUnderTest, Is.InstanceOf<IConsumer<Fault<CreateExampleCommand>>>());
+                Assert.That(_subjectUnderTest, Is.InstanceOf<IConsumer<Fault<UpdateExampleCommand>>>());
+            }
+
+            [Test]
+            public async Task Consume_CreateExampleFault_PublishesDomainFault()
+            {
+                // Arrange
+                var command = _fixture.Create<CreateExampleCommand>();
+                var context = _fixture.Create<ConsumeContext<Fault<CreateExampleCommand>>>();
+                A.CallTo(() => context.Message).Returns(CreateFault(command));
+
+                // Act
+                await _subjectUnderTest.Consume(context);
+
+                // Assert
+                A.CallTo(() => _events.PublishAsync(
+                        "DomainFault_CreateExampleCommand",
+                        A<object>.That.Matches(i => ((DomainFault)i).CorrelationId == command.CorrelationId),
+                        A<CancellationToken>._))
+                    .MustHaveHappenedOnceExactly();
+            }
+
+            [Test]
+            public async Task Consume_UpdateExampleFault_PublishesDomainFault()
+            {
+                // Arrange
+                var command = _fixture.Create<UpdateExampleCommand>();
+                var context = _fixture.Create<ConsumeContext<Fault<UpdateExampleCommand>>>();
+                A.CallTo(() => context.Message).Returns(CreateFault(command));
+
+                // Act
+                await _subjectUnderTest.Consume(context);
+
+                // Assert
+                A.CallTo(() => _events.PublishAsync(
+                        "DomainFault_UpdateExampleCommand",
+                        A<object>.That.Matches(i => ((DomainFault)i).CorrelationId == command.CorrelationId),
+                        A<CancellationToken>._))
+                    .MustHaveHappenedOnceExactly();
+            }
+
+            private Fault<T> CreateFault<T>(T command) where T : class => new()
+            {
+                FaultId = Guid.NewGuid(),
+                FaultedMessageId = Guid.NewGuid(),
+                Timestamp = DateTime.UtcNow,
+                Exceptions = [ExceptionInfo.From(new InvalidOperationException("failed"))],
+                Host = _fixture.Create<HostInfo>(),
+                Message = command,
+            };
         }
     }
 }

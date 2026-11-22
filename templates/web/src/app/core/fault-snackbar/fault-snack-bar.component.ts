@@ -1,3 +1,4 @@
+import { ClipboardModule } from '@angular/cdk/clipboard';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -12,6 +13,7 @@ import { DomainFault } from '../contracts';
 @Component({
     selector: 'app-fault-snackbar',
     imports: [
+        ClipboardModule,
         MatButtonModule,
         MatSnackBarLabel,
         MatSnackBarActions,

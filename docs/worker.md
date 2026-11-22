@@ -16,7 +16,7 @@ The worker owns the domain work:
 
 - Handlers must be idempotent because RabbitMQ can redeliver a message after a worker restart or acknowledgement timeout.
 - OpenTelemetry exports traces, metrics, and logs, so you can answer "what happened to message X?" from a single trace ID.
-- Transient failures go through Conveyo's retry pipeline with exponential backoff, and unrecoverable ones are published as a `Fault` and moved to a `{queue}_error` queue. The template ships defaults; you set the retry counts and backoff per consumer.
+- A failed message is retried three times, after 1, 2, and 4 seconds. When the retries run out, Conveyo publishes a `Fault` and moves the message to a `{queue}_error` queue. `MaxRetries` in `Program.cs` sets the count for the whole bus; the delays are fixed. While a message waits for a retry, other deliveries on that bus wait too, unless you raise `ConsumerDispatchConcurrency`, which gives up delivery ordering.
 - Background jobs belong here too. The template shows a hosted service for cache invalidation.
 - Kestrel listens on port 8080 only to answer probes. `/healthz` is the liveness probe and runs no dependency checks, so a database or bus outage never restarts the pod. `/readyz` is the readiness probe and runs every check tagged `ready`: `database-initialization` and a `database` connection test.
 - `DatabaseInitializerService` creates the schema in the background, retrying for two minutes while PostgreSQL is unavailable, so a database that is still starting costs a wait rather than a pod restart.

@@ -63,7 +63,7 @@ The generated manifests assume path-based routing through Istio's Gateway API:
 - `/` goes to the web app
 - `/api/` goes to the API and is rewritten to `/`
 
-Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>`. With the default prompts, that becomes `awesome-app.kube.local`.
+Each `HTTPRoute` attaches to the shared `Gateway` you provided in the generator prompts, and is bound to a single literal hostname of the form `<service>.<domain>`. With the default prompts, that becomes `awesome-app.kube.internal`.
 
 Your ingress and DNS must expose hosts such as `awesome-app.your-domain.tld`. If they don't, edit the generated `HTTPRoute` resources or add a Kustomize patch for your environment.
 
@@ -88,8 +88,6 @@ The policies select pods by label: the gateway by `gateway.networking.k8s.io/gat
 
 DNS stays allowed for the API, worker, and Pgweb, so a dependency could still leak data through DNS queries. Blocking that needs a DNS-level filter, not a network policy.
 
-The policies assume the namespace is not enrolled in an Istio ambient mesh. In ambient mode, traffic between meshed pods arrives on port `15008` and kubelet probes come from `169.254.7.127`, and both need extra rules.
-
 ## Overlay usage
 
 ### Local
@@ -106,7 +104,7 @@ It changes five parts of the base:
 
 If you use a different local registry, edit the image names before applying the overlay.
 
-Pgweb uses the local database secret for both PostgreSQL access and HTTP basic auth. With the default generator prompts, it is available at `http://applicationname-pgweb.kube.local`.
+Pgweb uses the local database secret for both PostgreSQL access and HTTP basic auth. With the default generator prompts, it is available at `https://applicationname-pgweb.kube.internal`.
 
 ### Development and production
 

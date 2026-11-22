@@ -2,6 +2,13 @@
   display: flex;
 }
 
-.example-pizza-party {
-  color: hotpink;
+.fault {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fault code {
+  color: inherit;
+  overflow-wrap: anywhere;
 }

@@ -79,7 +79,8 @@ export class ExampleCollectionComponent implements AfterViewInit, OnDestroy {
     this.data$ = merge(
       this.sort.sortChange,
       this.paginator.page,
-      this.eventService.ExampleCreatedEvent
+      this.eventService.ExampleCreatedEvent,
+      this.eventService.ExampleUpdatedEvent
     )
       .pipe(
         startWith([]),

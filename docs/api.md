@@ -74,9 +74,11 @@ For commands, the application service:
 
 `LocalEventHandler.cs` subscribes to events such as `ExampleCreatedEvent` and `ExampleUpdatedEvent`. It removes stale cache entries and broadcasts the event through `IServerSentEventsService`. Browsers connect to `/events`, exposed as `/api/events` through ingress, with the native `EventSource` API.
 
+API replicas compete for messages on one queue, while each browser is connected to a single replica. `ServerSentEventsService` therefore publishes every event to a Valkey pub/sub channel, and each replica forwards it to its own clients. Pub/sub does not store messages, so a browser that is disconnected at that moment misses the event.
+
 #### Fault notifications
 
-The handler consumes `Fault<TCommand>` and sends a `DomainFault` containing the correlation ID and trace ID. Clients use those IDs to match a UI failure with its command, logs, and trace.
+The handler consumes `Fault<CreateExampleCommand>` and `Fault<UpdateExampleCommand>` and sends a `DomainFault` containing the correlation ID and trace ID. Declare `IConsumer<Fault<TCommand>>` for each command the browser needs a result for. Clients use those IDs to match a UI failure with its command, logs, and trace.
 
 The original HTTP request has already completed when the worker reports this kind of failure.
 

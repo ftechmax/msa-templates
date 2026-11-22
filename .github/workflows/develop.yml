@@ -39,7 +39,7 @@ jobs:
             rabbitmq.rabbitmq-system.svc \
             istio-ingress \
             gateway \
-            kube.local \
+            kube.internal \
             | ./generator.sh
 
       - name: Placeholder check
@@ -115,7 +115,7 @@ jobs:
             'rabbitmq.rabbitmq-system.svc',
             'istio-ingress',
             'gateway',
-            'kube.local'
+            'kube.internal'
           ) -join "`r`n" | Set-Content -Path inputs.txt -Encoding ascii
           cmd /c 'pwsh -NoProfile -NonInteractive -File .\generator.ps1 < inputs.txt'
 

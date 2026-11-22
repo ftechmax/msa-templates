@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { ExampleCreatedEvent, ExampleUpdatedEvent } from './example/contracts';
+import {
+  ExampleCreatedEvent,
+  ExampleRemoteCodeSetEvent,
+  ExampleUpdatedEvent,
+} from './example/contracts';
 import { DomainFault } from './core/contracts';
 
 @Injectable({
@@ -12,5 +16,8 @@ export class EventService {
     new Subject<ExampleCreatedEvent>();
   ExampleUpdatedEvent: Subject<ExampleUpdatedEvent> =
     new Subject<ExampleUpdatedEvent>();
+  ExampleRemoteCodeSetEvent: Subject<ExampleRemoteCodeSetEvent> =
+    new Subject<ExampleRemoteCodeSetEvent>();
   CreateExampleFault: Subject<DomainFault> = new Subject<DomainFault>();
+  UpdateExampleFault: Subject<DomainFault> = new Subject<DomainFault>();
 }
